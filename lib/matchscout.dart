@@ -1,4 +1,4 @@
-// get latest match scouting form -> cache -> ensure app version matches -> process into a form -> send to server
+// get latest match scouting form -> cache -> ensure app version matches -> process into a form -> user fills form out -> send to server w/ season year, event id, match #
 import 'package:flutter/material.dart';
 
 class MatchScout extends StatelessWidget {
@@ -6,24 +6,37 @@ class MatchScout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return Scaffold(
+        body: Column(
+      children: const [
+        Question(question: "What is your name?", answerType: AnswerType.string)
+      ],
+    ));
   }
 }
 
-class Question extends StatelessWidget {
+class Question extends StatefulWidget {
   final String question;
   final AnswerType answerType;
 
-  const Question({
-    required super.key,
-    required this.question,
-    required this.answerType,
-  });
+  const Question({Key? key, required this.question, required this.answerType})
+      : super(key: key);
+
+  @override
+  _QuestionState createState() => _QuestionState();
+}
+
+class _QuestionState extends State<Question> {
+  String answer = "";
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(),
+    return Container(
+      child: Column(
+        children: [
+          Text(widget.question),
+        ],
+      ),
     );
   }
 }
