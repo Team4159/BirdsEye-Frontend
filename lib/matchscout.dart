@@ -1,5 +1,4 @@
 // get latest match scouting form -> cache -> ensure app version matches -> process into a form -> user fills form out -> send to server w/ season year, event id, match #
-
 import 'package:flutter/material.dart';
 
 class MatchScout extends StatelessWidget {
@@ -40,7 +39,9 @@ class _QuestionState extends State<Question> {
           keyboardType: widget.answerType,
         ),
         const RadioChoiceFormField(choices: <String>["foo", "bar"]),
-        const CheckboxChoiceFormField(choices: <String>["bat", "bazz"])
+        const CheckboxChoiceFormField(choices: <String>["bat", "bazz"]),
+        const CounterFormField(),
+        const SliderFormField(min: 0, max: 10, divisions: 10),
       ],
     );
   }
@@ -137,6 +138,103 @@ class _CheckboxListTileWrapperState extends State<CheckboxListTileWrapper> {
           isChecked = value;
         });
       },
+    );
+  }
+}
+
+class CounterFormField extends StatefulWidget {
+  final int startingNumber;
+
+  const CounterFormField({Key? key, this.startingNumber = 0}) : super(key: key);
+
+  @override
+  State<CounterFormField> createState() => _CounterFormFieldState();
+}
+
+class _CounterFormFieldState extends State<CounterFormField> {
+  late int num;
+
+  @override
+  void initState() {
+    super.initState();
+    num = widget.startingNumber;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: AlignmentDirectional.center,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.remove),
+          onPressed: () {
+            if (num <= 0) {
+              return;
+            }
+
+            setState(() {
+              num--;
+            });
+          },
+        ),
+        TextButton(
+          child: Text(num.toString()),
+          onPressed: () {
+            setState(() {
+              num++;
+            });
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class SliderFormField extends StatefulWidget {
+  final int min;
+  final int max;
+  final int divisions;
+
+  const SliderFormField(
+      {Key? key, required this.min, required this.max, required this.divisions})
+      : super(key: key);
+
+  @override
+  State<SliderFormField> createState() => _SliderFormFieldState();
+}
+
+class _SliderFormFieldState extends State<SliderFormField> {
+  late double currentValue;
+
+  @override
+  void initState() {
+    super.initState();
+    currentValue = widget.min.toDouble();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text(widget.min.toString()),
+        Slider(
+          value: currentValue,
+          min: widget.min.toDouble(),
+          max: widget.max.toDouble(),
+          label: currentValue.toString(),
+          divisions: widget.divisions,
+          onChanged: (double? value) {
+            if (value == null) {
+              return;
+            }
+
+            setState(() {
+              currentValue = value;
+            });
+          },
+        ),
+        Text(widget.max.toString()),
+      ],
     );
   }
 }
