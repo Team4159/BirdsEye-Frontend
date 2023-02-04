@@ -13,10 +13,7 @@ class BirdsEye extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: "Bird's Eye",
-      home: MainScreen(),
-    );
+    return const MaterialApp(title: "Bird's Eye", home: MainScreen());
   }
 }
 

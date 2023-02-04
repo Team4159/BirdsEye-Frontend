@@ -1,29 +1,28 @@
-import 'dart:convert';
-
+import 'package:birdseye/web.dart';
 import 'package:flutter/material.dart';
-
 import 'main.dart';
 import 'matchscout.dart';
 
-enum PitScoutQuestionTypes {
-  text
-}
+enum PitScoutQuestionTypes { text }
 
-Future<List<FormField?>> getPitScoutQuestions() async {
-  // await http.get(Uri.parse("https://api.lol.xd/pitscout"))).body
-  return jsonDecode('''{
-    "How Robot?": "text",
-    "Literally Trolled": "text",
-    "Break": "lmao"
-  }''', reviver: (k, v) {
-    if (k is String && v is String && PitScoutQuestionTypes.values.any((t) => t.name == v)) {
-      switch (PitScoutQuestionTypes.values.byName(v)) {
-        case PitScoutQuestionTypes.text:
-          return TextFormField(decoration: InputDecoration(labelText: k, border: const OutlineInputBorder()));
-      }
+Future<ListView> getQuestions() async {
+  List<FormField> items = (await stock.get(WebDataTypes.pit))
+      .entries
+      .where((e) => PitScoutQuestionTypes.values.any((t) => t.name == e.value))
+      .map((e) {
+    switch (PitScoutQuestionTypes.values.byName(e.value)) {
+      case PitScoutQuestionTypes.text:
+        return TextFormField(
+            keyboardType: TextInputType.multiline,
+            maxLines: null,
+            decoration: InputDecoration(
+                labelText: e.key, border: const OutlineInputBorder()));
     }
-    return null;
-  });
+  }).toList();
+  return ListView.builder(
+      itemCount: items.length,
+      itemBuilder: (context, index) =>
+          Padding(padding: const EdgeInsets.only(top: 7), child: items[index]));
 }
 
 class PitScout extends StatelessWidget {
@@ -43,14 +42,18 @@ class PitScout extends StatelessWidget {
               title: const Text("Match Scouting"),
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const MatchScout()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const MatchScout()));
               },
             ),
             ListTile(
               title: const Text("Pit Scouting"),
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const PitScout()));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const PitScout()));
               },
             ),
             const AboutListTile(
@@ -59,6 +62,17 @@ class PitScout extends StatelessWidget {
             )
           ],
         )),
-        body: Container(padding: const EdgeInsets.all(20), child: Form(autovalidateMode: AutovalidateMode.onUserInteraction, child: FutureBuilder(initialData: const <FormField>[], future: getPitScoutQuestions(), builder: (context, snapshot) => ListView.builder(itemCount: snapshot.data?.length ?? 0, itemBuilder: (context, index) => snapshot.data?[index] ?? Container(color: Colors.red))))));
+        body: Container(
+            padding: const EdgeInsets.all(20),
+            child: Form(
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                child: FutureBuilder(
+                    future: getQuestions(),
+                    builder: (context, snapshot) =>
+                        snapshot.data ??
+                        Container(
+                            color: Colors.red[800],
+                            child: Center(
+                                child: Text(snapshot.error.toString())))))));
   }
 }
