@@ -23,61 +23,65 @@ class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text("Bird's Eye"),
-        ),
-        drawer: Drawer(
-            child: ListView(
-          children: [
-            ListTile(
-              title: const Text("Match Scouting"),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const MatchScout()));
-              },
+      appBar: AppBar(
+        title: const Text("Bird's Eye"),
+      ),
+      drawer: Drawer(
+          child: ListView(
+        children: [
+          ListTile(
+            title: const Text("Match Scouting"),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const MatchScout()));
+            },
+          ),
+          ListTile(
+            title: const Text("Pit Scouting"),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const PitScout()));
+            },
+          ),
+          const AboutListTile(
+            icon: Icon(Icons.info_outline_rounded),
+            applicationVersion: version,
+          )
+        ],
+      )),
+      body: Container(
+          constraints: const BoxConstraints(maxWidth: 400),
+          alignment: Alignment.topCenter,
+          margin: const EdgeInsets.all(20),
+          child: ListView(children: [
+            FutureBuilder(
+              initialData: -1,
+              future: currentSeason(),
+              builder: (context, snapshot) => Text(
+                "Current Season: ${snapshot.hasData ? snapshot.data.toString() : DateTime.now().year}",
+                style: const TextStyle(fontSize: 24, fontFamily: "Verdana"),
+              ), // TODO: Add current game name
             ),
-            ListTile(
-              title: const Text("Pit Scouting"),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const PitScout()));
+            TextFormField(
+              maxLength: 4,
+              decoration: const InputDecoration(
+                  border: UnderlineInputBorder(), labelText: "Team Number"),
+              onFieldSubmitted: (String teamStr) {
+                teamNumber = int.tryParse(teamStr) ?? 4159;
               },
-            ),
-            const AboutListTile(
-              icon: Icon(Icons.info_outline_rounded),
-              applicationVersion: version,
-            )
-          ],
-        )),
-        body: Container(
-            constraints: const BoxConstraints(maxWidth: 400),
-            alignment: Alignment.topCenter,
-            margin: const EdgeInsets.all(20),
-            child: ListView(children: [
-              FutureBuilder(
-                initialData: -1,
-                future: currentSeason(),
-                builder: (context, snapshot) => Text(
-                  "Current Season: ${snapshot.hasData ? snapshot.data.toString() : DateTime.now().year}",
-                  style: const TextStyle(fontSize: 24, fontFamily: "Verdana"),
-                ), // TODO: Add current game name
-              ),
-              TextFormField(
-                maxLength: 4,
-                decoration: const InputDecoration(
-                    border: UnderlineInputBorder(), labelText: "Team Number"),
-                onFieldSubmitted: (String teamStr) {
-                  teamNumber = int.tryParse(teamStr) ?? 4159;
-                },
-                validator: (String? teamStr) => // TODO: This doesn't work
-                    ((teamStr != null) && num.tryParse(teamStr) == null)
-                        ? "Team Number must be numeric!"
-                        : null,
-              ) // TODO: Event selector
-            ])));
+              validator: (String? teamStr) => // TODO: This doesn't work
+                  ((teamStr != null) && num.tryParse(teamStr) == null)
+                      ? "Team Number must be numeric!"
+                      : null,
+            ) // TODO: Event selector
+          ])),
+      floatingActionButton: IconButton(
+        icon: const Icon(Icons.refresh_rounded),
+        tooltip: "Refresh Cache",
+        onPressed: cacheSoT.deleteAll,
+      ),
+    );
   }
 }

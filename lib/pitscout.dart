@@ -71,8 +71,17 @@ class PitScout extends StatelessWidget {
                     builder: (context, snapshot) =>
                         snapshot.data ??
                         Container(
-                            color: Colors.red[800],
+                            decoration: BoxDecoration(
+                                color: Colors.red[800],
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(10)),
+                                border: Border.all(
+                                    width: 5, color: Colors.redAccent)),
                             child: Center(
-                                child: Text(snapshot.error.toString())))))));
+                                child: Text(
+                              snapshot.error.toString(),
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 40),
+                            )))))));
   }
 }

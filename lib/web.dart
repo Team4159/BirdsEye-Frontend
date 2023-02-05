@@ -5,6 +5,8 @@ import 'package:stock/stock.dart';
 
 enum WebDataTypes { pit }
 
+CachedSourceOfTruth<WebDataTypes, Map<String, dynamic>> cacheSoT =
+    CachedSourceOfTruth();
 final stock = Stock<WebDataTypes, Map<String, dynamic>>(
   fetcher: Fetcher.ofFuture<WebDataTypes, Map<String, dynamic>>((i) async {
     switch (i) {
@@ -13,7 +15,7 @@ final stock = Stock<WebDataTypes, Map<String, dynamic>>(
             (await http.get(Uri.parse("https://api.lol.xd/pitscout"))).body);
     }
   }),
-  sourceOfTruth: CachedSourceOfTruth(),
+  sourceOfTruth: cacheSoT,
 );
 
 // TODO: send back to server
