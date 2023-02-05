@@ -3,16 +3,36 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:stock/stock.dart';
 
-enum WebDataTypes { pit }
+enum WebDataTypes { pitScout, matchScout }
 
 CachedSourceOfTruth<WebDataTypes, Map<String, dynamic>> cacheSoT =
     CachedSourceOfTruth();
 final stock = Stock<WebDataTypes, Map<String, dynamic>>(
   fetcher: Fetcher.ofFuture<WebDataTypes, Map<String, dynamic>>((i) async {
     switch (i) {
-      case WebDataTypes.pit:
-        return json.decode(
-            (await http.get(Uri.parse("https://api.lol.xd/pitscout"))).body);
+      case WebDataTypes.pitScout:
+        return json.decode('''{
+          "How Robot?": "text",
+          "Ohno": "notText"
+        }'''); // (await http.get(Uri.parse("https://api.lol.xd/pitscout"))).body
+      case WebDataTypes.matchScout:
+        return json.decode('''{
+          "coneAttempted": "counter",
+          "coneLow": "counter",
+          "coneMid": "counter",
+          "coneHig": "counter"
+        }'''); /*, TODO: Nesting for match scout
+          "auto": {
+            "mobility":"toggle"
+          },
+          "endgame": {
+            "docked": "toggle",
+            "engaged":"toggle"
+          },
+          "driver": {
+            "rating": "slider",
+            "fouls": "counter"
+          }*/
     }
   }),
   sourceOfTruth: cacheSoT,
@@ -21,7 +41,7 @@ final stock = Stock<WebDataTypes, Map<String, dynamic>>(
 // TODO: send back to server
 
 Future<num> currentSeason() async {
-  var resp =
+  http.Response resp =
       await http.get(Uri.parse("https://frc-api.firstinspires.org/v3.0/"));
   return jsonDecode(resp.body).currentSeason;
 }

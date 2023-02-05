@@ -6,7 +6,13 @@ import 'web.dart';
 
 void main() => runApp(const BirdsEye());
 const version = "0.0.1";
+String userid = "6658";
+// TODO: These all need to be settable
 num teamNumber = 4159;
+num season = 2023;
+String event = "casf2023";
+String name = "Max";
+//
 
 class BirdsEye extends StatelessWidget {
   const BirdsEye({super.key});
@@ -63,19 +69,7 @@ class MainScreen extends StatelessWidget {
                 "Current Season: ${snapshot.hasData ? snapshot.data.toString() : DateTime.now().year}",
                 style: const TextStyle(fontSize: 24, fontFamily: "Verdana"),
               ), // TODO: Add current game name
-            ),
-            TextFormField(
-              maxLength: 4,
-              decoration: const InputDecoration(
-                  border: UnderlineInputBorder(), labelText: "Team Number"),
-              onFieldSubmitted: (String teamStr) {
-                teamNumber = int.tryParse(teamStr) ?? 4159;
-              },
-              validator: (String? teamStr) => // TODO: This doesn't work
-                  ((teamStr != null) && num.tryParse(teamStr) == null)
-                      ? "Team Number must be numeric!"
-                      : null,
-            ) // TODO: Event selector
+            )
           ])),
       floatingActionButton: IconButton(
         icon: const Icon(Icons.refresh_rounded),
