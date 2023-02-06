@@ -1,5 +1,6 @@
 // get latest match scouting form -> cache -> ensure app version matches -> process into a form -> user fills form out -> send to server w/ season year, event id, match #
 import 'package:birdseye/widgets/counter.dart';
+import 'package:birdseye/widgets/toggle.dart';
 import 'package:flutter/material.dart';
 
 import 'main.dart';
@@ -7,40 +8,69 @@ import 'pitscout.dart';
 import 'web.dart';
 import 'widgets/errorcontainer.dart';
 
-enum MatchScoutQuestionTypes { text, counter, toggle, slider }
+enum MatchScoutQuestionTypes {
+  text,
+  counter,
+  toggle, /*slider*/
+}
 
 Future<ListView> getQuestions(GlobalKey<FormState> k) async {
-  List<Widget /*FormField*/ > items = (await stock.get(WebDataTypes.matchScout))
-      .entries
-      .where(
-          (e) => MatchScoutQuestionTypes.values.any((t) => t.name == e.value))
-      .map((e) {
-    switch (MatchScoutQuestionTypes.values.byName(e.value)) {
-      case MatchScoutQuestionTypes.text:
-        return TextFormField(
-          keyboardType: TextInputType.multiline,
-          maxLines: null,
-          decoration: InputDecoration(
-              labelText: e.key, border: const OutlineInputBorder()),
-          onSaved: (String? content) {
-            print(content);
-          },
-        );
-      case MatchScoutQuestionTypes.counter:
-        return CounterFormField(
-            initialValue: 0,
-            decoration: InputDecoration(labelText: e.key),
-            onSaved: (int? content) {
-              print(content);
-            });
-      default:
-        throw UnimplementedError();
-    }
+  List<Widget> items =
+      (await stock.get(WebDataTypes.matchScout)).entries.map((e1) {
+    Iterable<MapEntry<String, dynamic>> a = e1.value.entries.where(
+        (e) => MatchScoutQuestionTypes.values.any((t) => t.name == e.value));
+
+    return ListBody(children: [
+      Align(
+        alignment: Alignment.topCenter,
+        child: Text(
+          e1.key,
+          style: const TextStyle(
+            fontFamily: "varela round",
+            fontSize: 36,
+            letterSpacing: 5,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+      ),
+      GridView.count(
+          crossAxisCount: 2,
+          mainAxisSpacing: 10,
+          crossAxisSpacing: 10,
+          shrinkWrap: true,
+          children: a.map((e2) {
+            switch (MatchScoutQuestionTypes.values.byName(e2.value)) {
+              case MatchScoutQuestionTypes.text:
+                return TextFormField(
+                  keyboardType: TextInputType.multiline,
+                  maxLines: null,
+                  decoration: InputDecoration(
+                      labelText: e2.key, border: const OutlineInputBorder()),
+                  onSaved: (String? content) {
+                    print(content);
+                  },
+                );
+              case MatchScoutQuestionTypes.counter:
+                return CounterFormField(
+                    initialValue: 0,
+                    labelText: e2.key,
+                    onSaved: (int? content) {
+                      print(content);
+                    });
+              case MatchScoutQuestionTypes.toggle:
+                return ToggleFormField(
+                    labelText: e2.key,
+                    onSaved: (bool? content) {
+                      print(content);
+                    });
+            }
+          }).toList())
+    ]);
   }).toList();
   return ListView.builder(
       itemCount: items.length + 1,
       itemBuilder: (context, index) => Padding(
-          padding: const EdgeInsets.only(top: 7),
+          padding: const EdgeInsets.symmetric(vertical: 12),
           child: index < items.length
               ? items[index]
               : ElevatedButton(

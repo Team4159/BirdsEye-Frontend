@@ -7,31 +7,45 @@ class CounterFormField extends FormField<int> {
       super.validator,
       super.initialValue = 0,
       super.autovalidateMode = AutovalidateMode.disabled,
-      InputDecoration decoration = const InputDecoration()})
-      : super(builder: (FormFieldState<int> state) {
-          return InputDecorator(
-              // TODO: This needs to be customized
-              decoration: decoration,
-              child: Stack(
-                alignment: AlignmentDirectional.center,
-                fit: StackFit.passthrough,
-                children: [
-                  ElevatedButton(
-                    child: Text(state.value.toString()),
-                    onPressed: () {
-                      state.didChange(state.value! + 1);
-                    },
-                  ),
-                  Align(
-                      alignment: Alignment.bottomRight,
-                      child: IconButton(
-                        icon: const Icon(Icons.remove),
-                        onPressed: () {
-                          if (state.value! <= 0) return;
-                          state.didChange(state.value! - 1);
-                        },
+      String labelText = ""})
+      : super(
+            builder: (FormFieldState<int> state) => Stack(
+                  alignment: AlignmentDirectional.center,
+                  fit: StackFit.passthrough,
+                  children: [
+                    ElevatedButton(
+                      child: Center(
+                          child: Text(
+                        state.value.toString(),
+                        style: const TextStyle(fontSize: 24),
                       )),
-                ],
-              ));
-        });
+                      onPressed: () {
+                        state.didChange(state.value! + 1);
+                      },
+                    ),
+                    Align(
+                        alignment: Alignment.bottomRight,
+                        child: IconButton(
+                          icon: const Icon(Icons.remove),
+                          iconSize: 32,
+                          color: Colors.white60,
+                          onPressed: () {
+                            if (state.value! <= 0) return;
+                            state.didChange(state.value! - 1);
+                          },
+                        )),
+                    Align(
+                        alignment: Alignment.topCenter,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 25),
+                          child: Text(
+                            labelText,
+                            style: const TextStyle(
+                                fontFamily: "verdana",
+                                fontSize: 30,
+                                fontWeight: FontWeight.w500),
+                          ),
+                        )),
+                  ],
+                ));
 }

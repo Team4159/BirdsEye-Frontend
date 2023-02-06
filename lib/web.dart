@@ -17,18 +17,24 @@ final stock = Stock<WebDataTypes, Map<String, dynamic>>(
         }'''); // (await http.get(Uri.parse("https://api.lol.xd/pitscout"))).body
       case WebDataTypes.matchScout:
         return json.decode('''{
-          "coneAttempted": "counter",
-          "coneLow": "counter",
-          "coneMid": "counter",
-          "coneHig": "counter"
-        }'''); /*, TODO: Nesting for match scout
           "auto": {
+            "coneAttempted": "counter",
+            "coneLow": "counter",
+            "coneMid": "counter",
+            "coneHig": "counter",
             "mobility":"toggle"
+          },
+          "teleop": {
+            "coneAttempted": "counter",
+            "coneLow": "counter",
+            "coneMid": "counter",
+            "coneHig": "counter"
           },
           "endgame": {
             "docked": "toggle",
             "engaged":"toggle"
-          },
+          }
+        }'''); /*
           "driver": {
             "rating": "slider",
             "fouls": "counter"
