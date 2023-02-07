@@ -19,7 +19,13 @@ class BirdsEye extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(title: "Bird's Eye", home: MainScreen());
+    return MaterialApp(
+      title: "Bird's Eye",
+      home: const MainScreen(),
+      theme: ThemeData(
+          brightness:
+              Brightness.dark), // TODO: We need to use themes to customize
+    );
   }
 }
 
@@ -33,6 +39,7 @@ class MainScreen extends StatelessWidget {
         title: const Text("Bird's Eye"),
       ),
       drawer: Drawer(
+          // TODO: Nested Navigation https://docs.flutter.dev/cookbook/effects/nested-nav
           child: ListView(
         children: [
           ListTile(
@@ -79,3 +86,5 @@ class MainScreen extends StatelessWidget {
     );
   }
 }
+
+const double buttonBaseline = 30;

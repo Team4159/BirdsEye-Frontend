@@ -27,7 +27,7 @@ Future<ListView> getQuestions(GlobalKey<FormState> k) async {
   return ListView.builder(
       itemCount: items.length + 1,
       itemBuilder: (context, index) => Padding(
-          padding: const EdgeInsets.only(top: 7),
+          padding: const EdgeInsets.only(top: 12),
           child: index < items.length
               ? items[index]
               : ElevatedButton(
@@ -57,7 +57,6 @@ class PitScoutState extends State<PitScout> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      // TODO: Nested Navigation https://docs.flutter.dev/cookbook/effects/nested-nav
       appBar: AppBar(
         title: const Text("Pit Scouting"),
       ),

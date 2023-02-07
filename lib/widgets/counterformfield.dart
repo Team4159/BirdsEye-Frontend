@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../main.dart';
+
 class CounterFormField extends FormField<int> {
   CounterFormField(
       {super.key,
@@ -28,7 +30,7 @@ class CounterFormField extends FormField<int> {
                         child: IconButton(
                           icon: const Icon(Icons.remove),
                           iconSize: 32,
-                          color: Colors.white60,
+                          color: Colors.white70,
                           onPressed: () {
                             if (state.value! <= 0) return;
                             state.didChange(state.value! - 1);
@@ -36,10 +38,12 @@ class CounterFormField extends FormField<int> {
                         )),
                     Align(
                         alignment: Alignment.topCenter,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 25),
+                        child: Baseline(
+                          baseline: buttonBaseline,
+                          baselineType: TextBaseline.alphabetic,
                           child: Text(
                             labelText,
+                            textAlign: TextAlign.center,
                             style: const TextStyle(
                                 fontFamily: "verdana",
                                 fontSize: 30,

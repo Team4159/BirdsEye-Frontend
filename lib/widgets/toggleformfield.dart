@@ -17,12 +17,11 @@ class ToggleFormField extends FormField<bool> {
                   state.didChange(!state.value!);
                 },
                 child: Center(
-                    child: Text(
-                  labelText,
-                  style: TextStyle(
-                      fontFamily: "verdana",
-                      fontSize: 30,
-                      fontWeight: FontWeight.w500,
-                      color: state.value! ? Colors.white : Colors.black),
-                ))));
+                    child: Text(labelText,
+                        style: TextStyle(
+                            fontFamily: "verdana",
+                            fontSize: 30,
+                            fontWeight: FontWeight.w500,
+                            color:
+                                state.value! ? Colors.white : Colors.black)))));
 }

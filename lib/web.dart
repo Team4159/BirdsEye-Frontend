@@ -33,12 +33,12 @@ final stock = Stock<WebDataTypes, Map<String, dynamic>>(
           "endgame": {
             "docked": "toggle",
             "engaged":"toggle"
-          }
-        }'''); /*
+          },
           "driver": {
             "rating": "slider",
             "fouls": "counter"
-          }*/
+          }
+        }''');
     }
   }),
   sourceOfTruth: cacheSoT,
