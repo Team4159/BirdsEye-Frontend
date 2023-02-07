@@ -64,20 +64,35 @@ class MainScreen extends StatelessWidget {
           )
         ],
       )),
-      body: Container(
-          constraints: const BoxConstraints(maxWidth: 400),
-          alignment: Alignment.topCenter,
-          margin: const EdgeInsets.all(20),
-          child: ListView(children: [
-            FutureBuilder(
-              initialData: -1,
-              future: currentSeason(),
-              builder: (context, snapshot) => Text(
-                "Current Season: ${snapshot.hasData ? snapshot.data.toString() : DateTime.now().year}",
-                style: const TextStyle(fontSize: 24, fontFamily: "Verdana"),
-              ), // TODO: Add current game name
-            )
-          ])),
+      body: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Current Season",
+                        textAlign: TextAlign.left,
+                      )),
+                  TextField(
+                    maxLength: 4,
+                    textAlign: TextAlign.right,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                        border: InputBorder.none, counterText: ''),
+                    controller: TextEditingController(
+                        text: DateTime.now().year.toString()),
+                    onSubmitted: (value) {
+                      season = int.parse(value);
+                    },
+                  )
+                ],
+              )
+            ],
+          )),
       floatingActionButton: IconButton(
         icon: const Icon(Icons.refresh_rounded),
         tooltip: "Refresh Cache",

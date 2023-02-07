@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:http/http.dart' as http;
+// import 'package:http/http.dart' as http;
 import 'package:stock/stock.dart';
 
 enum WebDataTypes { pitScout, matchScout }
@@ -43,11 +43,3 @@ final stock = Stock<WebDataTypes, Map<String, dynamic>>(
   }),
   sourceOfTruth: cacheSoT,
 );
-
-// TODO: send back to server
-
-Future<num> currentSeason() async {
-  http.Response resp =
-      await http.get(Uri.parse("https://frc-api.firstinspires.org/v3.0/"));
-  return jsonDecode(resp.body).currentSeason;
-}
