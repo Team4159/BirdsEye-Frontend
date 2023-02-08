@@ -32,10 +32,8 @@ class SliderFormField extends FormField<double> {
                             child: Text(
                               labelText,
                               textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                  fontFamily: "verdana",
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.w500),
+                              style:
+                                  Theme.of(state.context).textTheme.bodyMedium,
                             ),
                           )),
                     ]));

@@ -1,7 +1,7 @@
+import 'package:birdseye/main.dart';
 import 'package:birdseye/web.dart';
 import 'package:flutter/material.dart';
-import 'main.dart';
-import 'matchscout.dart';
+
 import 'widgets/errorcontainer.dart';
 
 enum PitScoutQuestionTypes { text }
@@ -16,8 +16,7 @@ Future<ListView> getQuestions(GlobalKey<FormState> k) async {
         return TextFormField(
           keyboardType: TextInputType.multiline,
           maxLines: null,
-          decoration: InputDecoration(
-              labelText: e.key, border: const OutlineInputBorder()),
+          decoration: InputDecoration(labelText: e.key),
           onSaved: (String? content) {
             print(content);
           },
@@ -27,20 +26,15 @@ Future<ListView> getQuestions(GlobalKey<FormState> k) async {
   return ListView.builder(
       itemCount: items.length + 1,
       itemBuilder: (context, index) => Padding(
-          padding: const EdgeInsets.only(top: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
           child: index < items.length
               ? items[index]
               : ElevatedButton(
                   onPressed: () {
                     k.currentState!.save();
                     k.currentState!.reset();
-                    ScaffoldMessenger.of(k.currentContext!)
-                        .showSnackBar(const SnackBar(
-                      content: Text("Response Sent!"),
-                      behavior: SnackBarBehavior.floating,
-                      closeIconColor: Colors.white70,
-                      showCloseIcon: true,
-                    ));
+                    ScaffoldMessenger.of(k.currentContext!).showSnackBar(
+                        const SnackBar(content: Text("Response Sent!")));
                   },
                   child: const Text("Submit"))));
 }
@@ -60,33 +54,9 @@ class PitScoutState extends State<PitScout> {
       appBar: AppBar(
         title: const Text("Pit Scouting"),
       ),
-      drawer: Drawer(
-          child: ListView(
-        children: [
-          ListTile(
-            title: const Text("Match Scouting"),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const MatchScout()));
-            },
-          ),
-          ListTile(
-            title: const Text("Pit Scouting"),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const PitScout()));
-            },
-          ),
-          const AboutListTile(
-            icon: Icon(Icons.info_outline_rounded),
-            applicationVersion: version,
-          )
-        ],
-      )),
+      drawer: getDrawer(context),
       body: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(vertical: 20),
           child: Form(
               key: formKey,
               autovalidateMode: AutovalidateMode.onUserInteraction,

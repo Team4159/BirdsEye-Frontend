@@ -1,11 +1,10 @@
 // get latest match scouting form -> cache -> ensure app version matches -> process into a form -> user fills form out -> send to server w/ season year, event id, match #
+import 'package:birdseye/main.dart';
 import 'package:birdseye/widgets/counterformfield.dart';
 import 'package:birdseye/widgets/sliderformfield.dart';
 import 'package:birdseye/widgets/toggleformfield.dart';
 import 'package:flutter/material.dart';
 
-import 'main.dart';
-import 'pitscout.dart';
 import 'web.dart';
 import 'widgets/errorcontainer.dart';
 
@@ -18,16 +17,12 @@ Future<ListView> getQuestions(GlobalKey<FormState> k) async {
         (e) => MatchScoutQuestionTypes.values.any((t) => t.name == e.value));
 
     return Column(children: [
-      Align(
+      Container(
         alignment: Alignment.topCenter,
+        margin: const EdgeInsets.only(bottom: 10),
         child: Text(
           e1.key,
-          style: const TextStyle(
-            fontFamily: "varela round",
-            fontSize: 36,
-            letterSpacing: 5,
-            fontWeight: FontWeight.w900,
-          ),
+          style: Theme.of(k.currentContext!).textTheme.displayLarge,
         ),
       ),
       GridView.count(
@@ -43,8 +38,7 @@ Future<ListView> getQuestions(GlobalKey<FormState> k) async {
                 return TextFormField(
                   keyboardType: TextInputType.multiline,
                   maxLines: null,
-                  decoration: InputDecoration(
-                      labelText: e2.key, border: const OutlineInputBorder()),
+                  decoration: InputDecoration(labelText: e2.key),
                   onSaved: (String? content) {
                     print(content);
                   },
@@ -83,13 +77,8 @@ Future<ListView> getQuestions(GlobalKey<FormState> k) async {
                   onPressed: () {
                     k.currentState!.save();
                     k.currentState!.reset();
-                    ScaffoldMessenger.of(k.currentContext!)
-                        .showSnackBar(const SnackBar(
-                      content: Text("Response Sent!"),
-                      behavior: SnackBarBehavior.floating,
-                      closeIconColor: Colors.white70,
-                      showCloseIcon: true,
-                    ));
+                    ScaffoldMessenger.of(k.currentContext!).showSnackBar(
+                        const SnackBar(content: Text("Response Sent!")));
                   },
                   child: const Text("Submit"))));
 }
@@ -109,31 +98,7 @@ class MatchScoutState extends State<MatchScout> {
       appBar: AppBar(
         title: const Text("Match Scouting"),
       ),
-      drawer: Drawer(
-          child: ListView(
-        children: [
-          ListTile(
-            title: const Text("Match Scouting"),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const MatchScout()));
-            },
-          ),
-          ListTile(
-            title: const Text("Pit Scouting"),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const PitScout()));
-            },
-          ),
-          const AboutListTile(
-            icon: Icon(Icons.info_outline_rounded),
-            applicationVersion: version,
-          )
-        ],
-      )),
+      drawer: getDrawer(context),
       body: Padding(
           padding: const EdgeInsets.symmetric(vertical: 20),
           child: Form(

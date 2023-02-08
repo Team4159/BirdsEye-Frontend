@@ -19,7 +19,7 @@ class CounterFormField extends FormField<int> {
                       child: Center(
                           child: Text(
                         state.value.toString(),
-                        style: const TextStyle(fontSize: 24),
+                        style: const TextStyle(fontSize: 28),
                       )),
                       onPressed: () {
                         state.didChange(state.value! + 1);
@@ -44,10 +44,7 @@ class CounterFormField extends FormField<int> {
                           child: Text(
                             labelText,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
-                                fontFamily: "verdana",
-                                fontSize: 30,
-                                fontWeight: FontWeight.w500),
+                            style: Theme.of(state.context).textTheme.bodyMedium,
                           ),
                         )),
                   ],

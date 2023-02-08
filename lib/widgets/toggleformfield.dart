@@ -10,18 +10,19 @@ class ToggleFormField extends FormField<bool> {
       String labelText = ""})
       : super(
             builder: (FormFieldState<bool> state) => ElevatedButton(
-                style: ButtonStyle(
-                    backgroundColor: MaterialStateColor.resolveWith((states) =>
-                        state.value! ? Colors.blue : Colors.orange)),
                 onPressed: () {
                   state.didChange(!state.value!);
                 },
+                style: ButtonStyle(
+                    backgroundColor: MaterialStateColor.resolveWith((states) =>
+                        Color(state.value! ? 0xff1C7C7C : 0xffCF772E))),
                 child: Center(
                     child: Text(labelText,
-                        style: TextStyle(
-                            fontFamily: "verdana",
-                            fontSize: 30,
-                            fontWeight: FontWeight.w500,
-                            color:
-                                state.value! ? Colors.white : Colors.black)))));
+                        style: Theme.of(state.context)
+                            .textTheme
+                            .bodyMedium!
+                            .copyWith(
+                                color: state.value!
+                                    ? Colors.white
+                                    : Colors.black)))));
 }

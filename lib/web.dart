@@ -13,8 +13,9 @@ final stock = Stock<WebDataTypes, Map<String, dynamic>>(
       case WebDataTypes.pitScout:
         return json.decode('''{
           "How Robot?": "text",
+          "AFL": "text",
           "Ohno": "notText"
-        }'''); // (await http.get(Uri.parse("https://api.lol.xd/pitscout"))).body
+        }''');
       case WebDataTypes.matchScout:
         return json.decode('''{
           "auto": {
