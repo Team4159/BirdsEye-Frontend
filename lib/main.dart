@@ -1,3 +1,4 @@
+import 'package:birdseye/widgets/errorcontainer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -43,6 +44,12 @@ void main() async {
               letterSpacing: 5,
               fontWeight: FontWeight.w900,
             ),
+            displaySmall: TextStyle(
+                // Settings Option List
+                fontFamily: "OpenSans",
+                fontSize: 16,
+                fontWeight: FontWeight.w200,
+                color: Colors.green[700]),
             labelMedium: const TextStyle(
               // Drawer Items
               fontFamily: "Verdana",
@@ -72,8 +79,6 @@ void main() async {
 }
 
 SharedPreferences? prefs;
-String event = "casf"; // TODO: Create Event Selector
-num season = DateTime.now().year;
 String serverIP = "10.66.70.169:5000";
 
 getDrawer(context) => Drawer(
@@ -128,8 +133,16 @@ class MainScreen extends StatelessWidget {
       );
 }
 
-class Settings extends StatelessWidget {
+class Settings extends StatefulWidget {
   const Settings({super.key});
+
+  @override
+  State<StatefulWidget> createState() => SettingsState();
+}
+
+class SettingsState extends State<Settings> {
+  static num season = DateTime.now().year;
+  static String event = "casf";
 
   @override
   Widget build(BuildContext context) => Padding(
@@ -221,31 +234,6 @@ class Settings extends StatelessWidget {
             Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  "Current Event",
-                  style: Theme.of(context).textTheme.labelSmall,
-                  textAlign: TextAlign.left,
-                )),
-            TextField(
-              cursorColor: Colors.green[900],
-              style: Theme.of(context).textTheme.bodySmall,
-              maxLength: 12,
-              textAlign: TextAlign.right,
-              keyboardType: TextInputType.text,
-              decoration: const InputDecoration(
-                  border: InputBorder.none, counterText: ''),
-              controller: TextEditingController(text: event),
-              onSubmitted: (value) {
-                event = value;
-              },
-            )
-          ],
-        ),
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
                   "Server IP",
                   style: Theme.of(context).textTheme.labelSmall,
                   textAlign: TextAlign.left,
@@ -265,6 +253,86 @@ class Settings extends StatelessWidget {
             )
           ],
         ),
+        Stack(alignment: Alignment.topCenter, children: [
+          Container(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Current Event",
+                style: Theme.of(context).textTheme.labelSmall,
+                textAlign: TextAlign.left,
+              )),
+          Align(
+              alignment: Alignment.centerRight,
+              child: FractionallySizedBox(
+                  widthFactor: 0.4,
+                  child: FutureBuilder(
+                      future: stock.get(WebDataTypes.currentEvents),
+                      builder: (context, snapshot) {
+                        final e = snapshot.data?.entries.toList();
+                        if (e == null) {
+                          return ErrorContainer(snapshot.error.toString());
+                        }
+                        int i = e.indexWhere((element) => element.key == event);
+                        MapEntry<String, dynamic>? se =
+                            i >= 0 ? e.removeAt(i) : null;
+                        return Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: (se != null
+                                    ? <ListTile>[
+                                        ListTile(
+                                          title: Text(
+                                            se.value,
+                                            textAlign: TextAlign.right,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .displaySmall!
+                                                .copyWith(
+                                                    fontWeight:
+                                                        FontWeight.w700),
+                                          ),
+                                          trailing: ConstrainedBox(
+                                              constraints: const BoxConstraints(
+                                                  minWidth: 60, maxWidth: 60),
+                                              child: Text(se.key,
+                                                  textAlign: TextAlign.right,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall!
+                                                      .copyWith(
+                                                          fontWeight: FontWeight
+                                                              .w900))),
+                                        )
+                                      ]
+                                    : <ListTile>[])
+                                .followedBy(e.map((e) => ListTile(
+                                      title: Text(
+                                        e.value,
+                                        textAlign: TextAlign.right,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .displaySmall,
+                                      ),
+                                      trailing: ConstrainedBox(
+                                          constraints: const BoxConstraints(
+                                              minWidth: 60, maxWidth: 60),
+                                          child: Text(e.key,
+                                              textAlign: TextAlign.right,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodySmall!
+                                                  .copyWith(
+                                                      fontWeight:
+                                                          FontWeight.w600))),
+                                      onTap: () {
+                                        setState(() {
+                                          SettingsState.event = e.key;
+                                        });
+                                      },
+                                    )))
+                                .toList());
+                      })))
+        ])
       ]));
 }
 

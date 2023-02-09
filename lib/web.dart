@@ -3,7 +3,7 @@ import 'dart:convert';
 // import 'package:http/http.dart' as http;
 import 'package:stock/stock.dart';
 
-enum WebDataTypes { pitScout, matchScout }
+enum WebDataTypes { pitScout, matchScout, currentEvents }
 
 CachedSourceOfTruth<WebDataTypes, Map<String, dynamic>> cacheSoT =
     CachedSourceOfTruth();
@@ -39,6 +39,12 @@ final stock = Stock<WebDataTypes, Map<String, dynamic>>(
             "rating": "slider",
             "fouls": "counter"
           }
+        }''');
+      case WebDataTypes.currentEvents:
+        return json.decode('''{
+          "casf": "San Francisco Regional",
+          "casv": "Silicon Valley Regional",
+          "pppp": "Peepee peepee"
         }''');
     }
   }),
