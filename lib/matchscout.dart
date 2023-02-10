@@ -106,7 +106,10 @@ class MatchScoutState extends State<MatchScout> {
               autovalidateMode: AutovalidateMode.onUserInteraction,
               child: FutureBuilder(
                   future: getQuestions(formKey),
-                  builder: (context, snapshot) =>
-                      snapshot.data ??
-                      ErrorContainer(snapshot.error.toString())))));
+                  builder: (context, snapshot) => snapshot.hasData
+                      ? snapshot.data!
+                      : snapshot.hasError
+                          ? ErrorContainer(snapshot.error.toString())
+                          : const Center(
+                              child: CircularProgressIndicator())))));
 }

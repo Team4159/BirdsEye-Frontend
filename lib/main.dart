@@ -121,6 +121,7 @@ class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
+          centerTitle: false,
           title: const Text("Bird's Eye"),
         ),
         drawer: getDrawer(context),
@@ -335,5 +336,3 @@ class SettingsState extends State<Settings> {
         ])
       ]));
 }
-
-const double buttonBaseline = 36;
