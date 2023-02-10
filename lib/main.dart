@@ -91,7 +91,8 @@ getDrawer(context) => Drawer(
             style: Theme.of(context).textTheme.labelMedium,
           ),
           onTap: () {
-            Navigator.of(context).popAndPushNamed("/");
+            Navigator.of(context)
+                .pushReplacement(_createRoute(const MainScreen()));
           },
         ),
         ListTile(
@@ -100,7 +101,8 @@ getDrawer(context) => Drawer(
             style: Theme.of(context).textTheme.labelMedium,
           ),
           onTap: () {
-            Navigator.of(context).popAndPushNamed("/matchscout");
+            Navigator.of(context)
+                .pushReplacement(_createRoute(const MatchScout()));
           },
         ),
         ListTile(
@@ -109,7 +111,8 @@ getDrawer(context) => Drawer(
             style: Theme.of(context).textTheme.labelMedium,
           ),
           onTap: () {
-            Navigator.of(context).popAndPushNamed("/pitscout");
+            Navigator.of(context)
+                .pushReplacement(_createRoute(const PitScout()));
           },
         ),
       ],
@@ -334,6 +337,21 @@ class SettingsState extends State<Settings> {
                       })))
         ])
       ]));
+}
+
+Route _createRoute(Widget widget) {
+  return PageRouteBuilder(
+      pageBuilder: ((context, animation, secondaryAnimation) => widget),
+      transitionsBuilder: ((context, animation, secondaryAnimation, child) {
+        // Edit transition here
+        var tween = Tween(begin: const Offset(1, 0), end: Offset.zero)
+            .chain(CurveTween(curve: Curves.easeOut));
+
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      }));
 }
 
 const double buttonBaseline = 36;
