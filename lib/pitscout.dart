@@ -6,39 +6,6 @@ import 'widgets/errorcontainer.dart';
 
 enum PitScoutQuestionTypes { text }
 
-Future<ListView> getQuestions(GlobalKey<FormState> k) async {
-  List<FormField> items = (await stock.get(WebDataTypes.pitScout))
-      .entries
-      .where((e) => PitScoutQuestionTypes.values.any((t) => t.name == e.value))
-      .map((e) {
-    switch (PitScoutQuestionTypes.values.byName(e.value)) {
-      case PitScoutQuestionTypes.text:
-        return TextFormField(
-          keyboardType: TextInputType.multiline,
-          maxLines: null,
-          decoration: InputDecoration(labelText: e.key),
-          onSaved: (String? content) {
-            print(content);
-          },
-        );
-    }
-  }).toList();
-  return ListView.builder(
-      itemCount: items.length + 1,
-      itemBuilder: (context, index) => Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
-          child: index < items.length
-              ? items[index]
-              : ElevatedButton(
-                  onPressed: () {
-                    k.currentState!.save();
-                    k.currentState!.reset();
-                    ScaffoldMessenger.of(k.currentContext!).showSnackBar(
-                        const SnackBar(content: Text("Response Sent!")));
-                  },
-                  child: const Text("Submit"))));
-}
-
 class PitScout extends StatefulWidget {
   const PitScout({super.key});
 
@@ -48,6 +15,8 @@ class PitScout extends StatefulWidget {
 
 class PitScoutState extends State<PitScout> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final Map<String, String> fields = {};
+  bool _loading = false;
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -61,7 +30,74 @@ class PitScoutState extends State<PitScout> {
               key: formKey,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               child: FutureBuilder(
-                  future: getQuestions(formKey),
+                  future: () async {
+                    Iterable<Widget> items =
+                        (await stock.get(WebDataTypes.pitScout))
+                            .entries
+                            .where((e) => PitScoutQuestionTypes.values
+                                .any((t) => t.name == e.value))
+                            .map((e) {
+                      switch (PitScoutQuestionTypes.values.byName(e.value)) {
+                        case PitScoutQuestionTypes.text:
+                          return TextFormField(
+                            keyboardType: TextInputType.multiline,
+                            maxLines: null,
+                            decoration: InputDecoration(labelText: e.key),
+                            onSaved: (String? content) {
+                              fields[e.key] = content ?? "";
+                            },
+                          );
+                      }
+                    });
+                    return ListView(
+                        children: items
+                            .followedBy([
+                              ElevatedButton(
+                                  onPressed: () {
+                                    if (_loading) return;
+                                    fields.clear();
+                                    formKey.currentState!.save();
+                                    formKey.currentState!.reset();
+                                    var m = ScaffoldMessenger.of(context);
+                                    m.showSnackBar(SnackBar(
+                                        duration: const Duration(minutes: 5),
+                                        behavior: SnackBarBehavior.fixed,
+                                        elevation: 0,
+                                        content: Row(children: const [
+                                          CircularProgressIndicator(),
+                                          Padding(
+                                              padding:
+                                                  EdgeInsets.only(left: 15),
+                                              child: Text("Loading"))
+                                        ])));
+                                    setState(() {
+                                      _loading = true;
+                                    }); 
+                                    postResponse(WebDataTypes.pitScout, fields)
+                                        .then((response) {
+                                      m.hideCurrentSnackBar();
+                                      setState(() {
+                                        _loading = false;
+                                      });
+                                      m.showSnackBar(const SnackBar(
+                                          content: Text("Response Sent!")));
+                                    }).catchError((e) {
+                                      m.hideCurrentSnackBar();
+                                      setState(() {
+                                        _loading = false;
+                                      });
+                                      m.showSnackBar(SnackBar(
+                                          content: Text(e.toString())));
+                                    });
+                                  },
+                                  child: _loading ? const Text("Waiting..") : const Text("Submit"))
+                            ])
+                            .map((e) => Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 15, vertical: 6),
+                                child: e))
+                            .toList());
+                  }(),
                   builder: (context, snapshot) => snapshot.hasData
                       ? snapshot.data!
                       : snapshot.hasError

@@ -17,16 +17,28 @@ final stock = Stock<WebDataTypes, Map<String, dynamic>>(
                 Uri.http(serverIP, "/api/${SettingsState.season}/pitschema/")))
             .body);
       case WebDataTypes.matchScout:
-        return json.decode((await http.get(Uri.http(
-                serverIP, "/api/${SettingsState.season}/matchschema/")))
-            .body);
+        return {"autonomous": {
+          "coneAttempted": "counter",
+          "mobility": "toggle"
+        }, "driver": {
+          "comments": "text"
+        }};
       case WebDataTypes.currentEvents:
-        return json.decode('''{
-          "casf": "San Francisco Regional",
-          "casv": "Silicon Valley Regional",
-          "pppp": "Peepee peepee"
-        }''');
+        return json.decode((await http
+                .get(Uri.http(serverIP, "/api/bluealliance/getCurrentEvents/")))
+            .body);
     }
   }),
   sourceOfTruth: cacheSoT,
 );
+
+Future<http.Response> postResponse(WebDataTypes dataType, Map<String, dynamic> body) {
+  switch (dataType) {
+    case WebDataTypes.pitScout:
+      return http.post(Uri.http(serverIP, "/api/${SettingsState.season}/pit"), body: json.encode(body));
+    case WebDataTypes.matchScout:
+      return http.post(Uri.http(serverIP, "/api/${SettingsState.season}/match"), body: json.encode(body));
+    default:
+      return Future.error(Exception("Unsupported Post-Response WebDataType $dataType"));
+  }
+}
