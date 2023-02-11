@@ -59,20 +59,18 @@ class PitScoutState extends State<PitScout> {
                                     formKey.currentState!.save();
                                     formKey.currentState!.reset();
                                     var m = ScaffoldMessenger.of(context);
-                                    m.showSnackBar(SnackBar(
-                                        duration: const Duration(minutes: 5),
+                                    m.showSnackBar(const SnackBar(
+                                        duration: Duration(minutes: 5),
                                         behavior: SnackBarBehavior.fixed,
                                         elevation: 0,
-                                        content: Row(children: const [
-                                          CircularProgressIndicator(),
-                                          Padding(
-                                              padding:
-                                                  EdgeInsets.only(left: 15),
-                                              child: Text("Loading"))
-                                        ])));
+                                        padding: EdgeInsets.zero,
+                                        backgroundColor: Colors.transparent,
+                                        content: LinearProgressIndicator(
+                                          backgroundColor: Colors.transparent,
+                                        )));
                                     setState(() {
                                       _loading = true;
-                                    }); 
+                                    });
                                     postResponse(WebDataTypes.pitScout, fields)
                                         .then((response) {
                                       m.hideCurrentSnackBar();
@@ -90,7 +88,9 @@ class PitScoutState extends State<PitScout> {
                                           content: Text(e.toString())));
                                     });
                                   },
-                                  child: _loading ? const Text("Waiting..") : const Text("Submit"))
+                                  child: _loading
+                                      ? const Text("Waiting..")
+                                      : const Text("Submit"))
                             ])
                             .map((e) => Padding(
                                 padding: const EdgeInsets.symmetric(

@@ -113,17 +113,15 @@ class MatchScoutState extends State<MatchScout> {
                                     formKey.currentState!.save();
                                     formKey.currentState!.reset();
                                     var m = ScaffoldMessenger.of(context);
-                                    m.showSnackBar(SnackBar(
-                                        duration: const Duration(minutes: 5),
+                                    m.showSnackBar(const SnackBar(
+                                        duration: Duration(minutes: 5),
                                         behavior: SnackBarBehavior.fixed,
                                         elevation: 0,
-                                        content: Row(children: const [
-                                          CircularProgressIndicator(),
-                                          Padding(
-                                              padding:
-                                                  EdgeInsets.only(left: 15),
-                                              child: Text("Loading"))
-                                        ])));
+                                        padding: EdgeInsets.zero,
+                                        backgroundColor: Colors.transparent,
+                                        content: LinearProgressIndicator(
+                                          backgroundColor: Colors.transparent,
+                                        )));
                                     setState(() {
                                       _loading = true;
                                     });

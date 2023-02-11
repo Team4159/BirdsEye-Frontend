@@ -28,11 +28,15 @@ void main() async {
         inputDecorationTheme:
             const InputDecorationTheme(border: OutlineInputBorder()),
         snackBarTheme: const SnackBarThemeData(
-            behavior: SnackBarBehavior.floating, closeIconColor: Colors.black, elevation: 3, contentTextStyle: TextStyle(
-                fontFamily: "OpenSans",
-                fontSize: 18,
-                fontWeight: FontWeight.normal,
-                color: Colors.black),),
+          behavior: SnackBarBehavior.floating,
+          closeIconColor: Colors.black,
+          elevation: 3,
+          contentTextStyle: TextStyle(
+              fontFamily: "OpenSans",
+              fontSize: 18,
+              fontWeight: FontWeight.normal,
+              color: Colors.black),
+        ),
         appBarTheme: const AppBarTheme(
             titleTextStyle: TextStyle(
                 // AppBar Title
@@ -40,7 +44,8 @@ void main() async {
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
                 fontSize: 28)),
-        progressIndicatorTheme: const ProgressIndicatorThemeData(color: Color(0xffcf2e2e), refreshBackgroundColor: Colors.black45),
+        progressIndicatorTheme: const ProgressIndicatorThemeData(
+            color: Color(0xffcf2e2e), refreshBackgroundColor: Colors.black45),
         textTheme: TextTheme(
             displayLarge: const TextStyle(
               // Match Scout Section Titles
