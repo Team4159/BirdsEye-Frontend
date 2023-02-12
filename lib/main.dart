@@ -89,7 +89,7 @@ void main() async {
 }
 
 SharedPreferences? prefs;
-String serverIP = "10.66.70.169:5000";
+String serverIP = "localhost:5000";
 
 getDrawer(context) => Drawer(
         // TODO: Nested Navigation https://stackoverflow.com/questions/66755344/flutter-navigation-push-while-keeping-the-same-appbar

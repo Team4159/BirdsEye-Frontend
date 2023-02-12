@@ -17,13 +17,10 @@ final stock = Stock<WebDataTypes, Map<String, dynamic>>(
                 Uri.http(serverIP, "/api/${SettingsState.season}/pitschema/")))
             .body);
       case WebDataTypes.matchScout:
-        return {"autonomous": {
-          "coneAttempted": "counter",
-          "mobility": "toggle"
-        }, "driver": {
-          "comments": "text"
-        }};
-      case WebDataTypes.currentEvents:
+        return json.decode((await http.get(Uri.http(
+                serverIP, "/api/${SettingsState.season}/matchschema/")))
+            .body);
+      case WebDataTypes.currentEvents: // trust the process
         return json.decode((await http
                 .get(Uri.http(serverIP, "/api/bluealliance/getCurrentEvents/")))
             .body);
@@ -32,13 +29,22 @@ final stock = Stock<WebDataTypes, Map<String, dynamic>>(
   sourceOfTruth: cacheSoT,
 );
 
-Future<http.Response> postResponse(WebDataTypes dataType, Map<String, dynamic> body) {
+Future<http.Response> postResponse(
+    WebDataTypes dataType, Map<String, dynamic> body) {
   switch (dataType) {
     case WebDataTypes.pitScout:
-      return http.post(Uri.http(serverIP, "/api/${SettingsState.season}/pit"), body: json.encode(body));
+      return http.post(
+          Uri.http(serverIP,
+              "/api/${SettingsState.season}/${SettingsState.event}/pit/"),
+          body: json.encode(body));
     case WebDataTypes.matchScout:
-      return http.post(Uri.http(serverIP, "/api/${SettingsState.season}/match"), body: json.encode(body));
+      return http.post(
+          Uri.http(serverIP,
+              "/api/${SettingsState.season}${SettingsState.event}/match"),
+          body: json.encode(body),
+          headers: {"Content-Type": "application/json"});
     default:
-      return Future.error(Exception("Unsupported Post-Response WebDataType $dataType"));
+      return Future.error(
+          Exception("Unsupported Post-Response WebDataType $dataType"));
   }
 }

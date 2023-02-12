@@ -1,6 +1,7 @@
 import 'package:birdseye/main.dart';
 import 'package:birdseye/web.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'widgets/errorcontainer.dart';
 
@@ -16,6 +17,7 @@ class PitScout extends StatefulWidget {
 class PitScoutState extends State<PitScout> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final Map<String, String> fields = {};
+  int? teamNumber;
   bool _loading = false;
 
   @override
@@ -34,28 +36,41 @@ class PitScoutState extends State<PitScout> {
                     Iterable<Widget> items =
                         (await stock.get(WebDataTypes.pitScout))
                             .entries
-                            .where((e) => PitScoutQuestionTypes.values
-                                .any((t) => t.name == e.value))
-                            .map((e) {
-                      switch (PitScoutQuestionTypes.values.byName(e.value)) {
-                        case PitScoutQuestionTypes.text:
-                          return TextFormField(
-                            keyboardType: TextInputType.multiline,
-                            maxLines: null,
-                            decoration: InputDecoration(labelText: e.key),
-                            onSaved: (String? content) {
-                              fields[e.key] = content ?? "";
-                            },
-                          );
-                      }
-                    });
+                            .map((e) => TextFormField(
+                                  keyboardType: TextInputType.multiline,
+                                  maxLines: null,
+                                  decoration: InputDecoration(labelText: e.key),
+                                  onSaved: (String? content) {
+                                    fields[e.value] = content ?? "";
+                                  },
+                                ));
+
                     return ListView(
-                        children: items
+                        children: <Widget>[
+                      TextFormField(
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
+                          maxLines: 1,
+                          maxLength: 4,
+                          validator: (value) =>
+                              (value?.isNotEmpty ?? false) ? null : "Required",
+                          decoration: const InputDecoration(
+                              labelText: "Team Number", counterText: ""),
+                          onSaved: (String? content) {
+                            teamNumber = int.parse(content!);
+                          })
+                    ]
+                            .followedBy(items)
                             .followedBy([
                               ElevatedButton(
                                   onPressed: () {
                                     if (_loading) return;
                                     fields.clear();
+                                    if (!formKey.currentState!.validate())
+                                      // ignore: curly_braces_in_flow_control_structures
+                                      return;
                                     formKey.currentState!.save();
                                     formKey.currentState!.reset();
                                     var m = ScaffoldMessenger.of(context);
@@ -71,8 +86,10 @@ class PitScoutState extends State<PitScout> {
                                     setState(() {
                                       _loading = true;
                                     });
-                                    postResponse(WebDataTypes.pitScout, fields)
-                                        .then((response) {
+                                    postResponse(WebDataTypes.pitScout, {
+                                      ...fields,
+                                      "teamNumber": teamNumber
+                                    }).then((response) {
                                       m.hideCurrentSnackBar();
                                       setState(() {
                                         _loading = false;
