@@ -21,9 +21,8 @@ final stock = Stock<WebDataTypes, Map<String, dynamic>>(
                 serverIP, "/api/${SettingsState.season}/matchschema/")))
             .body);
       case WebDataTypes.currentEvents: // trust the process
-        return json.decode((await http
-                .get(Uri.http(serverIP, "/api/bluealliance/getCurrentEvents/")))
-            .body);
+        return json.decode(
+            (await http.get(Uri.http(serverIP, "/api/currentEvents/"))).body);
     }
   }),
   sourceOfTruth: cacheSoT,
