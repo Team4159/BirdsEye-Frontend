@@ -17,7 +17,7 @@ class PitScout extends StatefulWidget {
 class PitScoutState extends State<PitScout> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final Map<String, String> fields = {};
-  int? teamNumber;
+  int? _teamNumber;
   bool _loading = false;
 
   @override
@@ -32,19 +32,13 @@ class PitScoutState extends State<PitScout> {
               key: formKey,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               child: FutureBuilder(
-                  future: () async {
-                    Iterable<Widget> items =
-                        (await stock.get(WebDataTypes.pitScout))
-                            .entries
-                            .map((e) => TextFormField(
-                                  keyboardType: TextInputType.multiline,
-                                  maxLines: null,
-                                  decoration: InputDecoration(labelText: e.key),
-                                  onSaved: (String? content) {
-                                    fields[e.value] = content ?? "";
-                                  },
-                                ));
-
+                  future: stock.get(WebDataTypes.pitScout),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return snapshot.hasError
+                          ? ErrorContainer(snapshot.error.toString())
+                          : const Center(child: CircularProgressIndicator());
+                    }
                     return ListView(
                         children: <Widget>[
                       TextFormField(
@@ -59,10 +53,19 @@ class PitScoutState extends State<PitScout> {
                           decoration: const InputDecoration(
                               labelText: "Team Number", counterText: ""),
                           onSaved: (String? content) {
-                            teamNumber = int.parse(content!);
+                            _teamNumber = int.parse(content!);
                           })
                     ]
-                            .followedBy(items)
+                            .followedBy(
+                                snapshot.data!.entries.map((e) => TextFormField(
+                                      keyboardType: TextInputType.multiline,
+                                      maxLines: null,
+                                      decoration:
+                                          InputDecoration(labelText: e.key),
+                                      onSaved: (String? content) {
+                                        fields[e.value] = content ?? "";
+                                      },
+                                    )))
                             .followedBy([
                               ElevatedButton(
                                   onPressed: () {
@@ -72,7 +75,6 @@ class PitScoutState extends State<PitScout> {
                                       // ignore: curly_braces_in_flow_control_structures
                                       return;
                                     formKey.currentState!.save();
-                                    formKey.currentState!.reset();
                                     var m = ScaffoldMessenger.of(context);
                                     m.showSnackBar(const SnackBar(
                                         duration: Duration(minutes: 5),
@@ -88,8 +90,10 @@ class PitScoutState extends State<PitScout> {
                                     });
                                     postResponse(WebDataTypes.pitScout, {
                                       ...fields,
-                                      "teamNumber": teamNumber
+                                      "teamNumber": _teamNumber
                                     }).then((response) {
+                                      formKey.currentState!.reset();
+                                      _teamNumber = null;
                                       m.hideCurrentSnackBar();
                                       setState(() {
                                         _loading = false;
@@ -114,11 +118,5 @@ class PitScoutState extends State<PitScout> {
                                     horizontal: 15, vertical: 6),
                                 child: e))
                             .toList());
-                  }(),
-                  builder: (context, snapshot) => snapshot.hasData
-                      ? snapshot.data!
-                      : snapshot.hasError
-                          ? ErrorContainer(snapshot.error.toString())
-                          : const Center(
-                              child: CircularProgressIndicator())))));
+                  }))));
 }

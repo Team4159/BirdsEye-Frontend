@@ -287,8 +287,9 @@ class SettingsState extends State<Settings> {
                         int i = e.indexWhere((element) => element.key == event);
                         MapEntry<String, dynamic>? se =
                             i >= 0 ? e.removeAt(i) : null;
-                        return Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
+                        return ListView(
+                            // TODO: Fix selector overflow
+                            shrinkWrap: true,
                             children: (se != null
                                     ? <ListTile>[
                                         ListTile(
