@@ -46,6 +46,7 @@ void main() async {
                 fontSize: 28)),
         progressIndicatorTheme: const ProgressIndicatorThemeData(
             color: Color(0xffcf2e2e), refreshBackgroundColor: Colors.black45),
+        dividerTheme: const DividerThemeData(thickness: 4, indent: 0),
         textTheme: TextTheme(
             displayLarge: const TextStyle(
               // Match Scout Section Titles
@@ -140,10 +141,9 @@ class MainScreen extends StatelessWidget {
         drawer: getDrawer(context),
         body: const Settings(),
         floatingActionButton: IconButton(
-          icon: const Icon(Icons.refresh_rounded),
-          tooltip: "Refresh Cache",
-          onPressed: cacheSoT.deleteAll,
-        ),
+            icon: const Icon(Icons.refresh_rounded),
+            tooltip: "Refresh Cache",
+            onPressed: cacheSoT.deleteAll),
       );
 }
 
@@ -155,215 +155,220 @@ class Settings extends StatefulWidget {
 }
 
 class SettingsState extends State<Settings> {
+  List<MapEntry<String, dynamic>>? _events;
   static num season = DateTime.now().year;
   static String event = "casf";
 
   @override
+  void initState() {
+    super.initState();
+    stock.get(WebDataTypes.currentEvents).then(
+          (value) => setState(() {
+            _events = value.entries.toList();
+          }),
+        );
+  }
+
+  @override
   Widget build(BuildContext context) => Padding(
       padding: const EdgeInsets.all(20),
-      child: Column(children: [
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Current Season",
-                  style: Theme.of(context).textTheme.labelSmall,
-                  textAlign: TextAlign.left,
-                )),
-            TextField(
-              cursorColor: Colors.green[900],
-              style: Theme.of(context).textTheme.bodySmall,
-              maxLength: 4,
-              textAlign: TextAlign.right,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(
-                  border: InputBorder.none, counterText: ''),
-              controller: TextEditingController(text: season.toString()),
-              onSubmitted: (value) {
-                season = int.parse(value);
-              },
-            )
-          ],
-        ),
-        Stack(alignment: Alignment.center, children: [
-          Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Team Number",
-                style: Theme.of(context).textTheme.labelSmall,
-                textAlign: TextAlign.left,
-              )),
-          TextField(
-            cursorColor: Colors.green[900],
-            style: Theme.of(context).textTheme.bodySmall,
-            maxLength: 4,
-            textAlign: TextAlign.right,
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            decoration: const InputDecoration(
-                border: InputBorder.none, counterText: ''),
-            controller: TextEditingController(
-                text: (prefs!.getInt("teamNumber") ?? 4159).toString()),
-            onSubmitted: (value) {
-              prefs!.setInt("teamNumber", int.parse(value)).then((value) =>
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Set Team Number!"))));
-            },
+      child: Row(children: [
+        Expanded(
+            child: Column(children: [
+          Stack(
+            alignment: Alignment.center,
+            fit: StackFit.passthrough,
+            children: [
+              Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Current Season",
+                    style: Theme.of(context).textTheme.labelSmall,
+                    textAlign: TextAlign.left,
+                  )),
+              TextField(
+                cursorColor: Colors.green[900],
+                style: Theme.of(context).textTheme.bodySmall,
+                maxLength: 4,
+                textAlign: TextAlign.right,
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                decoration: const InputDecoration(
+                    border: InputBorder.none, counterText: ''),
+                controller: TextEditingController(text: season.toString()),
+                onSubmitted: (value) {
+                  season = int.parse(value);
+                },
+              )
+            ],
           ),
-        ]),
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Your Name",
-                  style: Theme.of(context).textTheme.labelSmall,
-                  textAlign: TextAlign.left,
-                )),
-            TextField(
-              cursorColor: Colors.green[900],
-              style: Theme.of(context).textTheme.bodySmall,
-              maxLength: 64,
-              textAlign: TextAlign.right,
-              keyboardType: TextInputType.name,
-              decoration: const InputDecoration(
-                  border: InputBorder.none, counterText: ''),
-              controller: TextEditingController(
-                  text: prefs!.getString("name") ?? "NoName"),
-              onSubmitted: (value) {
-                prefs!.setString("name", value).then((value) =>
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Set Name!"))));
-              },
-            )
-          ],
+          Stack(
+              alignment: Alignment.center,
+              fit: StackFit.passthrough,
+              children: [
+                Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Team Number",
+                      style: Theme.of(context).textTheme.labelSmall,
+                      textAlign: TextAlign.left,
+                    )),
+                TextField(
+                  cursorColor: Colors.green[900],
+                  style: Theme.of(context).textTheme.bodySmall,
+                  maxLength: 4,
+                  textAlign: TextAlign.right,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: const InputDecoration(
+                      border: InputBorder.none, counterText: ''),
+                  controller: TextEditingController(
+                      text: (prefs!.getInt("teamNumber") ?? 4159).toString()),
+                  onSubmitted: (value) {
+                    prefs!.setInt("teamNumber", int.parse(value)).then(
+                        (value) => ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Set Team Number!"))));
+                  },
+                ),
+              ]),
+          Stack(
+            alignment: Alignment.center,
+            fit: StackFit.passthrough,
+            children: [
+              Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Your Name",
+                    style: Theme.of(context).textTheme.labelSmall,
+                    textAlign: TextAlign.left,
+                  )),
+              TextField(
+                cursorColor: Colors.green[900],
+                style: Theme.of(context).textTheme.bodySmall,
+                maxLength: 64,
+                textAlign: TextAlign.right,
+                keyboardType: TextInputType.name,
+                decoration: const InputDecoration(
+                    border: InputBorder.none, counterText: ''),
+                controller: TextEditingController(
+                    text: prefs!.getString("name") ?? "NoName"),
+                onSubmitted: (value) {
+                  prefs!.setString("name", value).then((value) =>
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Set Name!"))));
+                },
+              )
+            ],
+          ),
+          Stack(
+            alignment: Alignment.center,
+            fit: StackFit.passthrough,
+            children: [
+              Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Server IP",
+                    style: Theme.of(context).textTheme.labelSmall,
+                    textAlign: TextAlign.left,
+                  )),
+              TextField(
+                cursorColor: Colors.green[900],
+                style: Theme.of(context).textTheme.bodySmall,
+                maxLength: 24,
+                textAlign: TextAlign.right,
+                keyboardType: TextInputType.url,
+                decoration: const InputDecoration(
+                    border: InputBorder.none, counterText: ''),
+                controller: TextEditingController(text: serverIP),
+                onSubmitted: (value) {
+                  serverIP = value;
+                },
+              )
+            ],
+          )
+        ])),
+        VerticalDivider(
+          color: Theme.of(context).textTheme.labelSmall!.color,
+          width: 32,
         ),
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Server IP",
-                  style: Theme.of(context).textTheme.labelSmall,
-                  textAlign: TextAlign.left,
-                )),
-            TextField(
-              cursorColor: Colors.green[900],
-              style: Theme.of(context).textTheme.bodySmall,
-              maxLength: 24,
-              textAlign: TextAlign.right,
-              keyboardType: TextInputType.url,
-              decoration: const InputDecoration(
-                  border: InputBorder.none, counterText: ''),
-              controller: TextEditingController(text: serverIP),
-              onSubmitted: (value) {
-                serverIP = value;
-              },
-            )
-          ],
-        ),
-        Stack(alignment: Alignment.topCenter, children: [
+        Expanded(
+            child: Stack(children: [
           Container(
               padding: const EdgeInsets.symmetric(vertical: 14),
-              alignment: Alignment.centerLeft,
+              alignment: Alignment.topLeft,
               child: Text(
                 "Current Event",
                 style: Theme.of(context).textTheme.labelSmall,
                 textAlign: TextAlign.left,
               )),
-          Align(
-              alignment: Alignment.centerRight,
-              child: FractionallySizedBox(
-                  widthFactor: 0.4,
-                  child: FutureBuilder(
-                      future: stock.get(WebDataTypes.currentEvents),
-                      builder: (context, snapshot) {
-                        final e = snapshot.data?.entries.toList();
-                        if (e == null) {
-                          return ErrorContainer(snapshot.error.toString());
-                        }
-                        int i = e.indexWhere((element) => element.key == event);
-                        MapEntry<String, dynamic>? se =
-                            i >= 0 ? e.removeAt(i) : null;
-                        return ListView(
-                            // TODO: Fix selector overflow
-                            shrinkWrap: true,
-                            children: (se != null
-                                    ? <ListTile>[
-                                        ListTile(
-                                          title: Text(
-                                            se.value,
-                                            textAlign: TextAlign.right,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .displaySmall!
-                                                .copyWith(
-                                                    fontWeight:
-                                                        FontWeight.w700),
-                                          ),
-                                          trailing: ConstrainedBox(
-                                              constraints: const BoxConstraints(
-                                                  minWidth: 60, maxWidth: 60),
-                                              child: Text(se.key,
-                                                  textAlign: TextAlign.right,
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .bodySmall!
-                                                      .copyWith(
-                                                          fontWeight: FontWeight
-                                                              .w900))),
-                                        )
-                                      ]
-                                    : <ListTile>[])
-                                .followedBy(e.map((e) => ListTile(
-                                      title: Text(
-                                        e.value,
-                                        textAlign: TextAlign.right,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .displaySmall,
-                                      ),
-                                      trailing: ConstrainedBox(
-                                          constraints: const BoxConstraints(
-                                              minWidth: 60, maxWidth: 60),
-                                          child: Text(e.key,
-                                              textAlign: TextAlign.right,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodySmall!
-                                                  .copyWith(
-                                                      fontWeight:
-                                                          FontWeight.w600))),
-                                      onTap: () {
-                                        setState(() {
-                                          SettingsState.event = e.key;
-                                        });
-                                      },
-                                    )))
-                                .toList());
-                      })))
-        ])
+          Builder(builder: (context) {
+            if (_events == null) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            return ReorderableListView(
+                shrinkWrap: true,
+                buildDefaultDragHandles: false,
+                onReorder: (int oldIndex, int newIndex) {
+                  setState(() {
+                    if (oldIndex < newIndex) {
+                      newIndex--;
+                    }
+                    final item = _events!.removeAt(oldIndex);
+                    _events!.insert(newIndex, item);
+                    if (newIndex == 0) event = item.key;
+                  });
+                },
+                children: [
+                  for (int i = 0; i < _events!.length; i++)
+                    ReorderableDragStartListener(
+                        key: ValueKey(_events![i].key),
+                        index: i,
+                        child: ListTile(
+                          onTap: () {
+                            setState(() {
+                              event = _events![i].key;
+                            });
+                          },
+                          title: Text(
+                            _events![i].value,
+                            textAlign: TextAlign.right,
+                            style: _events![i].key == event
+                                ? Theme.of(context)
+                                    .textTheme
+                                    .displaySmall!
+                                    .copyWith(fontWeight: FontWeight.w800)
+                                : Theme.of(context).textTheme.displaySmall,
+                          ),
+                          trailing: ConstrainedBox(
+                              constraints: const BoxConstraints(
+                                  minWidth: 60, maxWidth: 60),
+                              child: Text(_events![i].key,
+                                  textAlign: TextAlign.right,
+                                  style: _events![i].key == event
+                                      ? Theme.of(context)
+                                          .textTheme
+                                          .bodySmall!
+                                          .copyWith(fontWeight: FontWeight.w900)
+                                      : Theme.of(context)
+                                          .textTheme
+                                          .bodySmall!
+                                          .copyWith(
+                                              fontWeight: FontWeight.w600))),
+                        ))
+                ]);
+          })
+        ]))
       ]));
 }
 
-Route _createRoute(Widget widget) {
-  return PageRouteBuilder(
-      pageBuilder: ((context, animation, secondaryAnimation) => widget),
-      transitionsBuilder: ((context, animation, secondaryAnimation, child) {
-        // Edit transition here
-        var tween = Tween(begin: const Offset(1, 0), end: Offset.zero)
-            .chain(CurveTween(curve: Curves.easeOut));
+Route _createRoute(Widget widget) => PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => widget,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var tween = Tween(begin: const Offset(1, 0), end: Offset.zero)
+          .chain(CurveTween(curve: Curves.easeOut));
 
-        return SlideTransition(
-          position: animation.drive(tween),
-          child: child,
-        );
-      }));
-}
-
-const double buttonBaseline = 36;
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    });
