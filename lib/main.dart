@@ -1,4 +1,3 @@
-import 'package:birdseye/widgets/errorcontainer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -93,7 +92,6 @@ SharedPreferences? prefs;
 String serverIP = "localhost:5000";
 
 getDrawer(context) => Drawer(
-        // TODO: Nested Navigation https://stackoverflow.com/questions/66755344/flutter-navigation-push-while-keeping-the-same-appbar
         child: ListView(
       children: [
         ListTile(
