@@ -28,7 +28,15 @@ void main() async {
         inputDecorationTheme:
             const InputDecorationTheme(border: OutlineInputBorder()),
         snackBarTheme: const SnackBarThemeData(
-            behavior: SnackBarBehavior.floating, closeIconColor: Colors.black),
+          behavior: SnackBarBehavior.floating,
+          closeIconColor: Colors.black,
+          elevation: 3,
+          contentTextStyle: TextStyle(
+              fontFamily: "OpenSans",
+              fontSize: 18,
+              fontWeight: FontWeight.normal,
+              color: Colors.black),
+        ),
         appBarTheme: const AppBarTheme(
             titleTextStyle: TextStyle(
                 // AppBar Title
@@ -36,6 +44,8 @@ void main() async {
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
                 fontSize: 28)),
+        progressIndicatorTheme: const ProgressIndicatorThemeData(
+            color: Color(0xffcf2e2e), refreshBackgroundColor: Colors.black45),
         textTheme: TextTheme(
             displayLarge: const TextStyle(
               // Match Scout Section Titles
@@ -79,7 +89,7 @@ void main() async {
 }
 
 SharedPreferences? prefs;
-String serverIP = "10.66.70.169:5000";
+String serverIP = "localhost:5000";
 
 getDrawer(context) => Drawer(
         // TODO: Nested Navigation https://stackoverflow.com/questions/66755344/flutter-navigation-push-while-keeping-the-same-appbar
@@ -124,6 +134,7 @@ class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
+          centerTitle: false,
           title: const Text("Bird's Eye"),
         ),
         drawer: getDrawer(context),
@@ -279,8 +290,9 @@ class SettingsState extends State<Settings> {
                         int i = e.indexWhere((element) => element.key == event);
                         MapEntry<String, dynamic>? se =
                             i >= 0 ? e.removeAt(i) : null;
-                        return Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
+                        return ListView(
+                            // TODO: Fix selector overflow
+                            shrinkWrap: true,
                             children: (se != null
                                     ? <ListTile>[
                                         ListTile(

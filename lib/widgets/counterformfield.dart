@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../main.dart';
+import 'formfieldtitle.dart';
 
 class CounterFormField extends FormField<int> {
   CounterFormField(
@@ -36,17 +36,7 @@ class CounterFormField extends FormField<int> {
                             state.didChange(state.value! - 1);
                           },
                         )),
-                    Align(
-                        alignment: Alignment.topCenter,
-                        child: Baseline(
-                          baseline: buttonBaseline,
-                          baselineType: TextBaseline.alphabetic,
-                          child: Text(
-                            labelText,
-                            textAlign: TextAlign.center,
-                            style: Theme.of(state.context).textTheme.bodyMedium,
-                          ),
-                        )),
+                    FormFieldTitle(labelText),
                   ],
                 ));
 }

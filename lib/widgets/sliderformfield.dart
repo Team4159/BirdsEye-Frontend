@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../main.dart';
+import 'formfieldtitle.dart';
 
 class SliderFormField extends FormField<double> {
   SliderFormField(
@@ -24,17 +24,6 @@ class SliderFormField extends FormField<double> {
                         max: 5,
                         divisions: 4,
                       ),
-                      Align(
-                          alignment: Alignment.topCenter,
-                          child: Baseline(
-                            baseline: buttonBaseline,
-                            baselineType: TextBaseline.alphabetic,
-                            child: Text(
-                              labelText,
-                              textAlign: TextAlign.center,
-                              style:
-                                  Theme.of(state.context).textTheme.bodyMedium,
-                            ),
-                          )),
+                      FormFieldTitle(labelText),
                     ]));
 }

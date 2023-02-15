@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'formfieldtitle.dart';
+
 class ToggleFormField extends FormField<bool> {
   ToggleFormField(
       {super.key,
@@ -9,20 +11,23 @@ class ToggleFormField extends FormField<bool> {
       super.autovalidateMode = AutovalidateMode.disabled,
       String labelText = ""})
       : super(
-            builder: (FormFieldState<bool> state) => ElevatedButton(
-                onPressed: () {
-                  state.didChange(!state.value!);
-                },
-                style: ButtonStyle(
-                    backgroundColor: MaterialStateColor.resolveWith((states) =>
-                        Color(state.value! ? 0xff1C7C7C : 0xffCF772E))),
-                child: Center(
-                    child: Text(labelText,
-                        style: Theme.of(state.context)
-                            .textTheme
-                            .bodyMedium!
-                            .copyWith(
-                                color: state.value!
-                                    ? Colors.white
-                                    : Colors.black)))));
+            builder: (FormFieldState<bool> state) => Stack(
+                    alignment: Alignment.center,
+                    fit: StackFit.passthrough,
+                    children: [
+                      ElevatedButton(
+                          onPressed: () {
+                            state.didChange(!state.value!);
+                          },
+                          style: ButtonStyle(
+                              backgroundColor: MaterialStateColor.resolveWith(
+                                  (states) => Color(
+                                      state.value! ? 0xff1C7C7C : 0xffCF772E))),
+                          child: Center(
+                              child: Text(
+                            state.value.toString(),
+                            style: const TextStyle(fontSize: 28),
+                          ))),
+                      FormFieldTitle(labelText),
+                    ]));
 }
