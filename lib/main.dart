@@ -163,6 +163,13 @@ class SettingsState extends State<Settings> {
     stock.get(WebDataTypes.currentEvents).then(
           (value) => setState(() {
             _events = value.entries.toList();
+            _events!.sort(
+              (a, b) => a.key == event
+                  ? -1
+                  : b.key == event
+                      ? 1
+                      : 0,
+            );
           }),
         );
   }
@@ -194,41 +201,12 @@ class SettingsState extends State<Settings> {
                 decoration: const InputDecoration(
                     border: InputBorder.none, counterText: ''),
                 controller: TextEditingController(text: season.toString()),
-                onSubmitted: (value) {
-                  season = int.parse(value);
+                onSubmitted: (content) {
+                  season = int.parse(content);
                 },
               )
             ],
           ),
-          Stack(
-              alignment: Alignment.center,
-              fit: StackFit.passthrough,
-              children: [
-                Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      "Team Number",
-                      style: Theme.of(context).textTheme.labelSmall,
-                      textAlign: TextAlign.left,
-                    )),
-                TextField(
-                  cursorColor: Colors.green[900],
-                  style: Theme.of(context).textTheme.bodySmall,
-                  maxLength: 4,
-                  textAlign: TextAlign.right,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  decoration: const InputDecoration(
-                      border: InputBorder.none, counterText: ''),
-                  controller: TextEditingController(
-                      text: (prefs!.getInt("teamNumber") ?? 4159).toString()),
-                  onSubmitted: (value) {
-                    prefs!.setInt("teamNumber", int.parse(value)).then(
-                        (value) => ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("Set Team Number!"))));
-                  },
-                ),
-              ]),
           Stack(
             alignment: Alignment.center,
             fit: StackFit.passthrough,
@@ -278,9 +256,16 @@ class SettingsState extends State<Settings> {
                 decoration: const InputDecoration(
                     border: InputBorder.none, counterText: ''),
                 controller: TextEditingController(text: serverIP),
-                onSubmitted: (value) {
-                  serverIP = value;
-                },
+                onSubmitted: (content) => getStatus(content).then((value) {
+                  if (value) {
+                    serverIP = content;
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(const SnackBar(content: Text("Set IP!")));
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Invalid IP!")));
+                  }
+                }),
               )
             ],
           )

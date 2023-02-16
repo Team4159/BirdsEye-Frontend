@@ -21,13 +21,22 @@ final stock = Stock<WebDataTypes, Map<String, dynamic>>(
                 serverIP, "/api/${SettingsState.season}/matchschema/")))
             .body);
       case WebDataTypes.currentEvents:
-        return json.decode((await http.get(Uri.http(serverIP,
-                "/api/bluealliance/currentEvents", {"ignoreDate": "true"})))
+        return json.decode((await http.get(Uri.http(
+                serverIP,
+                "/api/bluealliance/${SettingsState.season}/",
+                {"ignoreDate": "true"})))
             .body);
     }
   }),
   sourceOfTruth: cacheSoT,
 );
+
+Future<bool> getStatus(String ip) {
+  return http
+      .get(Uri.http(ip))
+      .then((value) => value.body == "BirdsEye Scouting Server Online!")
+      .onError((error, stackTrace) => false);
+}
 
 Future<http.Response> postResponse(
     WebDataTypes dataType, Map<String, dynamic> body) {

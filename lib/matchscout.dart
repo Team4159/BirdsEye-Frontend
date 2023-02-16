@@ -21,6 +21,7 @@ class MatchScoutState extends State<MatchScout> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final Map<String, Map<String, dynamic>> fields = {};
   int? _teamNumber;
+  String? _matchCode;
   bool _loading = false;
 
   @override
@@ -44,20 +45,42 @@ class MatchScoutState extends State<MatchScout> {
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     child: Column(
                         children: <Widget>[
-                      TextFormField(
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly
-                          ],
+                      Row(children: [
+                        ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 70),
+                            child: TextFormField(
+                                keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly
+                                ],
+                                maxLines: 1,
+                                maxLength: 4,
+                                validator: (value) => (value?.isNotEmpty ??
+                                        false)
+                                    ? null // TODO: Validate this Field (match endpoint)
+                                    : "Required",
+                                decoration: const InputDecoration(
+                                    labelText: "Team #", counterText: ""),
+                                onSaved: (String? content) {
+                                  _teamNumber = int.parse(content!);
+                                })),
+                        Expanded(
+                            child: TextFormField(
+                          keyboardType: TextInputType.text,
+                          validator:
+                              (value) => // TODO: Validate this Field (event endpoint)
+                                  (value?.isNotEmpty ?? false)
+                                      ? null
+                                      : "Required",
                           maxLines: 1,
-                          maxLength: 4,
-                          validator: (value) =>
-                              (value?.isNotEmpty ?? false) ? null : "Required",
+                          maxLength: 3,
                           decoration: const InputDecoration(
-                              labelText: "Team Number", counterText: ""),
+                              labelText: "Match Code", counterText: ""),
                           onSaved: (String? content) {
-                            _teamNumber = int.parse(content!);
-                          })
+                            _matchCode = content;
+                          },
+                        ))
+                      ])
                     ]
                             .followedBy(snapshot.data!.entries.map((e1) {
                               Iterable<MapEntry<String, dynamic>> a = e1
@@ -166,8 +189,7 @@ class MatchScoutState extends State<MatchScout> {
                                         postResponse(WebDataTypes.matchScout, {
                                           "form": fields,
                                           "teamNumber": _teamNumber,
-                                          "match":
-                                              "q1" // TODO: Autofill current match
+                                          "match": _matchCode
                                         }).then((response) {
                                           formKey.currentState!.reset();
                                           _teamNumber = null;
