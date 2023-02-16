@@ -20,9 +20,8 @@ class MatchScout extends StatefulWidget {
 class MatchScoutState extends State<MatchScout> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final ScrollController _scrollController = ScrollController();
+  final MatchInfoFields matchInfoFields = const MatchInfoFields();
   final Map<String, Map<String, dynamic>> _fields = {};
-  int? _teamNumber;
-  String? _matchCode;
   bool _loading = false;
 
   @override
@@ -33,7 +32,7 @@ class MatchScoutState extends State<MatchScout> {
       drawer: getDrawer(context),
       body: Form(
           key: _formKey,
-          autovalidateMode: AutovalidateMode.disabled,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           child: FutureBuilder(
               future: stock.get(WebDataTypes.matchScout),
               builder: (context, snapshot) {
@@ -46,45 +45,7 @@ class MatchScoutState extends State<MatchScout> {
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     controller: _scrollController,
                     child: Column(
-                        children: <Widget>[
-                      Row(children: [
-                        ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 70),
-                            child: TextFormField(
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly
-                                ],
-                                maxLines: 1,
-                                maxLength: 4,
-                                validator: (value) => (value?.isNotEmpty ??
-                                        false)
-                                    ? null // TODO: Validate this Field (match endpoint)
-                                    : "Required",
-                                decoration: const InputDecoration(
-                                    labelText: "Team #", counterText: ""),
-                                onSaved: (String? content) {
-                                  _teamNumber = int.parse(content!);
-                                })),
-                        const SizedBox(width: 10),
-                        Expanded(
-                            child: TextFormField(
-                          keyboardType: TextInputType.text,
-                          validator:
-                              (value) => // TODO: Validate this Field (event endpoint)
-                                  (value?.isNotEmpty ?? false)
-                                      ? null
-                                      : "Required",
-                          maxLines: 1,
-                          maxLength: 3,
-                          decoration: const InputDecoration(
-                              labelText: "Match Code", counterText: ""),
-                          onSaved: (String? content) {
-                            _matchCode = content;
-                          },
-                        ))
-                      ])
-                    ]
+                        children: <Widget>[matchInfoFields]
                             .followedBy(snapshot.data!.entries.map((e1) {
                               Iterable<MapEntry<String, dynamic>> a = e1
                                   .value.entries
@@ -197,12 +158,16 @@ class MatchScoutState extends State<MatchScout> {
                                         });
                                         postResponse(WebDataTypes.matchScout, {
                                           "form": _fields,
-                                          "teamNumber": _teamNumber,
-                                          "match": _matchCode,
+                                          "teamNumber":
+                                              MatchInfoFieldsState._teamNumber,
+                                          "match":
+                                              MatchInfoFieldsState._matchCode,
                                         }).then((response) {
                                           _formKey.currentState!.reset();
-                                          _teamNumber = null;
-                                          _matchCode = null;
+                                          MatchInfoFieldsState._teamNumber =
+                                              null;
+                                          MatchInfoFieldsState._matchCode =
+                                              null;
                                           m.hideCurrentSnackBar();
                                           setState(() {
                                             _loading = false;
@@ -230,4 +195,81 @@ class MatchScoutState extends State<MatchScout> {
                                 padding: const EdgeInsets.all(15), child: e))
                             .toList()));
               })));
+}
+
+class MatchInfoFields extends StatefulWidget {
+  const MatchInfoFields({super.key});
+
+  @override
+  State<StatefulWidget> createState() => MatchInfoFieldsState();
+}
+
+class MatchInfoFieldsState extends State<MatchInfoFields> {
+  static int? _teamNumber;
+  static String? _matchCode;
+
+  @override
+  Widget build(BuildContext context) => Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            ConstrainedBox(
+              constraints: const BoxConstraints(minWidth: 100, maxWidth: 200),
+              child: TextFormField(
+                  keyboardType: TextInputType.text,
+                  maxLength: 3,
+                  decoration: const InputDecoration(
+                      border: UnderlineInputBorder(),
+                      labelText: "Match Code",
+                      counterText: ""),
+                  validator: (String? content) =>
+                      content == null || content.isEmpty ? "Required" : null,
+                  onFieldSubmitted: (String? content) {
+                    _matchCode = null;
+                    getMatches().then((val) {
+                      if (val.contains(content)) {
+                        setState(() {
+                          _matchCode = content;
+                        });
+                      }
+                    });
+                  }),
+            ),
+            const SizedBox(width: 10),
+            ConstrainedBox(
+                constraints: const BoxConstraints(minWidth: 75, maxWidth: 150),
+                child: TextFormField(
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    maxLength: 4,
+                    decoration: const InputDecoration(
+                        border: UnderlineInputBorder(),
+                        labelText: "Team #",
+                        counterText: ""),
+                    validator: (String? content) =>
+                        content == null || content.isEmpty
+                            ? "Required"
+                            : _matchCode == null
+                                ? "Set Match First!"
+                                : null,
+                    onFieldSubmitted: (String? content) {
+                      _teamNumber = null;
+                      getTeams(_matchCode!).then((val) {
+                        if (val.contains(content)) {
+                          setState(() {
+                            _teamNumber = int.parse(content!);
+                          });
+                        }
+                      });
+                    })),
+            const SizedBox(width: 10),
+            Icon(
+              _teamNumber == null || _matchCode == null
+                  ? Icons.close_rounded
+                  : Icons.check_rounded,
+              color: _teamNumber == null || _matchCode == null
+                  ? Colors.red
+                  : Colors.green,
+            )
+          ]);
 }
