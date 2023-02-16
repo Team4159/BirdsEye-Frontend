@@ -7,6 +7,7 @@ class ErrorContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
+      margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
           color: Colors.red[800],
           borderRadius: const BorderRadius.all(Radius.circular(10)),

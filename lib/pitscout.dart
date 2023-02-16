@@ -15,8 +15,9 @@ class PitScout extends StatefulWidget {
 }
 
 class PitScoutState extends State<PitScout> {
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final Map<String, String> fields = {};
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final ScrollController _scrollController = ScrollController();
+  final Map<String, String> _fields = {};
   int? _teamNumber;
   bool _loading = false;
 
@@ -29,7 +30,7 @@ class PitScoutState extends State<PitScout> {
       body: Padding(
           padding: const EdgeInsets.symmetric(vertical: 20),
           child: Form(
-              key: formKey,
+              key: _formKey,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               child: FutureBuilder(
                   future: stock.get(WebDataTypes.pitScout),
@@ -40,22 +41,24 @@ class PitScoutState extends State<PitScout> {
                           : const Center(child: CircularProgressIndicator());
                     }
                     return ListView(
+                        controller: _scrollController,
                         children: <Widget>[
-                      TextFormField(
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly
-                          ],
-                          maxLines: 1,
-                          maxLength: 4,
-                          validator: (value) =>
-                              (value?.isNotEmpty ?? false) ? null : "Required",
-                          decoration: const InputDecoration(
-                              labelText: "Team Number", counterText: ""),
-                          onSaved: (String? content) {
-                            _teamNumber = int.parse(content!);
-                          })
-                    ]
+                          TextFormField(
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly
+                              ],
+                              maxLines: 1,
+                              maxLength: 4,
+                              validator: (value) => (value?.isNotEmpty ?? false)
+                                  ? null
+                                  : "Required",
+                              decoration: const InputDecoration(
+                                  labelText: "Team Number", counterText: ""),
+                              onSaved: (String? content) {
+                                _teamNumber = int.parse(content!);
+                              })
+                        ]
                             .followedBy(
                                 snapshot.data!.entries.map((e) => TextFormField(
                                       keyboardType: TextInputType.multiline,
@@ -63,18 +66,22 @@ class PitScoutState extends State<PitScout> {
                                       decoration:
                                           InputDecoration(labelText: e.key),
                                       onSaved: (String? content) {
-                                        fields[e.value] = content ?? "";
+                                        _fields[e.value] = content ?? "";
                                       },
                                     )))
                             .followedBy([
                               ElevatedButton(
                                   onPressed: () {
                                     if (_loading) return;
-                                    fields.clear();
-                                    if (!formKey.currentState!.validate())
-                                      // ignore: curly_braces_in_flow_control_structures
+                                    _fields.clear();
+                                    if (!_formKey.currentState!.validate()) {
+                                      _scrollController.animateTo(0,
+                                          duration:
+                                              const Duration(milliseconds: 200),
+                                          curve: Curves.easeOutCubic);
                                       return;
-                                    formKey.currentState!.save();
+                                    }
+                                    _formKey.currentState!.save();
                                     var m = ScaffoldMessenger.of(context);
                                     m.showSnackBar(const SnackBar(
                                         duration: Duration(minutes: 5),
@@ -89,15 +96,18 @@ class PitScoutState extends State<PitScout> {
                                       _loading = true;
                                     });
                                     postResponse(WebDataTypes.pitScout, {
-                                      ...fields,
+                                      ..._fields,
                                       "teamNumber": _teamNumber
                                     }).then((response) {
-                                      formKey.currentState!.reset();
+                                      _formKey.currentState!.reset();
                                       _teamNumber = null;
                                       m.hideCurrentSnackBar();
                                       setState(() {
                                         _loading = false;
                                       });
+                                      _scrollController.animateTo(0,
+                                          duration: const Duration(seconds: 1),
+                                          curve: Curves.easeInOutQuad);
                                       m.showSnackBar(const SnackBar(
                                           content: Text("Response Sent!")));
                                     }).catchError((e) {

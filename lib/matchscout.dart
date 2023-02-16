@@ -18,8 +18,9 @@ class MatchScout extends StatefulWidget {
 }
 
 class MatchScoutState extends State<MatchScout> {
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final Map<String, Map<String, dynamic>> fields = {};
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final ScrollController _scrollController = ScrollController();
+  final Map<String, Map<String, dynamic>> _fields = {};
   int? _teamNumber;
   String? _matchCode;
   bool _loading = false;
@@ -31,7 +32,7 @@ class MatchScoutState extends State<MatchScout> {
       ),
       drawer: getDrawer(context),
       body: Form(
-          key: formKey,
+          key: _formKey,
           autovalidateMode: AutovalidateMode.disabled,
           child: FutureBuilder(
               future: stock.get(WebDataTypes.matchScout),
@@ -43,6 +44,7 @@ class MatchScoutState extends State<MatchScout> {
                 }
                 return SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(vertical: 20),
+                    controller: _scrollController,
                     child: Column(
                         children: <Widget>[
                       Row(children: [
@@ -64,6 +66,7 @@ class MatchScoutState extends State<MatchScout> {
                                 onSaved: (String? content) {
                                   _teamNumber = int.parse(content!);
                                 })),
+                        const SizedBox(width: 10),
                         Expanded(
                             child: TextFormField(
                           keyboardType: TextInputType.text,
@@ -118,10 +121,11 @@ class MatchScoutState extends State<MatchScout> {
                                             decoration: InputDecoration(
                                                 labelText: e2.key),
                                             onSaved: (String? content) {
-                                              fields[e1.key] =
-                                                  fields[e1.key] ?? {};
+                                              _fields[e1.key] =
+                                                  _fields[e1.key] ?? {};
 
-                                              fields[e1.key]![e2.key] = content;
+                                              _fields[e1.key]![e2.key] =
+                                                  content;
                                             },
                                           );
                                         case MatchScoutQuestionTypes.counter:
@@ -129,32 +133,32 @@ class MatchScoutState extends State<MatchScout> {
                                               initialValue: 0,
                                               labelText: e2.key,
                                               onSaved: (int? content) {
-                                                fields[e1.key] =
-                                                    fields[e1.key] ?? {};
+                                                _fields[e1.key] =
+                                                    _fields[e1.key] ?? {};
 
-                                                fields[e1.key]![e2.key] =
+                                                _fields[e1.key]![e2.key] =
                                                     content;
                                               });
                                         case MatchScoutQuestionTypes.toggle:
                                           return ToggleFormField(
                                               labelText: e2.key,
                                               onSaved: (bool? content) {
-                                                fields[e1.key] =
-                                                    fields[e1.key] ?? {};
+                                                _fields[e1.key] =
+                                                    _fields[e1.key] ?? {};
 
-                                                fields[e1.key]![e2.key] =
+                                                _fields[e1.key]![e2.key] =
                                                     content;
                                               });
                                         case MatchScoutQuestionTypes.slider:
                                           return SliderFormField(
                                               labelText: e2.key,
                                               onSaved: (double? contentd) {
-                                                fields[e1.key] =
-                                                    fields[e1.key] ?? {};
+                                                _fields[e1.key] =
+                                                    _fields[e1.key] ?? {};
 
                                                 int? content =
                                                     contentd?.toInt();
-                                                fields[e1.key]![e2.key] =
+                                                _fields[e1.key]![e2.key] =
                                                     content;
                                               });
                                       }
@@ -167,11 +171,16 @@ class MatchScoutState extends State<MatchScout> {
                                   child: ElevatedButton(
                                       onPressed: () {
                                         if (_loading) return;
-                                        fields.clear();
-                                        if (!formKey.currentState!.validate())
-                                          // ignore: curly_braces_in_flow_control_structures
+                                        _fields.clear();
+                                        if (!_formKey.currentState!
+                                            .validate()) {
+                                          _scrollController.animateTo(0,
+                                              duration: const Duration(
+                                                  milliseconds: 200),
+                                              curve: Curves.easeOutCubic);
                                           return;
-                                        formKey.currentState!.save();
+                                        }
+                                        _formKey.currentState!.save();
                                         var m = ScaffoldMessenger.of(context);
                                         m.showSnackBar(const SnackBar(
                                             duration: Duration(minutes: 5),
@@ -187,16 +196,21 @@ class MatchScoutState extends State<MatchScout> {
                                           _loading = true;
                                         });
                                         postResponse(WebDataTypes.matchScout, {
-                                          "form": fields,
+                                          "form": _fields,
                                           "teamNumber": _teamNumber,
-                                          "match": _matchCode
+                                          "match": _matchCode,
                                         }).then((response) {
-                                          formKey.currentState!.reset();
+                                          _formKey.currentState!.reset();
                                           _teamNumber = null;
+                                          _matchCode = null;
                                           m.hideCurrentSnackBar();
                                           setState(() {
                                             _loading = false;
                                           });
+                                          _scrollController.animateTo(0,
+                                              duration:
+                                                  const Duration(seconds: 1),
+                                              curve: Curves.easeInOutQuad);
                                           m.showSnackBar(const SnackBar(
                                               content: Text("Response Sent!")));
                                         }).catchError((e) {

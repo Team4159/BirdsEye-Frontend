@@ -42,7 +42,8 @@ void main() async {
                 fontFamily: "Verdana",
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
-                fontSize: 28)),
+                fontSize: 28),
+            centerTitle: false),
         progressIndicatorTheme: const ProgressIndicatorThemeData(
             color: Color(0xffcf2e2e), refreshBackgroundColor: Colors.black45),
         dividerTheme: const DividerThemeData(thickness: 4, indent: 0),
@@ -133,7 +134,6 @@ class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          centerTitle: false,
           title: const Text("Bird's Eye"),
         ),
         drawer: getDrawer(context),
@@ -275,7 +275,7 @@ class SettingsState extends State<Settings> {
           width: 32,
         ),
         Expanded(
-            child: Stack(children: [
+            child: Stack(fit: StackFit.expand, children: [
           Container(
               padding: const EdgeInsets.symmetric(vertical: 14),
               alignment: Alignment.topLeft,
@@ -288,57 +288,64 @@ class SettingsState extends State<Settings> {
             if (_events == null) {
               return const Center(child: CircularProgressIndicator());
             }
-            return ReorderableListView(
-                shrinkWrap: true,
-                buildDefaultDragHandles: false,
-                onReorder: (int oldIndex, int newIndex) {
-                  setState(() {
-                    if (oldIndex < newIndex) {
-                      newIndex--;
-                    }
-                    final item = _events!.removeAt(oldIndex);
-                    _events!.insert(newIndex, item);
-                    if (newIndex == 0) event = item.key;
-                  });
-                },
-                children: [
-                  for (int i = 0; i < _events!.length; i++)
-                    ReorderableDragStartListener(
-                        key: ValueKey(_events![i].key),
-                        index: i,
-                        child: ListTile(
-                          onTap: () {
-                            setState(() {
-                              event = _events![i].key;
-                            });
-                          },
-                          title: Text(
-                            _events![i].value,
-                            textAlign: TextAlign.right,
-                            style: _events![i].key == event
-                                ? Theme.of(context)
-                                    .textTheme
-                                    .displaySmall!
-                                    .copyWith(fontWeight: FontWeight.w800)
-                                : Theme.of(context).textTheme.displaySmall,
-                          ),
-                          trailing: ConstrainedBox(
-                              constraints: const BoxConstraints(
-                                  minWidth: 60, maxWidth: 60),
-                              child: Text(_events![i].key,
-                                  textAlign: TextAlign.right,
-                                  style: _events![i].key == event
-                                      ? Theme.of(context)
-                                          .textTheme
-                                          .bodySmall!
-                                          .copyWith(fontWeight: FontWeight.w900)
-                                      : Theme.of(context)
-                                          .textTheme
-                                          .bodySmall!
-                                          .copyWith(
-                                              fontWeight: FontWeight.w600))),
-                        ))
-                ]);
+            return FractionallySizedBox(
+                widthFactor: 0.5,
+                alignment: Alignment.topRight,
+                child: ReorderableListView(
+                    shrinkWrap: true,
+                    buildDefaultDragHandles: false,
+                    onReorder: (int oldIndex, int newIndex) {
+                      setState(() {
+                        if (oldIndex < newIndex) {
+                          newIndex--;
+                        }
+                        final item = _events!.removeAt(oldIndex);
+                        _events!.insert(newIndex, item);
+                        if (newIndex == 0) event = item.key;
+                      });
+                    },
+                    children: [
+                      for (int i = 0; i < _events!.length; i++)
+                        ReorderableDragStartListener(
+                            key: ValueKey(_events![i].key),
+                            index: i,
+                            child: ListTile(
+                              onTap: () {
+                                setState(() {
+                                  event = _events![i].key;
+                                });
+                              },
+                              title: Text(
+                                _events![i].value,
+                                overflow: TextOverflow.clip,
+                                maxLines: 1,
+                                textAlign: TextAlign.right,
+                                style: _events![i].key == event
+                                    ? Theme.of(context)
+                                        .textTheme
+                                        .displaySmall!
+                                        .copyWith(fontWeight: FontWeight.w800)
+                                    : Theme.of(context).textTheme.displaySmall,
+                              ),
+                              trailing: ConstrainedBox(
+                                  constraints: const BoxConstraints(
+                                      minWidth: 60, maxWidth: 60),
+                                  child: Text(_events![i].key,
+                                      textAlign: TextAlign.right,
+                                      style: _events![i].key == event
+                                          ? Theme.of(context)
+                                              .textTheme
+                                              .bodySmall!
+                                              .copyWith(
+                                                  fontWeight: FontWeight.w900)
+                                          : Theme.of(context)
+                                              .textTheme
+                                              .bodySmall!
+                                              .copyWith(
+                                                  fontWeight:
+                                                      FontWeight.w500))),
+                            ))
+                    ]));
           })
         ]))
       ]));
