@@ -4,7 +4,13 @@ import 'package:birdseye/main.dart';
 import 'package:http/http.dart' as http;
 import 'package:stock/stock.dart';
 
-enum WebDataTypes { pitScout, matchScout, currentEvents }
+enum WebDataTypes {
+  pitScout,
+  matchScout,
+  matchScoutEventMatches,
+  matchScoutEventMatchTeams,
+  currentEvents
+}
 
 CachedSourceOfTruth<WebDataTypes, Map<String, dynamic>> cacheSoT =
     CachedSourceOfTruth();
@@ -26,6 +32,8 @@ final stock = Stock<WebDataTypes, Map<String, dynamic>>(
                 "/api/bluealliance/${SettingsState.season}/",
                 {"ignoreDate": "true"})))
             .body);
+      default:
+        return Future.error(Exception("Unsupported WebDataType $dataType"));
     }
   }),
   sourceOfTruth: cacheSoT,
@@ -54,5 +62,23 @@ Future<http.Response> postResponse(
     default:
       return Future.error(
           Exception("Unsupported Post-Response WebDataType $dataType"));
+  }
+}
+
+Future<http.Response> getResponse(WebDataTypes dataType, [String? match]) {
+  switch (dataType) {
+    case WebDataTypes.matchScoutEventMatches:
+      return http.get(Uri.http(serverIP,
+          "/api/bluealliance/${SettingsState.season}/${SettingsState.event}/"));
+    case WebDataTypes.matchScoutEventMatchTeams:
+      if (match == null || match.isEmpty) {
+        return Future.error("No match code");
+      }
+
+      return http.get(Uri.http(serverIP,
+          "/api/bluealliance/${SettingsState.season}/${SettingsState.event}/$match/"));
+    default:
+      return Future.error(
+          Exception("Unsupported GET-Response WebDataType $dataType"));
   }
 }
