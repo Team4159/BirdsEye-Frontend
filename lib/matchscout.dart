@@ -207,7 +207,14 @@ class MatchInfoFields extends StatefulWidget {
 
 class MatchInfoFieldsState extends State<MatchInfoFields> {
   static int? _teamNumber;
+  final GlobalKey<FormFieldState> _teamNumberKey = GlobalKey<FormFieldState>();
+  String _lGoodTeamNumber = "";
+  String _lBadTeamNumber = "";
+
   static String? _matchCode;
+  final GlobalKey<FormFieldState> _matchCodeKey = GlobalKey<FormFieldState>();
+  String _lGoodMatchCode = "";
+  String _lBadMatchCode = "";
 
   @override
   Widget build(BuildContext context) => Row(
@@ -223,25 +230,32 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
                       border: UnderlineInputBorder(),
                       labelText: "Match Code",
                       counterText: ""),
-                  validator: (String? content) =>
-                      content == null || content.isEmpty ? "Required" : null,
-                  onFieldSubmitted: (String? content) {
-                    _matchCode = null;
+                  validator: (String? content) {
+                    if (content == null || content.isEmpty) return "Required";
+                    var tn = _matchCode.toString();
+                    if (_lGoodMatchCode == tn) return null;
+                    if (_lBadMatchCode == tn) return "Invalid";
                     tbaStock
                         .get("${SettingsState.season}${prefs.get('event')}")
                         .then((val) {
                       if (val.containsKey(content)) {
-                        setState(() {
-                          _matchCode = content;
-                        });
+                        _lGoodMatchCode = content;
+                      } else {
+                        _lBadMatchCode = content;
                       }
+                      _matchCodeKey.currentState!.validate();
                     });
+                    return "Validating";
+                  },
+                  onFieldSubmitted: (String? content) {
+                    _matchCode = content;
                   }),
             ),
             const SizedBox(width: 10),
             ConstrainedBox(
                 constraints: const BoxConstraints(minWidth: 75, maxWidth: 150),
                 child: TextFormField(
+                    key: _teamNumberKey,
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     maxLength: 4,
@@ -249,33 +263,27 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
                         border: UnderlineInputBorder(),
                         labelText: "Team #",
                         counterText: ""),
-                    validator: (String? content) =>
-                        content == null || content.isEmpty
-                            ? "Required"
-                            : _matchCode == null
-                                ? "Set Match First!"
-                                : null,
-                    onFieldSubmitted: (String? content) {
-                      _teamNumber = null;
+                    validator: (String? content) {
+                      if (content == null || content.isEmpty) return "Required";
+                      if (_matchCode == null) return "Set Match First!";
+                      var tn = _teamNumber.toString();
+                      if (_lGoodTeamNumber == tn) return null;
+                      if (_lBadTeamNumber == tn) return "Invalid";
                       tbaStock
                           .get(
                               "${SettingsState.season}${prefs.get('event')}_$_matchCode")
                           .then((val) {
                         if (val.containsKey(content)) {
-                          setState(() {
-                            _teamNumber = int.parse(content!);
-                          });
+                          _lGoodTeamNumber = content;
+                        } else {
+                          _lBadTeamNumber = content;
                         }
+                        _teamNumberKey.currentState!.validate();
                       });
-                    })),
-            const SizedBox(width: 10),
-            Icon(
-              _teamNumber == null || _matchCode == null
-                  ? Icons.close_rounded
-                  : Icons.check_rounded,
-              color: _teamNumber == null || _matchCode == null
-                  ? Colors.red
-                  : Colors.green,
-            )
+                      return "Validating";
+                    },
+                    onFieldSubmitted: (String? content) {
+                      _teamNumber = int.parse(content!);
+                    }))
           ]);
 }
