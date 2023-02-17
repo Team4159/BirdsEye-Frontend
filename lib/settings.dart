@@ -222,7 +222,7 @@ class IPConfigFieldState extends State<IPConfigField> {
             style: Theme.of(context).textTheme.bodySmall,
             textAlign: TextAlign.right,
             maxLines: 1,
-            maxLength: 24,
+            maxLength: 64,
             keyboardType: TextInputType.url,
             controller: _controller,
             textCapitalization: TextCapitalization.none,

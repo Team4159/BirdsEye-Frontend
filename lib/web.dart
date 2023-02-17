@@ -29,7 +29,7 @@ final stock = Stock<WebDataTypes, Map<String, dynamic>>(
 
 Future<bool> getStatus(String ip) {
   return http
-      .get(Uri.http(ip))
+      .get(Uri.https(ip))
       .then((value) => value.body == "BirdsEye Scouting Server Online!")
       .onError((error, stackTrace) => false);
 }
@@ -65,12 +65,12 @@ Future<http.Response> postResponse(
   switch (dataType) {
     case WebDataTypes.pitScout:
       return http.post(
-          Uri.http(serverIP,
+          Uri.https(serverIP,
               "/api/${SettingsState.season}/${prefs.getString('event')}/pit/"),
           body: json.encode(body));
     case WebDataTypes.matchScout:
       return http.post(
-          Uri.http(serverIP,
+          Uri.https(serverIP,
               "/api/${SettingsState.season}/${prefs.getString('event')}/match/"),
           body: json.encode(body));
   }
