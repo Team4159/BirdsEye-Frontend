@@ -14,7 +14,7 @@ void main() async {
       routes: {
         "/matchscout": (BuildContext context) => const MatchScout(),
         "/pitscout": (BuildContext context) => const PitScout(),
-        "/": (BuildContext context) => const MainScreen()
+        "/": (BuildContext context) => MainScreen()
       },
       themeMode: ThemeMode.dark,
       darkTheme: ThemeData(
@@ -101,8 +101,7 @@ getDrawer(context) => Drawer(
             style: Theme.of(context).textTheme.labelMedium,
           ),
           onTap: () {
-            Navigator.of(context)
-                .pushReplacement(_createRoute(const MainScreen()));
+            Navigator.of(context).pushReplacement(_createRoute(MainScreen()));
           },
         ),
         ListTile(
@@ -129,7 +128,8 @@ getDrawer(context) => Drawer(
     ));
 
 class MainScreen extends StatelessWidget {
-  const MainScreen({super.key});
+  MainScreen({super.key});
+  final GlobalKey<SettingsState> _settingsKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -137,11 +137,14 @@ class MainScreen extends StatelessWidget {
           title: const Text("Bird's Eye"),
         ),
         drawer: getDrawer(context),
-        body: const Settings(),
+        body: Settings(key: _settingsKey),
         floatingActionButton: IconButton(
             icon: const Icon(Icons.refresh_rounded),
             tooltip: "Refresh Cache",
-            onPressed: cacheSoT.deleteAll),
+            onPressed: () {
+              cacheSoT.deleteAll();
+              _settingsKey.currentState!.reloadEvents();
+            }),
       );
 }
 
