@@ -16,7 +16,8 @@ void main() async {
         "/pitscout": (BuildContext context) => const PitScout(),
         "/": (BuildContext context) => const MainScreen()
       },
-      theme: ThemeData(
+      themeMode: ThemeMode.dark,
+      darkTheme: ThemeData(
         colorScheme: ColorScheme.dark(
             primary: Colors.blue[600]!,
             surface: const Color(0xffcf2e2e),

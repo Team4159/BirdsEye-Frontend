@@ -15,17 +15,17 @@ String serverIP = "localhost:5000";
 
 class SettingsState extends State<Settings> {
   List<MapEntry<String, dynamic>>? _events;
-  static num season = DateTime.now().year;
+  static int season = DateTime.now().year;
 
   @override
   void initState() {
     super.initState();
-    stock
-        .get(WebDataTypes.currentEvents)
+    tbaStock
+        .get(SettingsState.season.toString())
         .then(
           (value) => setState(() {
             _events = value.entries.toList();
-            var event = prefs.getString("event");
+            var event = prefs.getString('event');
             _events!.sort(
               (a, b) => a.key == event
                   ? -1
@@ -39,7 +39,7 @@ class SettingsState extends State<Settings> {
       (_) {
         if (!prefs.containsKey("event") ||
             !_events!
-                .any((element) => element.key == prefs.getString("event"))) {
+                .any((element) => element.key == prefs.getString('event'))) {
           prefs.setString("event", _events![0].key);
         }
       },
@@ -161,7 +161,7 @@ class SettingsState extends State<Settings> {
                                 maxLines: 1,
                                 textAlign: TextAlign.right,
                                 style: _events![i].key ==
-                                        prefs.getString("event")
+                                        prefs.getString('event')
                                     ? Theme.of(context)
                                         .textTheme
                                         .displaySmall!
@@ -174,7 +174,7 @@ class SettingsState extends State<Settings> {
                                   child: Text(_events![i].key,
                                       textAlign: TextAlign.right,
                                       style: _events![i].key ==
-                                              prefs.getString("event")
+                                              prefs.getString('event')
                                           ? Theme.of(context)
                                               .textTheme
                                               .bodySmall!
