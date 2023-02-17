@@ -93,6 +93,9 @@ class MatchScoutState extends State<MatchScout> {
                           key: _matchCodeTextFormFieldKey,
                           keyboardType: TextInputType.text,
                           validator: (value) {
+                            _lastValidiatedTeamNumber = "";
+                            _lastRejectedTeamNumber = "";
+
                             if (value == null || value.isEmpty) {
                               _isMatchCodeValid = false;
                               _teamNumberTextFormFieldKey.currentState
