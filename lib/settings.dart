@@ -15,13 +15,13 @@ String serverIP = "localhost:5000";
 
 class SettingsState extends State<Settings> {
   List<MapEntry<String, dynamic>>? _events;
-  static num season = DateTime.now().year;
+  static int season = DateTime.now().year;
 
   @override
   void initState() {
     super.initState();
-    stock
-        .get(WebDataTypes.currentEvents)
+    tbaStock
+        .get(SettingsState.season.toString())
         .then(
           (value) => setState(() {
             _events = value.entries.toList();

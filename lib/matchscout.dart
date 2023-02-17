@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'main.dart';
+import 'settings.dart';
 import 'web.dart';
 
 enum MatchScoutQuestionTypes { text, counter, toggle, slider }
@@ -226,8 +227,10 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
                       content == null || content.isEmpty ? "Required" : null,
                   onFieldSubmitted: (String? content) {
                     _matchCode = null;
-                    getMatches().then((val) {
-                      if (val.contains(content)) {
+                    tbaStock
+                        .get("${SettingsState.season}${prefs.get('event')}")
+                        .then((val) {
+                      if (val.containsKey(content)) {
                         setState(() {
                           _matchCode = content;
                         });
@@ -254,8 +257,11 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
                                 : null,
                     onFieldSubmitted: (String? content) {
                       _teamNumber = null;
-                      getTeams(_matchCode!).then((val) {
-                        if (val.contains(content)) {
+                      tbaStock
+                          .get(
+                              "${SettingsState.season}${prefs.get('event')}_$_matchCode")
+                          .then((val) {
+                        if (val.containsKey(content)) {
                           setState(() {
                             _teamNumber = int.parse(content!);
                           });
