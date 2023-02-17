@@ -224,17 +224,17 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
             ConstrainedBox(
               constraints: const BoxConstraints(minWidth: 100, maxWidth: 200),
               child: TextFormField(
+                  key: _matchCodeKey,
                   keyboardType: TextInputType.text,
-                  maxLength: 3,
+                  maxLength: 5,
                   decoration: const InputDecoration(
                       border: UnderlineInputBorder(),
                       labelText: "Match Code",
                       counterText: ""),
                   validator: (String? content) {
                     if (content == null || content.isEmpty) return "Required";
-                    var tn = _matchCode.toString();
-                    if (_lGoodMatchCode == tn) return null;
-                    if (_lBadMatchCode == tn) return "Invalid";
+                    if (_lGoodMatchCode == content) return null;
+                    if (_lBadMatchCode == content) return "Invalid";
                     tbaStock
                         .get("${SettingsState.season}${prefs.get('event')}")
                         .then((val) {
@@ -247,8 +247,11 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
                     });
                     return "Validating";
                   },
-                  onFieldSubmitted: (String? content) {
+                  onFieldSubmitted: (String content) {
                     _matchCode = content;
+
+                    _lBadTeamNumber = _lGoodTeamNumber = "";
+                    _teamNumberKey.currentState!.validate();
                   }),
             ),
             const SizedBox(width: 10),
@@ -264,11 +267,13 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
                         labelText: "Team #",
                         counterText: ""),
                     validator: (String? content) {
+                      _teamNumber = null;
                       if (content == null || content.isEmpty) return "Required";
-                      if (_matchCode == null) return "Set Match First!";
-                      var tn = _teamNumber.toString();
-                      if (_lGoodTeamNumber == tn) return null;
-                      if (_lBadTeamNumber == tn) return "Invalid";
+                      if (_matchCode == null || _matchCode!.isEmpty) {
+                        return "Set Match First!";
+                      }
+                      if (_lGoodTeamNumber == content) return null;
+                      if (_lBadTeamNumber == content) return "Invalid";
                       tbaStock
                           .get(
                               "${SettingsState.season}${prefs.get('event')}_$_matchCode")
@@ -282,8 +287,8 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
                       });
                       return "Validating";
                     },
-                    onFieldSubmitted: (String? content) {
-                      _teamNumber = int.parse(content!);
+                    onFieldSubmitted: (String content) {
+                      _teamNumber = int.parse(content);
                     }))
           ]);
 }
