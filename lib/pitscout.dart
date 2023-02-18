@@ -1,4 +1,5 @@
 import 'package:birdseye/main.dart';
+import 'package:birdseye/settings.dart';
 import 'package:birdseye/web.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -97,7 +98,8 @@ class PitScoutState extends State<PitScout> {
                                     });
                                     postResponse(WebDataTypes.pitScout, {
                                       ..._fields,
-                                      "teamNumber": _teamNumber
+                                      "teamNumber": _teamNumber,
+                                      "name": prefs.getString("name")
                                     }).then((response) {
                                       _formKey.currentState!.reset();
                                       _teamNumber = null;

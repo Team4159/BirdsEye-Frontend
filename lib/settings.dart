@@ -109,7 +109,7 @@ class SettingsState extends State<Settings> {
                 decoration: const InputDecoration(
                     border: InputBorder.none, counterText: ''),
                 controller: TextEditingController(
-                    text: prefs.getString("name") ?? "NoName"),
+                    text: prefs.getString("name") ?? "null"),
                 onSubmitted: (value) {
                   prefs.setString("name", value).then((value) =>
                       ScaffoldMessenger.of(context).showSnackBar(

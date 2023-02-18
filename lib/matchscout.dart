@@ -163,6 +163,7 @@ class MatchScoutState extends State<MatchScout> {
                                               MatchInfoFieldsState._teamNumber,
                                           "match":
                                               MatchInfoFieldsState._matchCode,
+                                          "name": prefs.getString("name")
                                         }).then((response) {
                                           _formKey.currentState!.reset();
                                           MatchInfoFieldsState._teamNumber =
@@ -236,7 +237,8 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
                     if (_lGoodMatchCode == content) return null;
                     if (_lBadMatchCode == content) return "Invalid";
                     tbaStock
-                        .get("${SettingsState.season}${prefs.get('event')}")
+                        .get(
+                            "${SettingsState.season}${prefs.getString('event')}")
                         .then((val) {
                       if (val.containsKey(content)) {
                         _lGoodMatchCode = content;
@@ -276,7 +278,7 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
                       if (_lBadTeamNumber == content) return "Invalid";
                       tbaStock
                           .get(
-                              "${SettingsState.season}${prefs.get('event')}_$_matchCode")
+                              "${SettingsState.season}${prefs.getString('event')}_$_matchCode")
                           .then((val) {
                         if (val.containsKey(content)) {
                           _lGoodTeamNumber = content;

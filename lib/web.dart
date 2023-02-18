@@ -15,12 +15,12 @@ final stock = Stock<WebDataTypes, Map<String, dynamic>>(
     switch (dataType) {
       case WebDataTypes.pitScout:
         return http
-            .get(Uri.http(serverIP, "/api/${SettingsState.season}/pitschema/"))
+            .get(Uri.https(serverIP, "/api/${SettingsState.season}/pitschema/"))
             .then((resp) => json.decode(resp.body));
       case WebDataTypes.matchScout:
         return http
-            .get(
-                Uri.http(serverIP, "/api/${SettingsState.season}/matchschema/"))
+            .get(Uri.https(
+                serverIP, "/api/${SettingsState.season}/matchschema/"))
             .then((resp) => json.decode(resp.body));
     }
   }),
@@ -49,7 +49,7 @@ final tbaStock = Stock<String, Map<String, String>>(
       var i = groups.indexOf(null);
       return http
           .get(
-        Uri.http(
+        Uri.https(
             serverIP,
             "/api/bluealliance/${groups.sublist(0, i >= 0 ? i : null).join("/")}",
             {"ignoreDate": "true"}),
