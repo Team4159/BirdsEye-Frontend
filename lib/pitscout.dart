@@ -1,5 +1,4 @@
 import 'package:birdseye/main.dart';
-import 'package:birdseye/settings.dart';
 import 'package:birdseye/web.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
