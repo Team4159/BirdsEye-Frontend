@@ -129,7 +129,7 @@ class SettingsState extends State<Settings> {
           _events == null
               ? const Padding(
                   padding: EdgeInsets.only(top: 30),
-                  child: ErrorContainer("Error."))
+                  child: ErrorContainer("Error"))
               : _events!.isEmpty
                   ? const Center(child: CircularProgressIndicator())
                   : FractionallySizedBox(

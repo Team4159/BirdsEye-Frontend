@@ -39,7 +39,7 @@ class MatchScoutState extends State<MatchScout> {
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return snapshot.hasError
-                      ? ErrorContainer(snapshot.error.toString())
+                      ? ErrorContainer(snapshot.error)
                       : const Center(child: CircularProgressIndicator());
                 }
                 return SingleChildScrollView(
