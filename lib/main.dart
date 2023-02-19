@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const cardinalred = Color(0xffcf2e2e);
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   prefs = await SharedPreferences.getInstance();
   runApp(MaterialApp(
     title: "Bird's Eye",
