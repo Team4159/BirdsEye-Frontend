@@ -1,13 +1,12 @@
+import 'package:birdseye/main.dart';
+import 'package:birdseye/settings.dart';
+import 'package:birdseye/web.dart';
 import 'package:birdseye/widgets/counterformfield.dart';
 import 'package:birdseye/widgets/errorcontainer.dart';
 import 'package:birdseye/widgets/sliderformfield.dart';
 import 'package:birdseye/widgets/toggleformfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'main.dart';
-import 'settings.dart';
-import 'web.dart';
 
 enum MatchScoutQuestionTypes { text, counter, toggle, slider }
 
@@ -178,8 +177,9 @@ class MatchScoutState extends State<MatchScout> {
                                               duration:
                                                   const Duration(seconds: 1),
                                               curve: Curves.easeInOutQuad);
-                                          m.showSnackBar(const SnackBar(
-                                              content: Text("Response Sent!")));
+                                          m.showSnackBar(SnackBar(
+                                              content: Text(
+                                                  "Response Sent! [${response.statusCode}]")));
                                         }).catchError((e) {
                                           m.hideCurrentSnackBar();
                                           setState(() {
@@ -225,36 +225,37 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
             ConstrainedBox(
               constraints: const BoxConstraints(minWidth: 100, maxWidth: 200),
               child: TextFormField(
-                  key: _matchCodeKey,
-                  keyboardType: TextInputType.text,
-                  maxLength: 5,
-                  decoration: const InputDecoration(
-                      border: UnderlineInputBorder(),
-                      labelText: "Match Code",
-                      counterText: ""),
-                  validator: (String? content) {
-                    if (content == null || content.isEmpty) return "Required";
-                    if (_lGoodMatchCode == content) return null;
-                    if (_lBadMatchCode == content) return "Invalid";
-                    tbaStock
-                        .get(
-                            "${SettingsState.season}${prefs.getString('event')}")
-                        .then((val) {
-                      if (val.containsKey(content)) {
-                        _lGoodMatchCode = content;
-                      } else {
-                        _lBadMatchCode = content;
-                      }
-                      _matchCodeKey.currentState!.validate();
-                    });
-                    return "Validating";
-                  },
-                  onFieldSubmitted: (String content) {
-                    _matchCode = content;
+                key: _matchCodeKey,
+                keyboardType: TextInputType.text,
+                maxLength: 5,
+                textInputAction: TextInputAction.done,
+                decoration: const InputDecoration(
+                    border: UnderlineInputBorder(),
+                    labelText: "Match Code",
+                    counterText: ""),
+                validator: (String? content) {
+                  if (content == null || content.isEmpty) return "Required";
+                  if (_lGoodMatchCode == content) return null;
+                  if (_lBadMatchCode == content) return "Invalid";
+                  tbaStock
+                      .get("${SettingsState.season}${prefs.getString('event')}")
+                      .then((val) {
+                    if (val.containsKey(content)) {
+                      _lGoodMatchCode = content;
+                    } else {
+                      _lBadMatchCode = content;
+                    }
+                    _matchCodeKey.currentState!.validate();
+                  });
+                  return "Validating";
+                },
+                onFieldSubmitted: (String content) {
+                  _matchCode = content;
 
-                    _lBadTeamNumber = _lGoodTeamNumber = "";
-                    _teamNumberKey.currentState!.validate();
-                  }),
+                  _lBadTeamNumber = _lGoodTeamNumber = "";
+                  _teamNumberKey.currentState!.validate();
+                },
+              ),
             ),
             const SizedBox(width: 10),
             ConstrainedBox(
@@ -264,6 +265,7 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     maxLength: 4,
+                    textInputAction: TextInputAction.done,
                     decoration: const InputDecoration(
                         border: UnderlineInputBorder(),
                         labelText: "Team #",

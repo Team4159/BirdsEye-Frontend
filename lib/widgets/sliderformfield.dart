@@ -1,6 +1,5 @@
+import 'package:birdseye/widgets/formfieldtitle.dart';
 import 'package:flutter/material.dart';
-
-import 'formfieldtitle.dart';
 
 class SliderFormField extends FormField<double> {
   SliderFormField(

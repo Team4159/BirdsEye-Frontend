@@ -1,9 +1,8 @@
 import 'package:birdseye/main.dart';
 import 'package:birdseye/web.dart';
+import 'package:birdseye/widgets/errorcontainer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'widgets/errorcontainer.dart';
 
 enum PitScoutQuestionTypes { text }
 
@@ -106,8 +105,9 @@ class PitScoutState extends State<PitScout> {
                                   _scrollController.animateTo(0,
                                       duration: const Duration(seconds: 1),
                                       curve: Curves.easeInOutQuad);
-                                  m.showSnackBar(const SnackBar(
-                                      content: Text("Response Sent!")));
+                                  m.showSnackBar(SnackBar(
+                                      content: Text(
+                                          "Response Sent! [${response.statusCode}]")));
                                 }).catchError((e) {
                                   m.hideCurrentSnackBar();
                                   setState(() {

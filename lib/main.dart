@@ -1,10 +1,9 @@
+import 'package:birdseye/matchscout.dart';
+import 'package:birdseye/pitscout.dart';
+import 'package:birdseye/settings.dart';
+import 'package:birdseye/web.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'matchscout.dart';
-import 'pitscout.dart';
-import 'settings.dart';
-import 'web.dart';
 
 const cardinalred = Color(0xffcf2e2e);
 void main() async {
@@ -183,7 +182,7 @@ class MainScreen extends StatelessWidget {
             icon: const Icon(Icons.refresh_rounded),
             tooltip: "Refresh Cache",
             onPressed: () {
-              cacheSoT.deleteAll();
+              stock.clearAll();
               _settingsKey.currentState!.reloadEvents();
             }),
       );

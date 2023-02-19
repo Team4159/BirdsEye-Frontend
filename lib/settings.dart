@@ -1,9 +1,8 @@
+import 'package:birdseye/main.dart';
+import 'package:birdseye/web.dart';
 import 'package:birdseye/widgets/errorcontainer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'main.dart';
-import 'web.dart';
 
 class Settings extends StatefulWidget {
   const Settings({Key? key}) : super(key: key);
@@ -50,9 +49,13 @@ class SettingsState extends State<Settings> {
         }
       },
     ).catchError((error) {
-      setState(() {
-        _events = null;
-      });
+      if (mounted) {
+        setState(() {
+          _events = null;
+        });
+      } else {
+        _events = null; // yeah whatever you deal with it
+      }
     });
   }
 
