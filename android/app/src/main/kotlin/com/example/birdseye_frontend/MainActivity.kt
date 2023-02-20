@@ -1,4 +1,4 @@
-package com.example.birdseye_frontend
+package org.team4159.birdseye
 
 import io.flutter.embedding.android.FlutterActivity
 
