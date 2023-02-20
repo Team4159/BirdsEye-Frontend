@@ -3,20 +3,25 @@ import 'package:flutter/material.dart';
 class FormFieldTitle extends Builder {
   FormFieldTitle(String title, {super.key})
       : super(
-            builder: (context) => Align(
-                alignment: Alignment.topCenter,
-                child: Baseline(
-                    baseline: MediaQuery.of(context).size.width < 750 ? 24 : 36,
-                    baselineType: TextBaseline.alphabetic,
+            builder: (context) => Baseline(
+                baseline: 36,
+                baselineType: TextBaseline.alphabetic,
+                child: Align(
+                    alignment: Alignment.bottomCenter,
                     child: FractionallySizedBox(
+                        alignment: Alignment.bottomCenter,
                         widthFactor: buttonTextWidthFactor,
+                        heightFactor: 0.4,
                         child: FittedBox(
-                          alignment: Alignment.topCenter,
+                          alignment: Alignment.bottomCenter,
                           fit: BoxFit.scaleDown,
                           child: Text(
                             title,
                             textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodyMedium,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(fontSize: 36),
                           ),
                         )))));
 }

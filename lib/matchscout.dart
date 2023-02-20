@@ -56,7 +56,10 @@ class MatchScoutState extends State<MatchScout> {
                                   alignment: Alignment.topCenter,
                                   margin: const EdgeInsets.only(bottom: 10),
                                   child: Text(
-                                    e1.key,
+                                    Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? e1.key
+                                        : e1.key.toUpperCase(),
                                     style: Theme.of(context)
                                         .textTheme
                                         .displayLarge,

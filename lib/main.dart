@@ -22,6 +22,7 @@ void main() async {
     darkTheme: ThemeData(
       colorScheme: ColorScheme.dark(
           primary: Colors.blue[600]!,
+          secondary: Colors.transparent,
           surface: cardinalred,
           background: Colors.black),
       scrollbarTheme: ScrollbarThemeData(
@@ -97,8 +98,11 @@ void main() async {
       scaffoldBackgroundColor: Colors.black,
     ),
     theme: ThemeData(
-      colorScheme:
-          ColorScheme.light(primary: Colors.blue[600]!, surface: cardinalred),
+      colorScheme: ColorScheme.light(
+          primary: Colors.blue[600]!,
+          secondary: Colors.grey[400]!,
+          surface: cardinalred,
+          background: Colors.grey[200]!),
       scrollbarTheme: ScrollbarThemeData(
           radius: const Radius.circular(1),
           trackVisibility: MaterialStateProperty.all(true)),
@@ -113,6 +117,7 @@ void main() async {
               color: Colors.white,
               fontSize: 28),
           centerTitle: true),
+      drawerTheme: DrawerThemeData(backgroundColor: Colors.grey[200]),
       textTheme: const TextTheme(
         titleLarge:
             TextStyle(fontFamily: "HemiHead", fontSize: 32, color: cardinalred),
@@ -122,17 +127,29 @@ void main() async {
             fontWeight: FontWeight.w900,
             fontSize: 16,
             letterSpacing: 1),
+        labelMedium: TextStyle(
+          // Drawer Items
+          fontFamily: "Verdana",
+          fontSize: 20,
+        ),
+        displayLarge: TextStyle(
+            // Match Scout Section Titles
+            fontFamily: "VarelaRound",
+            fontSize: 36,
+            letterSpacing: 2,
+            fontWeight: FontWeight.w900,
+            color: Colors.black),
+        displaySmall: TextStyle(
+            // Settings Option List
+            fontFamily: "OpenSans",
+            fontSize: 16,
+            fontWeight: FontWeight.w200),
         bodySmall: TextStyle(
             // Settings Input
             fontFamily: "Calibri",
             fontSize: 16,
             fontWeight: FontWeight.w800,
             color: Colors.black54),
-        labelMedium: TextStyle(
-          // Drawer Items
-          fontFamily: "Verdana",
-          fontSize: 20,
-        ),
       ),
     ),
   ));

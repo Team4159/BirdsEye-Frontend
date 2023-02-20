@@ -141,6 +141,25 @@ class SettingsState extends State<Settings> {
                       child: ReorderableListView(
                           shrinkWrap: true,
                           buildDefaultDragHandles: false,
+                          proxyDecorator: (child, index, animation) =>
+                              AnimatedBuilder(
+                                  animation: animation,
+                                  child: child,
+                                  builder: (BuildContext context,
+                                          Widget? child) =>
+                                      Material(
+                                        elevation: Curves.easeInOut
+                                                .transform(animation.value) *
+                                            6,
+                                        borderRadius: BorderRadius.circular(4),
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .secondary,
+                                        shadowColor: Theme.of(context)
+                                            .colorScheme
+                                            .secondary,
+                                        child: child,
+                                      )),
                           onReorder: (int oldIndex, int newIndex) {
                             setState(() {
                               if (oldIndex < newIndex) {
