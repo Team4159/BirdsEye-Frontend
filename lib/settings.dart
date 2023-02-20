@@ -59,6 +59,13 @@ class SettingsState extends State<Settings> {
     });
   }
 
+  static InputDecoration inputDecoration(BuildContext context) =>
+      InputDecoration(
+          border: Theme.of(context).brightness == Brightness.light
+              ? const UnderlineInputBorder()
+              : InputBorder.none,
+          counterText: '');
+
   @override
   Widget build(BuildContext context) => Padding(
       padding: const EdgeInsets.all(20),
@@ -83,8 +90,7 @@ class SettingsState extends State<Settings> {
                 textAlign: TextAlign.right,
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: const InputDecoration(
-                    border: InputBorder.none, counterText: ''),
+                decoration: inputDecoration(context),
                 controller: TextEditingController(text: season.toString()),
                 onSubmitted: (content) {
                   season = int.parse(content);
@@ -109,8 +115,7 @@ class SettingsState extends State<Settings> {
                 maxLength: 64,
                 textAlign: TextAlign.right,
                 keyboardType: TextInputType.name,
-                decoration: const InputDecoration(
-                    border: InputBorder.none, counterText: ''),
+                decoration: inputDecoration(context),
                 controller: TextEditingController(
                     text: prefs.getString("name") ?? "null"),
                 onSubmitted: (value) {
@@ -266,8 +271,7 @@ class IPConfigFieldState extends State<IPConfigField> {
             keyboardType: TextInputType.url,
             controller: _controller,
             textCapitalization: TextCapitalization.none,
-            decoration: const InputDecoration(
-                border: InputBorder.none, counterText: ''),
+            decoration: SettingsState.inputDecoration(context),
             onSubmitted: (content) {
               setState(() {
                 _enabled = false;
