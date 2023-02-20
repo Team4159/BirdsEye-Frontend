@@ -6,7 +6,7 @@ class FormFieldTitle extends Builder {
             builder: (context) => Align(
                 alignment: Alignment.topCenter,
                 child: Baseline(
-                    baseline: buttonBaseline,
+                    baseline: MediaQuery.of(context).size.width < 750 ? 24 : 36,
                     baselineType: TextBaseline.alphabetic,
                     child: FractionallySizedBox(
                         widthFactor: buttonTextWidthFactor,
@@ -21,5 +21,4 @@ class FormFieldTitle extends Builder {
                         )))));
 }
 
-const double buttonBaseline = 36;
-const double buttonTextWidthFactor = 0.25;
+const double buttonTextWidthFactor = 0.6;

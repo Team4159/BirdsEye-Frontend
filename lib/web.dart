@@ -1,4 +1,4 @@
-import 'dart:convert';
+import 'dart:convert' show json;
 
 import 'package:birdseye/main.dart';
 import 'package:birdseye/settings.dart';
@@ -8,7 +8,7 @@ import 'package:stock/stock.dart';
 
 Uri parseURI(String path, {Map<String, dynamic>? params}) {
   return kDebugMode
-      ? Uri.http("localhost:5000", path, params)
+      ? Uri.http(kIsWeb ? "localhost:5000" : "10.0.2.2:5000", path, params)
       : Uri.https(serverIP, path, params);
 }
 

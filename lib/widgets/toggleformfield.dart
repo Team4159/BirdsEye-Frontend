@@ -25,7 +25,12 @@ class ToggleFormField extends FormField<bool> {
                           child: Center(
                               child: Text(
                             state.value.toString(),
-                            style: const TextStyle(fontSize: 28),
+                            style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(state.context).size.width <
+                                            750
+                                        ? 20
+                                        : 28),
                           ))),
                       FormFieldTitle(labelText),
                     ]));

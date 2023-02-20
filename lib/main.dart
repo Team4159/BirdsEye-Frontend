@@ -64,6 +64,11 @@ void main() async {
             fontSize: 16,
             fontWeight: FontWeight.w200,
             color: Colors.green[700]),
+        titleLarge: const TextStyle(
+            // CardinalBotics Logo Theme
+            fontFamily: "HemiHead",
+            fontSize: 32,
+            color: cardinalred),
         labelMedium: const TextStyle(
           // Drawer Items
           fontFamily: "Verdana",
@@ -109,6 +114,8 @@ void main() async {
               fontSize: 28),
           centerTitle: true),
       textTheme: const TextTheme(
+        titleLarge:
+            TextStyle(fontFamily: "HemiHead", fontSize: 32, color: cardinalred),
         labelSmall: TextStyle(
             // Settings Labels
             fontFamily: "OpenSans",
@@ -134,11 +141,21 @@ void main() async {
 late SharedPreferences prefs;
 
 getDrawer(context) => Drawer(
-        child: Column(
+    width: 200,
+    child: Column(
       children: [
+        SizedBox(
+            height: 65,
+            child: DrawerHeader(
+                margin: EdgeInsets.zero,
+                padding: const EdgeInsets.only(top: 10),
+                child: Text(
+                  "Bird's Eye",
+                  style: Theme.of(context).textTheme.titleLarge,
+                ))),
         ListTile(
           title: Text(
-            "Home",
+            "Configuration",
             style: Theme.of(context).textTheme.labelMedium,
           ),
           onTap: () {
@@ -175,7 +192,7 @@ class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: const Text("Bird's Eye"),
+          title: const Text("Configuration"),
         ),
         drawer: getDrawer(context),
         body: Settings(key: _settingsKey),

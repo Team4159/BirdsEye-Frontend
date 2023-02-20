@@ -94,6 +94,9 @@ flutter:
     - family: RobotoMono
       fonts:
         - asset: fonts/RobotoMono-VariableFont_wght.ttf
+    - family: HemiHead
+      fonts:
+        - asset: fonts/hemi-head.otf
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
