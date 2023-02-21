@@ -1,0 +1,13 @@
+name: automatic builds
+run-name: ${{ github.actor }} building flutter
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable' # or: 'beta', 'dev' or 'master'
+    - run: flutter build web
+    - run: flutter build apk --split-per-abi
