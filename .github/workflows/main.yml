@@ -15,5 +15,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: upload-apk
-        path: |
-          **.apk
+        path: build/app/outputs/flutter-apk/*.apk
