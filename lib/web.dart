@@ -2,14 +2,16 @@ import 'dart:convert' show json;
 
 import 'package:birdseye/main.dart';
 import 'package:birdseye/settings.dart';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:stock/stock.dart';
 
-Uri parseURI(String path, {Map<String, dynamic>? params}) {
-  return kDebugMode
-      ? Uri.http(kIsWeb ? "localhost:5000" : "10.0.2.2:5000", path, params)
-      : Uri.https(serverIP, path, params);
+final hasLetter = RegExp(r"[a-z]", caseSensitive: false);
+
+Uri parseURI(String path, {String? ip, Map<String, dynamic>? params}) {
+  ip ??= serverIP;
+  return hasLetter.hasMatch(ip)
+      ? Uri.https(ip, path, params)
+      : Uri.http(ip, path, params);
 }
 
 enum WebDataTypes { pitScout, matchScout }
@@ -32,7 +34,7 @@ final stock = Stock<WebDataTypes, Map<String, dynamic>>(
 
 Future<bool> getStatus(String ip) {
   return http
-      .get(Uri.https(ip))
+      .get(parseURI("", ip: ip))
       .then((value) => value.body == "BirdsEye Scouting Server Online!")
       .onError((error, stackTrace) => false);
 }
