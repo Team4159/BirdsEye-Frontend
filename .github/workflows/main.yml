@@ -11,3 +11,9 @@ jobs:
         channel: 'stable' # or: 'beta', 'dev' or 'master'
     - run: flutter build web
     - run: flutter build apk --split-per-abi
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: upload-apk
+        path: |
+          *.apk
