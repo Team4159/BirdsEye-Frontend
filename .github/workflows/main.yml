@@ -1,8 +1,15 @@
-name: automatic builds
+name: Autobuild
 run-name: ${{ github.actor }} building flutter
 on: [push]
 jobs:
+  cache:
+    steps:
+      uses: actions/cache@v3.2.6
+      with:
+        path: ".dart_tool"
+        enableCrossOsArchive: true
   build-web:
+    needs: cache
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -10,12 +17,8 @@ jobs:
       with:
         channel: 'stable' # or: 'beta', 'dev' or 'master'
     - run: flutter build web
-    - name: Archive production artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: web-dist
-        path: build/web/
   build-apk:
+    needs: cache
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -23,8 +26,17 @@ jobs:
       with:
         channel: 'stable' # or: 'beta', 'dev' or 'master'
     - run: flutter build apk --split-per-abi
-    - name: Archive production artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: apk-dist
-        path: build/app/outputs/flutter-apk/*.apk
+  upload:
+    runs-on: ubuntu-latest
+    needs: [build-web, build-apk]
+    steps:
+      - name: Upload Built Web Server
+        uses: actions/upload-artifact@v3
+        with:
+          name: web-dist
+          path: build/web/
+      - name: Upload Built APKs
+        uses: actions/upload-artifact@v3
+        with:
+          name: apk-dist
+          path: build/app/outputs/flutter-apk/*.apk
