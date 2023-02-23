@@ -9,6 +9,7 @@ const cardinalred = Color(0xffcf2e2e);
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   prefs = await SharedPreferences.getInstance();
+  prefs.setString("ip", prefs.getString("ip") ?? "scouting.team4159.org");
   runApp(MaterialApp(
     title: "Bird's Eye",
     initialRoute: "/",
@@ -32,6 +33,7 @@ void main() async {
           const InputDecorationTheme(border: OutlineInputBorder()),
       snackBarTheme: const SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.grey,
         closeIconColor: Colors.black,
         elevation: 3,
         contentTextStyle: TextStyle(

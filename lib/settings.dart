@@ -12,11 +12,10 @@ class Settings extends StatefulWidget {
   State<StatefulWidget> createState() => SettingsState();
 }
 
-String serverIP = "scouting.team4159.org";
-
 class SettingsState extends State<Settings> {
   List<MapEntry<String, dynamic>>? _events = [];
   static int season = DateTime.now().year;
+  final ScrollController _controller = ScrollController();
 
   @override
   void initState() {
@@ -84,7 +83,8 @@ class SettingsState extends State<Settings> {
                 style: Theme.of(context).textTheme.bodySmall,
                 maxLength: 4,
                 textAlign: TextAlign.right,
-                keyboardType: TextInputType.number,
+                keyboardType: TextInputType
+                    .text, // Not 'number' because apple number keyboard has no enter
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 decoration: inputDecoration(context),
                 controller: TextEditingController(text: season.toString()),
@@ -123,90 +123,63 @@ class SettingsState extends State<Settings> {
           width: 24,
         ),
         Expanded(
-            child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: _events == null
+            child: ShiftingFit(
+                Container(
+                    alignment: Alignment.topLeft,
+                    padding: const EdgeInsets.all(10),
+                    child: Text(
+                      "Current Event",
+                      style: Theme.of(context).textTheme.labelSmall,
+                      textAlign: TextAlign.left,
+                    )),
+                _events == null
                     ? const ErrorContainer("Error")
                     : _events!.isEmpty
                         ? const Center(child: CircularProgressIndicator())
-                        : ReorderableListView(
-                            header: Text(
-                              "Current Event",
-                              style: Theme.of(context).textTheme.labelSmall,
-                              textAlign: TextAlign.left,
-                            ),
+                        : ListView(
+                            controller: _controller,
                             shrinkWrap: true,
-                            buildDefaultDragHandles: false,
-                            proxyDecorator: (child, index, animation) =>
-                                AnimatedBuilder(
-                                    animation: animation,
-                                    child: child,
-                                    builder: (BuildContext context,
-                                            Widget? child) =>
-                                        Material(
-                                          elevation: Curves.easeInOut
-                                                  .transform(animation.value) *
-                                              6,
-                                          borderRadius:
-                                              BorderRadius.circular(4),
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .secondary,
-                                          shadowColor: Theme.of(context)
-                                              .colorScheme
-                                              .secondary,
-                                          child: child,
-                                        )),
-                            onReorder: (int oldIndex, int newIndex) {
-                              if (oldIndex < newIndex) {
-                                newIndex--;
-                              }
-                              setState(() {
-                                final item = _events!.removeAt(oldIndex);
-                                _events!.insert(newIndex, item);
-                                if (newIndex == 0) {
-                                  prefs.setString("event", item.key);
-                                }
-                              });
-                            },
                             children: [
                                 for (int i = 0; i < _events!.length; i++)
-                                  ReorderableDragStartListener(
+                                  ListTile(
                                       key: ValueKey(_events![i].key),
-                                      index: i,
-                                      child: ListTile(
-                                        onTap: () async {
-                                          await prefs.setString(
-                                              "event", _events![i].key);
-                                          var event = _events![i].key;
-                                          setState(() {
-                                            _events!.sort(
-                                              (a, b) => a.key == event
-                                                  ? -1
-                                                  : b.key == event
-                                                      ? 1
-                                                      : 0,
-                                            );
-                                          });
-                                        },
-                                        title: Text(
-                                          _events![i].value,
-                                          overflow: TextOverflow.clip,
-                                          maxLines: 1,
-                                          textAlign: TextAlign.right,
-                                          style: _events![i].key ==
-                                                  prefs.getString('event')
-                                              ? Theme.of(context)
-                                                  .textTheme
-                                                  .displaySmall!
-                                                  .copyWith(
-                                                      fontWeight:
-                                                          FontWeight.w800)
-                                              : Theme.of(context)
-                                                  .textTheme
-                                                  .displaySmall,
-                                        ),
-                                        trailing: ConstrainedBox(
+                                      onTap: () async {
+                                        await prefs.setString(
+                                            "event", _events![i].key);
+                                        _controller.animateTo(0,
+                                            duration: const Duration(
+                                                milliseconds: 500),
+                                            curve: Curves.easeOutCubic);
+                                        var event = _events![i].key;
+                                        setState(() {
+                                          _events!.sort(
+                                            (a, b) => a.key == event
+                                                ? -1
+                                                : b.key == event
+                                                    ? 1
+                                                    : 0,
+                                          );
+                                        });
+                                      },
+                                      title: Text(
+                                        _events![i].value,
+                                        overflow: TextOverflow.clip,
+                                        maxLines: 1,
+                                        textAlign: TextAlign.right,
+                                        style: _events![i].key ==
+                                                prefs.getString('event')
+                                            ? Theme.of(context)
+                                                .textTheme
+                                                .displaySmall!
+                                                .copyWith(
+                                                    fontWeight: FontWeight.w800)
+                                            : Theme.of(context)
+                                                .textTheme
+                                                .displaySmall,
+                                      ),
+                                      trailing: ReorderableDragStartListener(
+                                        index: i,
+                                        child: ConstrainedBox(
                                             constraints: const BoxConstraints(
                                                 minWidth: 60, maxWidth: 60),
                                             child: Text(_events![i].key,
@@ -239,7 +212,7 @@ class IPConfigField extends StatefulWidget {
 }
 
 class IPConfigFieldState extends State<IPConfigField> {
-  final _controller = TextEditingController(text: serverIP);
+  final _controller = TextEditingController(text: prefs.getString("ip"));
   bool _enabled = true;
 
   @override
@@ -268,11 +241,11 @@ class IPConfigFieldState extends State<IPConfigField> {
             });
             getStatus(content).then((value) {
               if (value) {
-                serverIP = content;
+                prefs.setString("ip", content);
                 ScaffoldMessenger.of(context)
                     .showSnackBar(const SnackBar(content: Text("Set IP!")));
               } else {
-                _controller.text = serverIP;
+                _controller.text = prefs.getString("ip")!;
                 ScaffoldMessenger.of(context)
                     .showSnackBar(const SnackBar(content: Text("Invalid IP!")));
               }

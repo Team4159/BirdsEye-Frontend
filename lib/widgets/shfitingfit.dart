@@ -5,11 +5,14 @@ class ShiftingFit extends LayoutBuilder {
   ShiftingFit(this.a, this.b, {super.key})
       : super(builder: (BuildContext context, BoxConstraints constraints) {
           if (constraints.maxWidth < 300) {
-            return Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
-                children: [a, b]);
+            return Padding(
+                padding: const EdgeInsets.only(top: 5),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: [a, Flexible(fit: FlexFit.loose, child: b)]));
           } else {
             return Row(
               crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -17,12 +20,10 @@ class ShiftingFit extends LayoutBuilder {
               children: [
                 Expanded(
                     child: Align(alignment: Alignment.centerLeft, child: a)),
-                ConstrainedBox(
-                    constraints:
-                        BoxConstraints(maxWidth: constraints.maxWidth / 1.75),
-                    child: IntrinsicWidth(
-                        child:
-                            Align(alignment: Alignment.centerRight, child: b)))
+                Align(
+                    alignment: Alignment.centerRight,
+                    child: LimitedBox(
+                        maxWidth: constraints.maxWidth / 1.75, child: b))
               ],
             );
           }

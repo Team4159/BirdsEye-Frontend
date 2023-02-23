@@ -8,7 +8,7 @@ import 'package:stock/stock.dart';
 final hasLetter = RegExp(r"[a-z]", caseSensitive: false);
 
 Uri parseURI(String path, {String? ip, Map<String, dynamic>? params}) {
-  ip ??= serverIP;
+  ip ??= prefs.getString("ip")!;
   return hasLetter.hasMatch(ip)
       ? Uri.https(ip, path, params)
       : Uri.http(ip, path, params);
