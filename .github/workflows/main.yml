@@ -8,6 +8,7 @@ jobs:
     - uses: actions/cache@v3.2.6
       with:
         path: ".dart_tool"
+        key: "dart-cache"
         enableCrossOsArchive: true
   build-web:
     needs: cache
