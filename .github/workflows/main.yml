@@ -4,7 +4,7 @@ on: [push]
 jobs:
   cache:
     steps:
-      uses: actions/cache@v3.2.6
+    - uses: actions/cache@v3.2.6
       with:
         path: ".dart_tool"
         enableCrossOsArchive: true
