@@ -1,4 +1,5 @@
 import 'package:birdseye/main.dart';
+import 'package:birdseye/settings.dart';
 import 'package:birdseye/web.dart';
 import 'package:birdseye/widgets/errorcontainer.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,6 @@ class PitScoutState extends State<PitScout> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final ScrollController _scrollController = ScrollController();
   final Map<String, String> _fields = {};
-  int? _teamNumber;
   bool _loading = false;
 
   @override
@@ -40,22 +40,7 @@ class PitScoutState extends State<PitScout> {
                 return ListView(
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     controller: _scrollController,
-                    children: <Widget>[
-                      TextFormField(
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly
-                          ],
-                          maxLines: 1,
-                          maxLength: 4,
-                          validator: (value) =>
-                              (value?.isNotEmpty ?? false) ? null : "Required",
-                          decoration: const InputDecoration(
-                              labelText: "Team Number", counterText: ""),
-                          onSaved: (String? content) {
-                            _teamNumber = int.parse(content!);
-                          })
-                    ]
+                    children: <Widget>[const PitInfoFields()]
                         .followedBy(
                             snapshot.data!.entries.map((e) => TextFormField(
                                   keyboardType: TextInputType.multiline,
@@ -93,11 +78,15 @@ class PitScoutState extends State<PitScout> {
                                 });
                                 postResponse(WebDataTypes.pitScout, {
                                   ..._fields,
-                                  "teamNumber": _teamNumber,
+                                  "teamNumber": PitInfoFieldsState._teamNumber,
                                   "name": prefs.getString("name")
                                 }).then((response) {
+                                  if (response.statusCode >= 400) {
+                                    throw Exception(
+                                        "Error ${response.statusCode}");
+                                  }
                                   _formKey.currentState!.reset();
-                                  _teamNumber = null;
+                                  PitInfoFieldsState._teamNumber = null;
                                   m.hideCurrentSnackBar();
                                   setState(() {
                                     _loading = false;
@@ -127,4 +116,52 @@ class PitScoutState extends State<PitScout> {
                             child: e))
                         .toList());
               })));
+}
+
+class PitInfoFields extends StatefulWidget {
+  const PitInfoFields({super.key});
+
+  @override
+  State<StatefulWidget> createState() => PitInfoFieldsState();
+}
+
+class PitInfoFieldsState extends State<PitInfoFields> {
+  static int? _teamNumber;
+  final GlobalKey<FormFieldState> _teamNumberKey = GlobalKey<FormFieldState>();
+  String _lGoodTeamNumber = "";
+  String _lBadTeamNumber = "";
+
+  @override
+  Widget build(BuildContext context) => ConstrainedBox(
+      constraints: const BoxConstraints(minWidth: 75, maxWidth: 150),
+      child: TextFormField(
+          key: _teamNumberKey,
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          maxLength: 4,
+          textInputAction: TextInputAction.done,
+          decoration: const InputDecoration(
+              border: UnderlineInputBorder(),
+              labelText: "Team #",
+              counterText: ""),
+          validator: (String? content) {
+            _teamNumber = null;
+            if (content == null || content.isEmpty) return "Required";
+            if (_lGoodTeamNumber == content) return null;
+            if (_lBadTeamNumber == content) return "Invalid";
+            tbaStock
+                .get("${SettingsState.season}${prefs.getString('event')}_*")
+                .then((val) {
+              if (val.containsKey(content)) {
+                _lGoodTeamNumber = content;
+              } else {
+                _lBadTeamNumber = content;
+              }
+              _teamNumberKey.currentState!.validate();
+            });
+            return "Validating";
+          },
+          onFieldSubmitted: (String content) {
+            _teamNumber = int.parse(content);
+          }));
 }

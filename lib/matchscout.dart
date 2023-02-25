@@ -20,7 +20,6 @@ class MatchScout extends StatefulWidget {
 class MatchScoutState extends State<MatchScout> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final ScrollController _scrollController = ScrollController();
-  final MatchInfoFields matchInfoFields = const MatchInfoFields();
   final Map<String, Map<String, dynamic>> _fields = {};
   bool _loading = false;
 
@@ -45,7 +44,7 @@ class MatchScoutState extends State<MatchScout> {
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     controller: _scrollController,
                     child: Column(
-                        children: <Widget>[matchInfoFields]
+                        children: <Widget>[const MatchInfoFields()]
                             .followedBy(snapshot.data!.entries.map((e1) {
                               Iterable<MapEntry<String, dynamic>> a = e1
                                   .value.entries
@@ -167,6 +166,10 @@ class MatchScoutState extends State<MatchScout> {
                                               MatchInfoFieldsState._matchCode,
                                           "name": prefs.getString("name")
                                         }).then((response) {
+                                          if (response.statusCode >= 400) {
+                                            throw Exception(
+                                                "Error ${response.statusCode}");
+                                          }
                                           _formKey.currentState!.reset();
                                           MatchInfoFieldsState._teamNumber =
                                               null;
