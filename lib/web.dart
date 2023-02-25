@@ -21,10 +21,10 @@ final stock = Stock<WebDataTypes, Map<String, dynamic>>(
     late Uri uri;
     switch (dataType) {
       case WebDataTypes.pitScout:
-        uri = parseURI("/api/${SettingsState.season}/pitschema/");
+        uri = parseURI("/api/${SettingsState.season}/pitschema");
         break;
       case WebDataTypes.matchScout:
-        uri = parseURI("/api/${SettingsState.season}/matchschema/");
+        uri = parseURI("/api/${SettingsState.season}/matchschema");
         break;
     }
     return http.get(uri).then((resp) => json.decode(resp.body));
@@ -36,7 +36,7 @@ Future<bool> getStatus(String ip) {
   return http
       .get(parseURI("", ip: ip))
       .then((value) => value.body == "BirdsEye Scouting Server Online!")
-      .onError((error, stackTrace) => false);
+      .onError((_, __) => false);
 }
 
 final tbaRegex = RegExp(
@@ -55,14 +55,10 @@ final tbaStock = Stock<String, Map<String, String>>(
             ];
       var i = groups.indexOf(null);
       return http
-          .get(
-        parseURI(
-            "/api/bluealliance/${groups.sublist(0, i >= 0 ? i : null).join("/")}",
-            params: {"ignoreDate": "true"}),
-      )
-          .then((resp) {
-        return Map.from(json.decode(resp.body));
-      });
+          .get(parseURI(
+              "/api/bluealliance/${groups.sublist(0, i >= 0 ? i : null).join("/")}",
+              params: {"ignoreDate": "true"}))
+          .then((resp) => Map<String, String>.from(json.decode(resp.body)));
     }),
     sourceOfTruth: tbaSoT);
 

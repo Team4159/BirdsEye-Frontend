@@ -31,7 +31,7 @@ class MatchScoutState extends State<MatchScout> {
       drawer: getDrawer(context),
       body: Form(
           key: _formKey,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
+          autovalidateMode: AutovalidateMode.disabled,
           child: FutureBuilder(
               future: stock.get(WebDataTypes.matchScout),
               builder: (context, snapshot) {
@@ -136,7 +136,8 @@ class MatchScoutState extends State<MatchScout> {
                                         if (_loading) return;
                                         _fields.clear();
                                         if (!_formKey.currentState!
-                                            .validate()) {
+                                                .validate() ||
+                                            !MatchInfoFieldsState.isValid) {
                                           _scrollController.animateTo(0,
                                               duration: const Duration(
                                                   milliseconds: 200),
@@ -171,10 +172,6 @@ class MatchScoutState extends State<MatchScout> {
                                                 "Error ${response.statusCode}");
                                           }
                                           _formKey.currentState!.reset();
-                                          MatchInfoFieldsState._teamNumber =
-                                              null;
-                                          MatchInfoFieldsState._matchCode =
-                                              null;
                                           m.hideCurrentSnackBar();
                                           setState(() {
                                             _loading = false;
@@ -213,6 +210,8 @@ class MatchInfoFields extends StatefulWidget {
 }
 
 class MatchInfoFieldsState extends State<MatchInfoFields> {
+  static bool get isValid => _matchCode != null && _teamNumber != null;
+
   static int? _teamNumber;
   final GlobalKey<FormFieldState> _teamNumberKey = GlobalKey<FormFieldState>();
   String _lGoodTeamNumber = "";
@@ -248,18 +247,22 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
                       .then((val) {
                     if (val.containsKey(content)) {
                       _lGoodMatchCode = content;
+                      _matchCode = content;
+                      _lBadTeamNumber = _lGoodTeamNumber = "";
+                      _teamNumberKey.currentState!.validate();
                     } else {
                       _lBadMatchCode = content;
+                      _matchCode = null;
                     }
                     _matchCodeKey.currentState!.validate();
                   });
                   return "Validating";
                 },
                 onFieldSubmitted: (String content) {
-                  _matchCode = content;
-
-                  _lBadTeamNumber = _lGoodTeamNumber = "";
-                  _teamNumberKey.currentState!.validate();
+                  _matchCodeKey.currentState!.validate();
+                },
+                onChanged: (String value) {
+                  if (value != _matchCode.toString()) _matchCode = null;
                 },
               ),
             ),
@@ -267,38 +270,43 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
             ConstrainedBox(
                 constraints: const BoxConstraints(minWidth: 75, maxWidth: 150),
                 child: TextFormField(
-                    key: _teamNumberKey,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    maxLength: 4,
-                    textInputAction: TextInputAction.done,
-                    decoration: const InputDecoration(
-                        border: UnderlineInputBorder(),
-                        labelText: "Team #",
-                        counterText: ""),
-                    validator: (String? content) {
-                      _teamNumber = null;
-                      if (content == null || content.isEmpty) return "Required";
-                      if (_matchCode == null || _matchCode!.isEmpty) {
-                        return "Set Match First!";
+                  key: _teamNumberKey,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  maxLength: 4,
+                  textInputAction: TextInputAction.done,
+                  decoration: const InputDecoration(
+                      border: UnderlineInputBorder(),
+                      labelText: "Team #",
+                      counterText: ""),
+                  validator: (String? content) {
+                    if (content == null || content.isEmpty) return "Required";
+                    if (_matchCode == null || _matchCode!.isEmpty) {
+                      return "Set Match First!";
+                    }
+                    if (_lGoodTeamNumber == content) return null;
+                    if (_lBadTeamNumber == content) return "Invalid";
+                    tbaStock
+                        .get(
+                            "${SettingsState.season}${prefs.getString('event')}_$_matchCode")
+                        .then((val) {
+                      if (val.containsKey(content)) {
+                        _lGoodTeamNumber = content;
+                        _teamNumber = int.parse(content);
+                      } else {
+                        _lBadTeamNumber = content;
+                        _teamNumber = null;
                       }
-                      if (_lGoodTeamNumber == content) return null;
-                      if (_lBadTeamNumber == content) return "Invalid";
-                      tbaStock
-                          .get(
-                              "${SettingsState.season}${prefs.getString('event')}_$_matchCode")
-                          .then((val) {
-                        if (val.containsKey(content)) {
-                          _lGoodTeamNumber = content;
-                        } else {
-                          _lBadTeamNumber = content;
-                        }
-                        _teamNumberKey.currentState!.validate();
-                      });
-                      return "Validating";
-                    },
-                    onFieldSubmitted: (String content) {
-                      _teamNumber = int.parse(content);
-                    }))
+                      _teamNumberKey.currentState!.validate();
+                    });
+                    return "Validating";
+                  },
+                  onFieldSubmitted: (String content) {
+                    _teamNumberKey.currentState!.validate();
+                  },
+                  onChanged: (String value) {
+                    if (value != _teamNumber.toString()) _teamNumber = null;
+                  },
+                ))
           ]);
 }
