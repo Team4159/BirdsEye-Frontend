@@ -35,7 +35,7 @@ final stock = Stock<WebDataTypes, Map<String, dynamic>>(
 Future<bool> getStatus(String ip) {
   return http
       .get(parseURI("", ip: ip))
-      .then((value) => value.body == "BirdsEye Scouting Server Online!")
+      .then((resp) => resp.body == "BirdsEye Scouting Server Online!")
       .onError((_, __) => false);
 }
 

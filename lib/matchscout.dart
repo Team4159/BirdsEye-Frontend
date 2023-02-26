@@ -169,7 +169,7 @@ class MatchScoutState extends State<MatchScout> {
                                         }).then((response) {
                                           if (response.statusCode >= 400) {
                                             throw Exception(
-                                                "Error ${response.statusCode}");
+                                                "Error ${response.statusCode}: ${response.reasonPhrase}");
                                           }
                                           _formKey.currentState!.reset();
                                           m.hideCurrentSnackBar();
