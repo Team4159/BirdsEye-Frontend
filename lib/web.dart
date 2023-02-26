@@ -68,12 +68,12 @@ Future<http.Response> postResponse(
     case WebDataTypes.pitScout:
       return http.post(
           parseURI(
-              "/api/${SettingsState.season}/${prefs.getString('event')}/pit/"),
+              "/api/${SettingsState.season}/${prefs.getString('event')}/pit"),
           body: json.encode(body));
     case WebDataTypes.matchScout:
       return http.post(
           parseURI(
-              "/api/${SettingsState.season}/${prefs.getString('event')}/match/"),
+              "/api/${SettingsState.season}/${prefs.getString('event')}/match"),
           body: json.encode(body));
   }
 }

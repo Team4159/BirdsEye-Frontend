@@ -220,6 +220,7 @@ class MainScreen extends StatelessWidget {
             tooltip: "Refresh Cache",
             onPressed: () {
               stock.clearAll();
+              tbaStock.clearAll();
               _settingsKey.currentState!.reloadEvents();
             }),
       );
