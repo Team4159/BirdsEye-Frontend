@@ -40,7 +40,7 @@ Future<bool> getStatus(String ip) {
 }
 
 final tbaRegex = RegExp(
-    r"^(?<season>\d{4})(?:(?<event>[a-z]{2,})(?:_(?<match>(?:qm\d+?)|(?:(?:qf|sf|f)\dm\d)|\*))?)?$");
+    r"^(?<season>\d{4})(?:(?<event>[a-z0-9]{2,})(?:_(?<match>(?:qm\d+?)|(?:(?:qf|sf|f)\dm\d)|\*))?)?$");
 final CachedSourceOfTruth<String, Map<String, String>> tbaSoT =
     CachedSourceOfTruth();
 final tbaStock = Stock<String, Map<String, String>>(
