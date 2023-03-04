@@ -44,7 +44,10 @@ class MatchScoutState extends State<MatchScout> {
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     controller: _scrollController,
                     child: Column(
-                        children: <Widget>[const MatchInfoFields()]
+                        children: <Widget>[
+                      MatchInfoFields(
+                          reset: () => _formKey.currentState!.reset())
+                    ]
                             .followedBy(snapshot.data!.entries.map((e1) {
                               Iterable<MapEntry<String, dynamic>> a = e1
                                   .value.entries
@@ -203,7 +206,8 @@ class MatchScoutState extends State<MatchScout> {
 }
 
 class MatchInfoFields extends StatefulWidget {
-  const MatchInfoFields({super.key});
+  final void Function() reset;
+  const MatchInfoFields({super.key, required this.reset});
 
   @override
   State<StatefulWidget> createState() => MatchInfoFieldsState();
@@ -307,6 +311,15 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
                   onChanged: (String value) {
                     if (value != _teamNumber.toString()) _teamNumber = null;
                   },
-                ))
+                )),
+            Expanded(
+                child: Align(
+              alignment: Alignment.centerRight,
+              child: IconButton(
+                icon: const Icon(Icons.delete),
+                tooltip: "Reset",
+                onPressed: widget.reset,
+              ),
+            ))
           ]);
 }

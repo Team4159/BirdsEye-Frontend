@@ -9,7 +9,9 @@ const cardinalred = Color(0xffcf2e2e);
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   prefs = await SharedPreferences.getInstance();
-  prefs.setString("ip", prefs.getString("ip") ?? "scouting.team4159.org");
+  if (prefs.getString("ip") == null) {
+    prefs.setString("ip", "scouting.team4159.org");
+  }
   runApp(MaterialApp(
     title: "Bird's Eye",
     initialRoute: "/",

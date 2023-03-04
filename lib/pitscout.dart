@@ -95,15 +95,17 @@ class PitScoutState extends State<PitScout> {
                                 }
                               },
                             )),
-                        ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 40),
-                          child: ElevatedButton(
-                            child: const Text("Reset"),
+                        Expanded(
+                            child: Align(
+                          alignment: Alignment.centerRight,
+                          child: IconButton(
+                            icon: const Icon(Icons.delete),
+                            tooltip: "Reset",
                             onPressed: () {
                               _formKey.currentState!.reset();
                             },
                           ),
-                        )
+                        ))
                       ])
                     ]
                         .followedBy(

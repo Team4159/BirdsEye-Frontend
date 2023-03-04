@@ -180,10 +180,7 @@ class NameConfigField extends StatelessWidget {
 
   final TextEditingController _controller =
       TextEditingController(text: prefs.getString("name"));
-
-  save(ScaffoldMessengerState messenger) =>
-      prefs.setString("name", _controller.text).then((value) =>
-          messenger.showSnackBar(const SnackBar(content: Text("Set Name!"))));
+  final FocusNode _node = FocusNode();
 
   @override
   Widget build(BuildContext context) => ShiftingFit(
@@ -194,20 +191,22 @@ class NameConfigField extends StatelessWidget {
               style: Theme.of(context).textTheme.labelSmall,
               textAlign: TextAlign.left,
             )),
-        Focus(
-            onFocusChange: (bool hasFocus) {
-              if (!hasFocus) save(ScaffoldMessenger.of(context));
-            },
-            child: TextField(
-              cursorColor: Colors.green[900],
-              style: Theme.of(context).textTheme.bodySmall,
-              maxLength: 64,
-              textAlign: TextAlign.right,
-              keyboardType: TextInputType.name,
-              decoration: SettingsState.inputDecoration(context),
-              controller: _controller,
-              onEditingComplete: () => save(ScaffoldMessenger.of(context)),
-            )),
+        TextField(
+          cursorColor: Colors.green[900],
+          style: Theme.of(context).textTheme.bodySmall,
+          maxLength: 64,
+          textAlign: TextAlign.right,
+          keyboardType: TextInputType.name,
+          decoration: SettingsState.inputDecoration(context),
+          controller: _controller,
+          focusNode: _node,
+          onEditingComplete: () =>
+              prefs.setString("name", _controller.text).then((value) {
+            _node.unfocus();
+            ScaffoldMessenger.of(context)
+                .showSnackBar(const SnackBar(content: Text("Set Name!")));
+          }),
+        ),
       );
 }
 
