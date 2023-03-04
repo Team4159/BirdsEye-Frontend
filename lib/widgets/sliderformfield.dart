@@ -16,7 +16,7 @@ class SliderFormField extends FormField<double> {
                     fit: StackFit.passthrough,
                     children: [
                       Slider(
-                        label: labels[state.value!.toInt()],
+                        label: labels[state.value!.toInt() - 1],
                         value: state.value ?? initialValue!,
                         onChanged: (double value) {
                           state.didChange(value);
