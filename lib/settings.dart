@@ -83,8 +83,7 @@ class SettingsState extends State<Settings> {
                 style: Theme.of(context).textTheme.bodySmall,
                 maxLength: 4,
                 textAlign: TextAlign.right,
-                keyboardType: TextInputType
-                    .text, // Not 'number' because apple number keyboard has no enter
+                keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 decoration: inputDecoration(context),
                 controller: TextEditingController(text: season.toString()),
@@ -92,30 +91,7 @@ class SettingsState extends State<Settings> {
                   season = int.parse(content);
                 },
               )),
-          ShiftingFit(
-            Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Your Name",
-                  style: Theme.of(context).textTheme.labelSmall,
-                  textAlign: TextAlign.left,
-                )),
-            TextField(
-              cursorColor: Colors.green[900],
-              style: Theme.of(context).textTheme.bodySmall,
-              maxLength: 64,
-              textAlign: TextAlign.right,
-              keyboardType: TextInputType.name,
-              decoration: inputDecoration(context),
-              controller: TextEditingController(
-                  text: prefs.getString("name") ?? "null"),
-              onSubmitted: (value) {
-                prefs.setString("name", value).then((value) =>
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Set Name!"))));
-              },
-            ),
-          ),
+          NameConfigField(),
           const IPConfigField()
         ])),
         VerticalDivider(
@@ -197,6 +173,42 @@ class SettingsState extends State<Settings> {
           ignoreBasline: true,
         )),
       ]));
+}
+
+class NameConfigField extends StatelessWidget {
+  NameConfigField({super.key});
+
+  final TextEditingController _controller =
+      TextEditingController(text: prefs.getString("name"));
+
+  save(ScaffoldMessengerState messenger) =>
+      prefs.setString("name", _controller.text).then((value) =>
+          messenger.showSnackBar(const SnackBar(content: Text("Set Name!"))));
+
+  @override
+  Widget build(BuildContext context) => ShiftingFit(
+        Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              "Your Name",
+              style: Theme.of(context).textTheme.labelSmall,
+              textAlign: TextAlign.left,
+            )),
+        Focus(
+            onFocusChange: (bool hasFocus) {
+              if (!hasFocus) save(ScaffoldMessenger.of(context));
+            },
+            child: TextField(
+              cursorColor: Colors.green[900],
+              style: Theme.of(context).textTheme.bodySmall,
+              maxLength: 64,
+              textAlign: TextAlign.right,
+              keyboardType: TextInputType.name,
+              decoration: SettingsState.inputDecoration(context),
+              controller: _controller,
+              onEditingComplete: () => save(ScaffoldMessenger.of(context)),
+            )),
+      );
 }
 
 class IPConfigField extends StatefulWidget {

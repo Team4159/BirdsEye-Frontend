@@ -16,7 +16,10 @@ class FormFieldTitle extends Builder {
                           alignment: Alignment.bottomCenter,
                           fit: BoxFit.scaleDown,
                           child: Text(
-                            title,
+                            Theme.of(context).brightness == Brightness.light
+                                ? title.replaceAllMapped(RegExp(r'([A-Z])'),
+                                    (Match m) => " ${m.group(0)}")
+                                : title,
                             textAlign: TextAlign.center,
                             style: Theme.of(context)
                                 .textTheme

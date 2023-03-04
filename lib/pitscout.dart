@@ -19,6 +19,12 @@ class PitScoutState extends State<PitScout> {
   final ScrollController _scrollController = ScrollController();
   final Map<String, String> _fields = {};
   bool _loading = false;
+  // Match Info Validation
+  static int? _teamNumber;
+  final GlobalKey<FormFieldState> _teamNumberKey = GlobalKey<FormFieldState>();
+  String _lGoodTeamNumber = "";
+  String _lBadTeamNumber = "";
+  //
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -40,7 +46,66 @@ class PitScoutState extends State<PitScout> {
                 return ListView(
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     controller: _scrollController,
-                    children: <Widget>[const PitInfoFields()]
+                    children: <Widget>[
+                      Row(children: [
+                        ConstrainedBox(
+                            constraints: const BoxConstraints(
+                                minWidth: 75, maxWidth: 150),
+                            child: TextFormField(
+                              key: _teamNumberKey,
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly
+                              ],
+                              maxLength: 4,
+                              textInputAction: TextInputAction.done,
+                              decoration: const InputDecoration(
+                                  border: UnderlineInputBorder(),
+                                  labelText: "Team #",
+                                  counterText: ""),
+                              validator: (String? content) {
+                                if (content == null || content.isEmpty) {
+                                  return "Required";
+                                }
+                                if (_lGoodTeamNumber == content) return null;
+                                if (_lBadTeamNumber == content) {
+                                  return "Invalid";
+                                }
+                                tbaStock
+                                    .get(
+                                        "${SettingsState.season}${prefs.getString('event')}_*")
+                                    .then((val) {
+                                  if (val.containsKey(content)) {
+                                    _lGoodTeamNumber = content;
+                                    _teamNumber = int.parse(content);
+                                  } else {
+                                    _lBadTeamNumber = content;
+                                    _teamNumber = null;
+                                  }
+                                  _teamNumberKey.currentState!.validate();
+                                });
+                                return "Validating";
+                              },
+                              onFieldSubmitted: (String content) {
+                                _teamNumberKey.currentState!.validate();
+                              },
+                              onChanged: (String value) {
+                                if (value != _teamNumber.toString()) {
+                                  _teamNumber = null;
+                                }
+                              },
+                            )),
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 40),
+                          child: ElevatedButton(
+                            child: const Text("Reset"),
+                            onPressed: () {
+                              _formKey.currentState!.reset();
+                            },
+                          ),
+                        )
+                      ])
+                    ]
                         .followedBy(
                             snapshot.data!.entries.map((e) => TextFormField(
                                   keyboardType: TextInputType.multiline,
@@ -56,7 +121,7 @@ class PitScoutState extends State<PitScout> {
                                 if (_loading) return;
                                 _fields.clear();
                                 if (!_formKey.currentState!.validate() ||
-                                    PitInfoFieldsState._teamNumber == null) {
+                                    _teamNumber == null) {
                                   _scrollController.animateTo(0,
                                       duration:
                                           const Duration(milliseconds: 200),
@@ -79,7 +144,7 @@ class PitScoutState extends State<PitScout> {
                                 });
                                 postResponse(WebDataTypes.pitScout, {
                                   ..._fields,
-                                  "teamNumber": PitInfoFieldsState._teamNumber,
+                                  "teamNumber": _teamNumber,
                                   "name": prefs.getString("name")
                                 }).then((response) {
                                   if (response.statusCode >= 400) {
@@ -87,7 +152,7 @@ class PitScoutState extends State<PitScout> {
                                         "Error ${response.statusCode}: ${response.reasonPhrase}");
                                   }
                                   _formKey.currentState!.reset();
-                                  PitInfoFieldsState._teamNumber = null;
+                                  _teamNumber = null;
                                   m.hideCurrentSnackBar();
                                   setState(() {
                                     _loading = false;
@@ -117,57 +182,4 @@ class PitScoutState extends State<PitScout> {
                             child: e))
                         .toList());
               })));
-}
-
-class PitInfoFields extends StatefulWidget {
-  const PitInfoFields({super.key});
-
-  @override
-  State<StatefulWidget> createState() => PitInfoFieldsState();
-}
-
-class PitInfoFieldsState extends State<PitInfoFields> {
-  static int? _teamNumber;
-  final GlobalKey<FormFieldState> _teamNumberKey = GlobalKey<FormFieldState>();
-  String _lGoodTeamNumber = "";
-  String _lBadTeamNumber = "";
-
-  @override
-  Widget build(BuildContext context) => ConstrainedBox(
-      constraints: const BoxConstraints(minWidth: 75, maxWidth: 150),
-      child: TextFormField(
-        key: _teamNumberKey,
-        keyboardType: TextInputType.number,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        maxLength: 4,
-        textInputAction: TextInputAction.done,
-        decoration: const InputDecoration(
-            border: UnderlineInputBorder(),
-            labelText: "Team #",
-            counterText: ""),
-        validator: (String? content) {
-          if (content == null || content.isEmpty) return "Required";
-          if (_lGoodTeamNumber == content) return null;
-          if (_lBadTeamNumber == content) return "Invalid";
-          tbaStock
-              .get("${SettingsState.season}${prefs.getString('event')}_*")
-              .then((val) {
-            if (val.containsKey(content)) {
-              _lGoodTeamNumber = content;
-              _teamNumber = int.parse(content);
-            } else {
-              _lBadTeamNumber = content;
-              _teamNumber = null;
-            }
-            _teamNumberKey.currentState!.validate();
-          });
-          return "Validating";
-        },
-        onFieldSubmitted: (String content) {
-          _teamNumberKey.currentState!.validate();
-        },
-        onChanged: (String value) {
-          if (value != _teamNumber.toString()) _teamNumber = null;
-        },
-      ));
 }

@@ -24,7 +24,10 @@ class ToggleFormField extends FormField<bool> {
                                       state.value! ? 0xff1C7C7C : 0xffCF772E))),
                           child: Center(
                               child: Text(
-                            state.value.toString(),
+                            Theme.of(state.context).brightness ==
+                                    Brightness.light
+                                ? (state.value! ? "Yes" : "No")
+                                : state.value.toString(),
                             style: TextStyle(
                                 fontSize:
                                     MediaQuery.of(state.context).size.width <
