@@ -150,7 +150,7 @@ class PitScoutTeamNumberFieldState extends State<PitScoutTeamNumberField> {
   String _lGoodTeamNumber = "";
   String _lBadTeamNumber = "";
   int? teamNumber;
-  static Set<int> _acTeams = {};
+  static List<int> _acTeams = [];
 
   @override
   void initState() {
@@ -161,7 +161,10 @@ class PitScoutTeamNumberFieldState extends State<PitScoutTeamNumberField> {
   void refreshAC() {
     _lGoodTeamNumber = "";
     _key.currentState?.reset();
-    pitScoutGetUnfilled().then((value) => _acTeams = value);
+    pitScoutGetUnfilled().then((value) {
+      value.sort();
+      _acTeams = value;
+    });
   }
 
   @override

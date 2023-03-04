@@ -78,8 +78,8 @@ Future<http.Response> postResponse(
   }
 }
 
-Future<Set<int>> pitScoutGetUnfilled() => http
+Future<List<int>> pitScoutGetUnfilled() => http
     .get(parseURI(
         "api/bluealliance/${SettingsState.season}/${prefs.getString('event')}/*",
         params: {"onlyUnfilled": "true"}))
-    .then((resp) => Set<int>.from(Iterable.castFrom(json.decode(resp.body))));
+    .then((resp) => List<int>.from(json.decode(resp.body), growable: false));
