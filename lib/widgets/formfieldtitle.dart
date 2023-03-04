@@ -21,10 +21,7 @@ class FormFieldTitle extends Builder {
                                     (Match m) => " ${m.group(0)}")
                                 : title,
                             textAlign: TextAlign.center,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(fontSize: 36),
+                            style: Theme.of(context).textTheme.bodyLarge,
                           ),
                         )))));
 }

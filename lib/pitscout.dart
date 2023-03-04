@@ -15,16 +15,11 @@ class PitScout extends StatefulWidget {
 }
 
 class PitScoutState extends State<PitScout> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey();
+  final GlobalKey<PitScoutTeamNumberFieldState> _teamNumberKey = GlobalKey();
   final ScrollController _scrollController = ScrollController();
   final Map<String, String> _fields = {};
   bool _loading = false;
-  // Match Info Validation
-  static int? _teamNumber;
-  final GlobalKey<FormFieldState> _teamNumberKey = GlobalKey<FormFieldState>();
-  String _lGoodTeamNumber = "";
-  String _lBadTeamNumber = "";
-  //
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -48,53 +43,7 @@ class PitScoutState extends State<PitScout> {
                     controller: _scrollController,
                     children: <Widget>[
                       Row(children: [
-                        ConstrainedBox(
-                            constraints: const BoxConstraints(
-                                minWidth: 75, maxWidth: 150),
-                            child: TextFormField(
-                              key: _teamNumberKey,
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly
-                              ],
-                              maxLength: 4,
-                              textInputAction: TextInputAction.done,
-                              decoration: const InputDecoration(
-                                  border: UnderlineInputBorder(),
-                                  labelText: "Team #",
-                                  counterText: ""),
-                              validator: (String? content) {
-                                if (content == null || content.isEmpty) {
-                                  return "Required";
-                                }
-                                if (_lGoodTeamNumber == content) return null;
-                                if (_lBadTeamNumber == content) {
-                                  return "Invalid";
-                                }
-                                tbaStock
-                                    .get(
-                                        "${SettingsState.season}${prefs.getString('event')}_*")
-                                    .then((val) {
-                                  if (val.containsKey(content)) {
-                                    _lGoodTeamNumber = content;
-                                    _teamNumber = int.parse(content);
-                                  } else {
-                                    _lBadTeamNumber = content;
-                                    _teamNumber = null;
-                                  }
-                                  _teamNumberKey.currentState!.validate();
-                                });
-                                return "Validating";
-                              },
-                              onFieldSubmitted: (String content) {
-                                _teamNumberKey.currentState!.validate();
-                              },
-                              onChanged: (String value) {
-                                if (value != _teamNumber.toString()) {
-                                  _teamNumber = null;
-                                }
-                              },
-                            )),
+                        const PitScoutTeamNumberField(),
                         Expanded(
                             child: Align(
                           alignment: Alignment.centerRight,
@@ -103,6 +52,7 @@ class PitScoutState extends State<PitScout> {
                             tooltip: "Reset",
                             onPressed: () {
                               _formKey.currentState!.reset();
+                              _teamNumberKey.currentState!.refreshAC();
                             },
                           ),
                         ))
@@ -123,7 +73,8 @@ class PitScoutState extends State<PitScout> {
                                 if (_loading) return;
                                 _fields.clear();
                                 if (!_formKey.currentState!.validate() ||
-                                    _teamNumber == null) {
+                                    _teamNumberKey.currentState?.teamNumber ==
+                                        null) {
                                   _scrollController.animateTo(0,
                                       duration:
                                           const Duration(milliseconds: 200),
@@ -146,7 +97,8 @@ class PitScoutState extends State<PitScout> {
                                 });
                                 postResponse(WebDataTypes.pitScout, {
                                   ..._fields,
-                                  "teamNumber": _teamNumber,
+                                  "teamNumber":
+                                      _teamNumberKey.currentState!.teamNumber,
                                   "name": prefs.getString("name")
                                 }).then((response) {
                                   if (response.statusCode >= 400) {
@@ -154,7 +106,7 @@ class PitScoutState extends State<PitScout> {
                                         "Error ${response.statusCode}: ${response.reasonPhrase}");
                                   }
                                   _formKey.currentState!.reset();
-                                  _teamNumber = null;
+                                  _teamNumberKey.currentState!.refreshAC();
                                   m.hideCurrentSnackBar();
                                   setState(() {
                                     _loading = false;
@@ -184,4 +136,87 @@ class PitScoutState extends State<PitScout> {
                             child: e))
                         .toList());
               })));
+}
+
+class PitScoutTeamNumberField extends StatefulWidget {
+  const PitScoutTeamNumberField({super.key});
+
+  @override
+  State<StatefulWidget> createState() => PitScoutTeamNumberFieldState();
+}
+
+class PitScoutTeamNumberFieldState extends State<PitScoutTeamNumberField> {
+  final GlobalKey<FormFieldState> _key = GlobalKey<FormFieldState>();
+  String _lGoodTeamNumber = "";
+  String _lBadTeamNumber = "";
+  int? teamNumber;
+  static Set<int> _acTeams = {};
+
+  @override
+  void initState() {
+    super.initState();
+    refreshAC();
+  }
+
+  void refreshAC() {
+    _lGoodTeamNumber = "";
+    _key.currentState?.reset();
+    pitScoutGetUnfilled().then((value) => _acTeams = value);
+  }
+
+  @override
+  Widget build(BuildContext context) => ConstrainedBox(
+      constraints: const BoxConstraints(minWidth: 75, maxWidth: 150),
+      child: Autocomplete(
+          fieldViewBuilder: (BuildContext context,
+                  TextEditingController controller,
+                  FocusNode focusNode,
+                  VoidCallback onFieldSubmitted) =>
+              TextFormField(
+                key: _key,
+                controller: controller,
+                focusNode: focusNode,
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                maxLength: 4,
+                textInputAction: TextInputAction.done,
+                decoration: const InputDecoration(
+                    border: UnderlineInputBorder(),
+                    labelText: "Team #",
+                    counterText: ""),
+                validator: (String? content) {
+                  if (content == null || content.isEmpty) {
+                    return "Required";
+                  }
+                  if (_lGoodTeamNumber == content) return null;
+                  if (_lBadTeamNumber == content) {
+                    return "Invalid";
+                  }
+                  tbaStock
+                      .get(
+                          "${SettingsState.season}${prefs.getString('event')}_*")
+                      .then((val) {
+                    if (val.containsKey(content)) {
+                      _lGoodTeamNumber = content;
+                      teamNumber = int.parse(content);
+                    } else {
+                      _lBadTeamNumber = content;
+                      teamNumber = null;
+                    }
+                    _key.currentState!.validate();
+                  });
+                  return "Validating";
+                },
+                onFieldSubmitted: (String content) {
+                  _key.currentState!.validate();
+                  onFieldSubmitted();
+                },
+                onChanged: (String value) {
+                  _lGoodTeamNumber = "";
+                  teamNumber = null;
+                },
+              ),
+          optionsBuilder: (TextEditingValue textEditingValue) => _acTeams.where(
+              (element) =>
+                  element.toString().startsWith(textEditingValue.text))));
 }

@@ -86,18 +86,23 @@ void main() async {
             fontSize: 16,
             letterSpacing: 2,
             color: Colors.green[700]),
+        bodyLarge: const TextStyle(
+            // Form Field Titles
+            fontFamily: "OpenSans",
+            fontSize: 36,
+            fontWeight: FontWeight.w500,
+            color: Colors.white70),
+        bodyMedium: const TextStyle(
+          // Hover Tooltips & Autocomplete Text
+          fontFamily: "Roboto",
+          fontSize: 16,
+        ),
         bodySmall: TextStyle(
             // Settings Input
             fontFamily: "Calibri",
             fontSize: 16,
             fontWeight: FontWeight.w800,
             color: Colors.green[700]),
-        bodyMedium: const TextStyle(
-            // Form Field Titles & Hover Tooltips
-            fontFamily: "OpenSans",
-            fontSize: 26,
-            fontWeight: FontWeight.w500,
-            color: Colors.white70),
       ),
       scaffoldBackgroundColor: Colors.black,
     ),
