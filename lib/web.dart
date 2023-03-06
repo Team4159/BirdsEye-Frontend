@@ -2,8 +2,10 @@ import 'dart:convert' show json;
 
 import 'package:birdseye/main.dart';
 import 'package:birdseye/settings.dart';
-import 'package:http/http.dart' as http;
+import 'package:http/http.dart' show Client, Response;
 import 'package:stock/stock.dart';
+
+final client = Client();
 
 final hasLetter = RegExp(r"[a-z]", caseSensitive: false);
 
@@ -27,13 +29,13 @@ final stock = Stock<WebDataTypes, Map<String, dynamic>>(
         uri = parseURI("/api/${SettingsState.season}/matchschema");
         break;
     }
-    return http.get(uri).then((resp) => json.decode(resp.body));
+    return client.get(uri).then((resp) => json.decode(resp.body));
   }),
   sourceOfTruth: CachedSourceOfTruth(),
 );
 
 Future<bool> getStatus(String ip) {
-  return http
+  return client
       .get(parseURI("", ip: ip))
       .then((resp) => resp.body == "BirdsEye Scouting Server Online!")
       .onError((_, __) => false);
@@ -54,7 +56,7 @@ final tbaStock = Stock<String, Map<String, String>>(
               rm.namedGroup("match")
             ];
       var i = groups.indexOf(null);
-      return http
+      return client
           .get(parseURI(
               "/api/bluealliance/${groups.sublist(0, i >= 0 ? i : null).join("/")}",
               params: {"ignoreDate": "true"}))
@@ -62,23 +64,23 @@ final tbaStock = Stock<String, Map<String, String>>(
     }),
     sourceOfTruth: tbaSoT);
 
-Future<http.Response> postResponse(
+Future<Response> postResponse(
     WebDataTypes dataType, Map<String, dynamic> body) {
   switch (dataType) {
     case WebDataTypes.pitScout:
-      return http.post(
+      return client.post(
           parseURI(
               "/api/${SettingsState.season}/${prefs.getString('event')}/pit"),
           body: json.encode(body));
     case WebDataTypes.matchScout:
-      return http.post(
+      return client.post(
           parseURI(
               "/api/${SettingsState.season}/${prefs.getString('event')}/match"),
           body: json.encode(body));
   }
 }
 
-Future<List<int>> pitScoutGetUnfilled() => http
+Future<List<int>> pitScoutGetUnfilled() => client
     .get(parseURI(
         "api/bluealliance/${SettingsState.season}/${prefs.getString('event')}/*",
         params: {"onlyUnfilled": "true"}))

@@ -89,6 +89,7 @@ class SettingsState extends State<Settings> {
                 controller: TextEditingController(text: season.toString()),
                 onSubmitted: (content) {
                   season = int.parse(content);
+                  reloadEvents();
                 },
               )),
           NameConfigField(),
