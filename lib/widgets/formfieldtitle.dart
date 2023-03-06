@@ -9,7 +9,7 @@ class FormFieldTitle extends Builder {
                 child: Align(
                     alignment: Alignment.bottomCenter,
                     child: FractionallySizedBox(
-                        alignment: Alignment.bottomCenter,
+                        alignment: Alignment.topCenter,
                         widthFactor: buttonTextWidthFactor,
                         heightFactor: 0.4,
                         child: FittedBox(
@@ -21,7 +21,7 @@ class FormFieldTitle extends Builder {
                                     (Match m) => " ${m.group(0)}")
                                 : title,
                             textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodyLarge,
+                            style: Theme.of(context).textTheme.displaySmall,
                           ),
                         )))));
 }

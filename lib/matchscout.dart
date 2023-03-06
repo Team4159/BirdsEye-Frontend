@@ -28,7 +28,7 @@ class MatchScoutState extends State<MatchScout> {
       appBar: AppBar(
         title: const Text("Match Scouting"),
       ),
-      drawer: getDrawer(context),
+      drawer: AppDrawer(),
       body: Form(
           key: _formKey,
           autovalidateMode: AutovalidateMode.disabled,
@@ -64,7 +64,7 @@ class MatchScoutState extends State<MatchScout> {
                                         : e1.key.toUpperCase(),
                                     style: Theme.of(context)
                                         .textTheme
-                                        .displayLarge,
+                                        .displayMedium,
                                   ),
                                 ),
                                 GridView.count(
@@ -85,6 +85,13 @@ class MatchScoutState extends State<MatchScout> {
                                             maxLines: null,
                                             expands: true,
                                             decoration: InputDecoration(
+                                                border:
+                                                    const OutlineInputBorder(),
+                                                enabledBorder:
+                                                    OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            color: Colors
+                                                                .grey[700]!)),
                                                 labelText: e2.key),
                                             onSaved: (String? content) {
                                               _fields[e1.key] =
@@ -239,9 +246,7 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
                 maxLength: 5,
                 textInputAction: TextInputAction.next,
                 decoration: const InputDecoration(
-                    border: UnderlineInputBorder(),
-                    labelText: "Match Code",
-                    counterText: ""),
+                    labelText: "Match Code", counterText: ""),
                 validator: (String? content) {
                   if (content == null || content.isEmpty) return "Required";
                   if (_lGoodMatchCode == content) return null;
@@ -294,9 +299,7 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
                           maxLength: 4,
                           textInputAction: TextInputAction.done,
                           decoration: const InputDecoration(
-                              border: UnderlineInputBorder(),
-                              labelText: "Team #",
-                              counterText: ""),
+                              labelText: "Team #", counterText: ""),
                           validator: (String? content) {
                             if (content == null || content.isEmpty) {
                               return "Required";
@@ -335,7 +338,7 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
                 child: Align(
               alignment: Alignment.centerRight,
               child: IconButton(
-                icon: const Icon(Icons.delete),
+                icon: Icon(Icons.delete, color: Colors.red[800]),
                 tooltip: "Reset",
                 onPressed: widget.reset,
               ),

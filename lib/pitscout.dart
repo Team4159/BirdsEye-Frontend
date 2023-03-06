@@ -26,7 +26,7 @@ class PitScoutState extends State<PitScout> {
       appBar: AppBar(
         title: const Text("Pit Scouting"),
       ),
-      drawer: getDrawer(context),
+      drawer: AppDrawer(),
       body: Form(
           key: _formKey,
           autovalidateMode: AutovalidateMode.disabled,
@@ -48,7 +48,7 @@ class PitScoutState extends State<PitScout> {
                             child: Align(
                           alignment: Alignment.centerRight,
                           child: IconButton(
-                            icon: const Icon(Icons.delete),
+                            icon: Icon(Icons.delete, color: Colors.red[800]),
                             tooltip: "Reset",
                             onPressed: () {
                               _formKey.currentState!.reset();
@@ -62,7 +62,12 @@ class PitScoutState extends State<PitScout> {
                             snapshot.data!.entries.map((e) => TextFormField(
                                   keyboardType: TextInputType.multiline,
                                   maxLines: null,
-                                  decoration: InputDecoration(labelText: e.key),
+                                  decoration: InputDecoration(
+                                      border: const OutlineInputBorder(),
+                                      enabledBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: Colors.grey[700]!)),
+                                      labelText: e.key),
                                   onSaved: (String? content) {
                                     _fields[e.value] = content ?? "";
                                   },
@@ -183,10 +188,8 @@ class PitScoutTeamNumberFieldState extends State<PitScoutTeamNumberField> {
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 maxLength: 4,
                 textInputAction: TextInputAction.done,
-                decoration: const InputDecoration(
-                    border: UnderlineInputBorder(),
-                    labelText: "Team #",
-                    counterText: ""),
+                decoration:
+                    const InputDecoration(labelText: "Team #", counterText: ""),
                 validator: (String? content) {
                   if (content == null || content.isEmpty) {
                     return "Required";

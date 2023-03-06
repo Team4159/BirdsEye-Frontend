@@ -60,11 +60,11 @@ class SettingsState extends State<Settings> {
   }
 
   static InputDecoration inputDecoration(BuildContext context) =>
-      InputDecoration(
-          border: Theme.of(context).brightness == Brightness.light
-              ? const UnderlineInputBorder()
-              : InputBorder.none,
-          counterText: '');
+      Theme.of(context).brightness == Brightness.light
+          ? const InputDecoration(border: InputBorder.none, counterText: '')
+          : InputDecoration(
+              border: Theme.of(context).inputDecorationTheme.border,
+              counterText: '');
 
   @override
   Widget build(BuildContext context) => Padding(
@@ -75,12 +75,11 @@ class SettingsState extends State<Settings> {
           ShiftingFit(
               Text(
                 "Current Season",
-                style: Theme.of(context).textTheme.labelSmall,
+                style: Theme.of(context).textTheme.titleMedium,
                 textAlign: TextAlign.left,
               ),
               TextField(
-                cursorColor: Colors.green[900],
-                style: Theme.of(context).textTheme.bodySmall,
+                style: Theme.of(context).textTheme.bodyMedium,
                 maxLength: 4,
                 textAlign: TextAlign.right,
                 keyboardType: TextInputType.number,
@@ -105,7 +104,7 @@ class SettingsState extends State<Settings> {
               padding: const EdgeInsets.all(10),
               child: Text(
                 "Current Event",
-                style: Theme.of(context).textTheme.labelSmall,
+                style: Theme.of(context).textTheme.titleMedium,
                 textAlign: TextAlign.left,
               )),
           _events == null
@@ -146,11 +145,9 @@ class SettingsState extends State<Settings> {
                                           prefs.getString('event')
                                       ? Theme.of(context)
                                           .textTheme
-                                          .displaySmall!
+                                          .titleLarge!
                                           .copyWith(fontWeight: FontWeight.w800)
-                                      : Theme.of(context)
-                                          .textTheme
-                                          .displaySmall,
+                                      : Theme.of(context).textTheme.titleLarge,
                                 ),
                                 trailing: ConstrainedBox(
                                   constraints: const BoxConstraints(
@@ -161,12 +158,12 @@ class SettingsState extends State<Settings> {
                                               prefs.getString('event')
                                           ? Theme.of(context)
                                               .textTheme
-                                              .bodySmall!
+                                              .titleMedium!
                                               .copyWith(
                                                   fontWeight: FontWeight.w900)
                                           : Theme.of(context)
                                               .textTheme
-                                              .bodySmall!
+                                              .titleMedium!
                                               .copyWith(
                                                   fontWeight: FontWeight.w500)),
                                 ))
@@ -189,12 +186,11 @@ class NameConfigField extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: Text(
               "Your Name",
-              style: Theme.of(context).textTheme.labelSmall,
+              style: Theme.of(context).textTheme.titleMedium,
               textAlign: TextAlign.left,
             )),
         TextField(
-          cursorColor: Colors.green[900],
-          style: Theme.of(context).textTheme.bodySmall,
+          style: Theme.of(context).textTheme.bodyMedium,
           maxLength: 64,
           textAlign: TextAlign.right,
           keyboardType: TextInputType.name,
@@ -228,13 +224,12 @@ class IPConfigFieldState extends State<IPConfigField> {
             alignment: Alignment.centerLeft,
             child: Text(
               "Server IP",
-              style: Theme.of(context).textTheme.labelSmall,
+              style: Theme.of(context).textTheme.titleMedium,
               textAlign: TextAlign.left,
             )),
         TextField(
           enabled: _enabled,
-          cursorColor: Colors.green[900],
-          style: Theme.of(context).textTheme.bodySmall,
+          style: Theme.of(context).textTheme.bodyMedium,
           textAlign: TextAlign.right,
           maxLines: 1,
           maxLength: 64,

@@ -12,204 +12,131 @@ void main() async {
   if (prefs.getString("ip") == null) {
     prefs.setString("ip", "scouting.team4159.org");
   }
-  runApp(MaterialApp(
-    title: "Bird's Eye",
-    initialRoute: "/",
-    routes: {
-      "/matchscout": (BuildContext context) => const MatchScout(),
-      "/pitscout": (BuildContext context) => const PitScout(),
-      "/": (BuildContext context) => MainScreen()
-    },
-    color: cardinalred,
-    themeMode: ThemeMode.system,
-    darkTheme: ThemeData(
-      colorScheme: ColorScheme.dark(
-          primary: Colors.blue[600]!,
-          secondary: Colors.transparent,
-          surface: cardinalred,
-          background: Colors.black),
-      scrollbarTheme: ScrollbarThemeData(
-          radius: const Radius.circular(1),
-          trackVisibility: MaterialStateProperty.all(true)),
-      inputDecorationTheme:
-          const InputDecorationTheme(border: OutlineInputBorder()),
-      snackBarTheme: const SnackBarThemeData(
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: Colors.grey,
-        closeIconColor: Colors.black,
-        elevation: 3,
-        contentTextStyle: TextStyle(
-            fontFamily: "OpenSans",
-            fontSize: 18,
-            fontWeight: FontWeight.normal,
-            color: Colors.black),
+  runApp(
+    MaterialApp(
+      title: "Bird's Eye",
+      initialRoute: "/",
+      routes: {
+        "/matchscout": (BuildContext context) => const MatchScout(),
+        "/pitscout": (BuildContext context) => const PitScout(),
+        "/": (BuildContext context) => MainScreen()
+      },
+      color: cardinalred,
+      themeMode: ThemeMode.system,
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.dark(
+            primary: Colors.blue[600]!,
+            secondary: Colors.grey[400]!,
+            onPrimary: Colors.black,
+            surface: cardinalred),
+        inputDecorationTheme: InputDecorationTheme(
+            border: const UnderlineInputBorder(),
+            enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey[350]!))),
+        snackBarTheme: const SnackBarThemeData(
+            behavior: SnackBarBehavior.floating,
+            elevation: 3,
+            backgroundColor: Colors.grey),
+        appBarTheme: const AppBarTheme(
+            titleTextStyle: TextStyle(
+                fontFamily: "Verdana",
+                fontWeight: FontWeight.bold,
+                fontSize: 28),
+            centerTitle: false),
+        progressIndicatorTheme: const ProgressIndicatorThemeData(
+            color: cardinalred, refreshBackgroundColor: Colors.black45),
+        dividerTheme: const DividerThemeData(thickness: 3),
+        sliderTheme: const SliderThemeData(
+            valueIndicatorColor: Colors.white60,
+            valueIndicatorTextStyle: TextStyle(
+              fontFamily: "Roboto",
+              fontSize: 16,
+            )),
+        textTheme: Typography.whiteHelsinki
+            .merge(Typography.englishLike2021)
+            .apply(bodyColor: Colors.white, displayColor: Colors.grey[200])
+            .copyWith(
+                displayMedium: const TextStyle(
+                    fontFamily: "VarelaRound", letterSpacing: 2, fontSize: 48)),
+        scaffoldBackgroundColor: Colors.black,
       ),
-      appBarTheme: const AppBarTheme(
-          titleTextStyle: TextStyle(
-              // AppBar Title
-              fontFamily: "Verdana",
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-              fontSize: 28),
-          centerTitle: false),
-      progressIndicatorTheme: const ProgressIndicatorThemeData(
-          color: cardinalred, refreshBackgroundColor: Colors.black45),
-      dividerTheme: const DividerThemeData(thickness: 4, indent: 0),
-      textTheme: TextTheme(
-        displayLarge: const TextStyle(
-          // Match Scout Section Titles
-          fontFamily: "VarelaRound",
-          fontSize: 36,
-          letterSpacing: 5,
-          fontWeight: FontWeight.w900,
-        ),
-        displaySmall: TextStyle(
-            // Settings Option List
-            fontFamily: "OpenSans",
-            fontSize: 16,
-            fontWeight: FontWeight.w200,
-            color: Colors.green[700]),
-        titleLarge: const TextStyle(
-            // CardinalBotics Logo Theme
-            fontFamily: "HemiHead",
-            fontSize: 32,
-            color: cardinalred),
-        labelMedium: const TextStyle(
-          // Drawer Items
-          fontFamily: "Verdana",
-          fontSize: 20,
-        ),
-        labelSmall: TextStyle(
-            // Settings Labels
-            fontFamily: "RobotoMono",
-            fontWeight: FontWeight.w900,
-            fontSize: 16,
-            letterSpacing: 2,
-            color: Colors.green[700]),
-        bodyLarge: const TextStyle(
-            // Form Field Titles
-            fontFamily: "OpenSans",
-            fontSize: 36,
-            fontWeight: FontWeight.w500,
-            color: Colors.white70),
-        bodyMedium: const TextStyle(
-          // Hover Tooltips & Autocomplete Text
-          fontFamily: "Roboto",
-          fontSize: 16,
-        ),
-        bodySmall: TextStyle(
-            // Settings Input
-            fontFamily: "Calibri",
-            fontSize: 16,
-            fontWeight: FontWeight.w800,
-            color: Colors.green[700]),
-      ),
-      scaffoldBackgroundColor: Colors.black,
-    ),
-    theme: ThemeData(
-      colorScheme: ColorScheme.light(
-          primary: Colors.blue[600]!,
-          secondary: Colors.grey[400]!,
-          surface: cardinalred,
-          background: Colors.grey[200]!),
-      scrollbarTheme: ScrollbarThemeData(
-          radius: const Radius.circular(1),
-          trackVisibility: MaterialStateProperty.all(true)),
-      inputDecorationTheme:
-          const InputDecorationTheme(border: OutlineInputBorder()),
-      appBarTheme: const AppBarTheme(
-          color: cardinalred,
-          titleTextStyle: TextStyle(
-              // AppBar Title
-              fontFamily: "Verdana",
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-              fontSize: 28),
-          centerTitle: true),
-      drawerTheme: DrawerThemeData(backgroundColor: Colors.grey[200]),
-      textTheme: const TextTheme(
-        titleLarge:
-            TextStyle(fontFamily: "HemiHead", fontSize: 32, color: cardinalred),
-        labelSmall: TextStyle(
-            // Settings Labels
-            fontFamily: "OpenSans",
-            fontWeight: FontWeight.w900,
-            fontSize: 16,
-            letterSpacing: 1),
-        labelMedium: TextStyle(
-          // Drawer Items
-          fontFamily: "Verdana",
-          fontSize: 20,
-        ),
-        displayLarge: TextStyle(
-            // Match Scout Section Titles
-            fontFamily: "VarelaRound",
-            fontSize: 36,
-            letterSpacing: 2,
-            fontWeight: FontWeight.w900,
-            color: Colors.black),
-        displaySmall: TextStyle(
-            // Settings Option List
-            fontFamily: "OpenSans",
-            fontSize: 16,
-            fontWeight: FontWeight.w200),
-        bodySmall: TextStyle(
-            // Settings Input
-            fontFamily: "Calibri",
-            fontSize: 16,
-            fontWeight: FontWeight.w800,
-            color: Colors.black54),
+      theme: ThemeData(
+        colorScheme: ColorScheme.light(
+            primary: Colors.blue[600]!,
+            secondary: Colors.grey[400]!,
+            surface: cardinalred,
+            background: Colors.grey[300]!),
+        inputDecorationTheme: InputDecorationTheme(
+            border: const UnderlineInputBorder(),
+            enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey[300]!))),
+        appBarTheme: const AppBarTheme(
+            backgroundColor: cardinalred,
+            titleTextStyle: TextStyle(
+                fontFamily: "Verdana",
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                fontSize: 28),
+            centerTitle: true),
+        textTheme: Typography.blackCupertino
+            .merge(Typography.englishLike2021)
+            .copyWith(
+                titleLarge: const TextStyle(fontFamily: "Verdana"),
+                displayMedium: const TextStyle(
+                    fontFamily: "VarelaRound", letterSpacing: 2, fontSize: 48)),
       ),
     ),
-  ));
+  );
 }
 
 late SharedPreferences prefs;
 
-getDrawer(context) => Drawer(
-    width: 200,
-    child: Column(
-      children: [
-        SizedBox(
-            height: 65,
-            child: DrawerHeader(
-                margin: EdgeInsets.zero,
-                padding: const EdgeInsets.only(top: 10),
-                child: Text(
-                  "Bird's Eye",
-                  style: Theme.of(context).textTheme.titleLarge,
-                ))),
-        ListTile(
-          title: Text(
-            "Configuration",
-            style: Theme.of(context).textTheme.labelMedium,
-          ),
-          onTap: () {
-            Navigator.of(context).pushReplacement(_createRoute(MainScreen()));
-          },
-        ),
-        ListTile(
-          title: Text(
-            "Match Scouting",
-            style: Theme.of(context).textTheme.labelMedium,
-          ),
-          onTap: () {
-            Navigator.of(context)
-                .pushReplacement(_createRoute(const MatchScout()));
-          },
-        ),
-        ListTile(
-          title: Text(
-            "Pit Scouting",
-            style: Theme.of(context).textTheme.labelMedium,
-          ),
-          onTap: () {
-            Navigator.of(context)
-                .pushReplacement(_createRoute(const PitScout()));
-          },
-        ),
-      ],
-    ));
+class AppDrawer extends Builder {
+  AppDrawer({super.key})
+      : super(
+            builder: (context) => Drawer(
+                width: 200,
+                child: Column(
+                  children: [
+                    const SizedBox(
+                        height: 65,
+                        child: DrawerHeader(
+                            margin: EdgeInsets.zero,
+                            padding: EdgeInsets.only(top: 10),
+                            child: Text(
+                              "Bird's Eye",
+                              style: TextStyle(
+                                  fontFamily: "HemiHead",
+                                  fontSize: 32,
+                                  color: cardinalred),
+                            ))),
+                    ListTile(
+                      title: Text(
+                        "Configuration",
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      onTap: () => Navigator.of(context)
+                          .pushReplacement(_createRoute(MainScreen())),
+                    ),
+                    ListTile(
+                      title: Text(
+                        "Match Scouting",
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      onTap: () => Navigator.of(context)
+                          .pushReplacement(_createRoute(const MatchScout())),
+                    ),
+                    ListTile(
+                      title: Text(
+                        "Pit Scouting",
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      onTap: () => Navigator.of(context)
+                          .pushReplacement(_createRoute(const PitScout())),
+                    ),
+                  ],
+                )));
+}
 
 class MainScreen extends StatelessWidget {
   MainScreen({super.key});
@@ -220,8 +147,45 @@ class MainScreen extends StatelessWidget {
         appBar: AppBar(
           title: const Text("Configuration"),
         ),
-        drawer: getDrawer(context),
-        body: Settings(key: _settingsKey),
+        drawer: AppDrawer(),
+        body: Theme(
+            data: Theme.of(context).brightness == Brightness.light
+                ? Theme.of(context).copyWith(
+                    textTheme: const TextTheme(
+                        bodyMedium: TextStyle(fontFamily: "Arial")),
+                    inputDecorationTheme: Theme.of(context)
+                        .inputDecorationTheme
+                        .copyWith(
+                            focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .primary))),
+                  )
+                : Theme.of(context).copyWith(
+                    colorScheme: ColorScheme.dark(primary: Colors.green[800]!),
+                    dividerColor: Colors.green[600],
+                    inputDecorationTheme: const InputDecorationTheme(
+                        enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: Colors.transparent))),
+                    textSelectionTheme:
+                        TextSelectionThemeData(cursorColor: Colors.green[900]),
+                    textTheme: const TextTheme(
+                        titleLarge: TextStyle(
+                            fontFamily: "OpenSans",
+                            fontSize: 16,
+                            fontWeight: FontWeight.w200),
+                        titleMedium: TextStyle(
+                            fontFamily: "RobotoMono",
+                            fontWeight: FontWeight.w900,
+                            fontSize: 16,
+                            letterSpacing: 1),
+                        bodyMedium: TextStyle(
+                          fontFamily: "Calibri",
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                        )).apply(bodyColor: Colors.green[700])),
+            child: Settings(key: _settingsKey)),
         floatingActionButton: IconButton(
             icon: const Icon(Icons.refresh_rounded),
             tooltip: "Refresh Cache",
