@@ -22,7 +22,7 @@ void main() async {
         "/": (BuildContext context) => MainScreen()
       },
       color: cardinalred,
-      themeMode: ThemeMode.light,
+      themeMode: ThemeMode.system,
       darkTheme: ThemeData(
         colorScheme: ColorScheme.dark(
             primary: Colors.blue[600]!,
@@ -50,10 +50,7 @@ void main() async {
         sliderTheme: const SliderThemeData(
             valueIndicatorColor: Colors.white60,
             valueIndicatorTextStyle: TextStyle(
-              fontFamily: "Roboto",
-              fontSize: 16,
-              color: Colors.black
-            )),
+                fontFamily: "Roboto", fontSize: 16, color: Colors.black)),
         textTheme: Typography.whiteHelsinki
             .merge(Typography.englishLike2021)
             .apply(bodyColor: Colors.white, displayColor: Colors.grey[200])
@@ -102,7 +99,7 @@ class AppDrawer extends Builder {
                 child: Column(
                   children: [
                     const SizedBox(
-                        height: 65,
+                        height: 75,
                         child: DrawerHeader(
                             margin: EdgeInsets.zero,
                             padding: EdgeInsets.only(top: 10),
@@ -153,9 +150,10 @@ class MainScreen extends StatelessWidget {
         drawer: AppDrawer(),
         body: Theme(
             data: Theme.of(context).brightness == Brightness.light
-                ? Theme.of(context).copyWith(
+                ? ThemeData(
                     textTheme: const TextTheme(
-                        bodyMedium: TextStyle(fontFamily: "Arial")),
+                        bodyMedium: TextStyle(fontFamily: "Arial"),
+                        titleLarge: TextStyle(fontSize: 18)),
                     inputDecorationTheme: Theme.of(context)
                         .inputDecorationTheme
                         .copyWith(
@@ -165,7 +163,7 @@ class MainScreen extends StatelessWidget {
                                         .colorScheme
                                         .primary))),
                   )
-                : Theme.of(context).copyWith(
+                : ThemeData(
                     colorScheme: ColorScheme.dark(primary: Colors.green[800]!),
                     dividerColor: Colors.green[600],
                     inputDecorationTheme: const InputDecorationTheme(
