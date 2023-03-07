@@ -56,7 +56,8 @@ class PitScoutState extends State<PitScout> {
                             },
                           ),
                         ))
-                      ])
+                      ]),
+                      const SizedBox(height: 10)
                     ]
                         .followedBy(
                             snapshot.data!.entries.map((e) => TextFormField(

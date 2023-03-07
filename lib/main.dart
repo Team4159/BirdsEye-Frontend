@@ -22,7 +22,7 @@ void main() async {
         "/": (BuildContext context) => MainScreen()
       },
       color: cardinalred,
-      themeMode: ThemeMode.system,
+      themeMode: ThemeMode.light,
       darkTheme: ThemeData(
         colorScheme: ColorScheme.dark(
             primary: Colors.blue[600]!,
@@ -53,8 +53,9 @@ void main() async {
                 fontFamily: "Roboto", fontSize: 16, color: Colors.black)),
         textTheme: Typography.whiteHelsinki
             .merge(Typography.englishLike2021)
-            .apply(bodyColor: Colors.white, displayColor: Colors.grey[200])
+            .apply(bodyColor: Colors.white, displayColor: Colors.grey[300])
             .copyWith(
+                displaySmall: const TextStyle(color: Colors.black),
                 displayMedium: const TextStyle(
                     fontFamily: "VarelaRound", letterSpacing: 2, fontSize: 48)),
         scaffoldBackgroundColor: Colors.black,

@@ -94,10 +94,7 @@ class SettingsState extends State<Settings> {
           NameConfigField(),
           const IPConfigField()
         ])),
-        VerticalDivider(
-          color: Theme.of(context).textTheme.labelSmall!.color,
-          width: 24,
-        ),
+        const VerticalDivider(width: 22, thickness: 3),
         Expanded(
             child: ShiftingFit(
           Padding(

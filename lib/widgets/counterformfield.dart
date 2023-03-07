@@ -18,10 +18,13 @@ class CounterFormField extends FormField<int> {
                     borderRadius: BorderRadius.all(Radius.circular(4))),
                 animationDuration: const Duration(milliseconds: 500),
                 color: Theme.of(state.context).colorScheme.primary,
-                textStyle: TextStyle(
-                    fontSize: MediaQuery.of(state.context).size.width < 750
-                        ? 20
-                        : 28),
+                textStyle: Theme.of(state.context)
+                    .textTheme
+                    .labelLarge!
+                    .copyWith(
+                        fontSize: MediaQuery.of(state.context).size.width < 750
+                            ? 20
+                            : 28),
                 child: InkWell(
                     onTap: () {
                       state.didChange(state.value! + 1);

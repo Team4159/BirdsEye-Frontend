@@ -16,10 +16,13 @@ class ToggleFormField extends FormField<bool> {
                     borderRadius: BorderRadius.all(Radius.circular(4))),
                 animationDuration: const Duration(milliseconds: 500),
                 color: Color(state.value! ? 0xff1C7C7C : 0xffCF772E),
-                textStyle: TextStyle(
-                    fontSize: MediaQuery.of(state.context).size.width < 750
-                        ? 20
-                        : 28),
+                textStyle: Theme.of(state.context)
+                    .textTheme
+                    .labelLarge!
+                    .copyWith(
+                        fontSize: MediaQuery.of(state.context).size.width < 750
+                            ? 20
+                            : 28),
                 child: InkWell(
                     onTap: () {
                       state.didChange(!state.value!);
