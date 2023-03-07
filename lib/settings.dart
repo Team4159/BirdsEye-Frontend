@@ -59,13 +59,6 @@ class SettingsState extends State<Settings> {
     });
   }
 
-  static InputDecoration inputDecoration(BuildContext context) =>
-      Theme.of(context).brightness == Brightness.light
-          ? const InputDecoration(border: InputBorder.none, counterText: '')
-          : InputDecoration(
-              border: Theme.of(context).inputDecorationTheme.border,
-              counterText: '');
-
   @override
   Widget build(BuildContext context) => Padding(
       padding: const EdgeInsets.all(20),
@@ -80,11 +73,11 @@ class SettingsState extends State<Settings> {
               ),
               TextField(
                 style: Theme.of(context).textTheme.bodyMedium,
+                decoration: const InputDecoration(counterText: ""),
                 maxLength: 4,
                 textAlign: TextAlign.right,
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: inputDecoration(context),
                 controller: TextEditingController(text: season.toString()),
                 onSubmitted: (content) {
                   season = int.parse(content);
@@ -188,10 +181,10 @@ class NameConfigField extends StatelessWidget {
             )),
         TextField(
           style: Theme.of(context).textTheme.bodyMedium,
+          decoration: const InputDecoration(counterText: ""),
           maxLength: 64,
           textAlign: TextAlign.right,
           keyboardType: TextInputType.name,
-          decoration: SettingsState.inputDecoration(context),
           controller: _controller,
           focusNode: _node,
           onEditingComplete: () =>
@@ -226,6 +219,7 @@ class IPConfigFieldState extends State<IPConfigField> {
             )),
         TextField(
           enabled: _enabled,
+          decoration: const InputDecoration(counterText: ""),
           style: Theme.of(context).textTheme.bodyMedium,
           textAlign: TextAlign.right,
           maxLines: 1,
@@ -233,7 +227,6 @@ class IPConfigFieldState extends State<IPConfigField> {
           keyboardType: TextInputType.url,
           controller: _controller,
           textCapitalization: TextCapitalization.none,
-          decoration: SettingsState.inputDecoration(context),
           onSubmitted: (content) {
             setState(() {
               _enabled = false;

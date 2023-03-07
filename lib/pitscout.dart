@@ -64,6 +64,7 @@ class PitScoutState extends State<PitScout> {
                                   keyboardType: TextInputType.multiline,
                                   maxLines: null,
                                   decoration: InputDecoration(
+                                      counterText: null,
                                       border: const OutlineInputBorder(),
                                       enabledBorder: OutlineInputBorder(
                                           borderSide: BorderSide(
@@ -190,7 +191,7 @@ class PitScoutTeamNumberFieldState extends State<PitScoutTeamNumberField> {
                 maxLength: 4,
                 textInputAction: TextInputAction.done,
                 decoration:
-                    const InputDecoration(labelText: "Team #", counterText: ""),
+                    const InputDecoration(counterText: "", labelText: "Team #"),
                 validator: (String? content) {
                   if (content == null || content.isEmpty) {
                     return "Required";

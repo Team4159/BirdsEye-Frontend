@@ -42,6 +42,7 @@ class CounterFormField extends FormField<int> {
                                   MediaQuery.of(state.context).size.width / 18,
                                   40),
                               color: Colors.white70,
+                              padding: const EdgeInsets.only(right: 5),
                               onPressed: () {
                                 if (state.value! <= 0) return;
                                 state.didChange(state.value! - 1);

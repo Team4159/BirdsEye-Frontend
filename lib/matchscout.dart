@@ -85,6 +85,7 @@ class MatchScoutState extends State<MatchScout> {
                                             maxLines: null,
                                             expands: true,
                                             decoration: InputDecoration(
+                                                counterText: null,
                                                 border:
                                                     const OutlineInputBorder(),
                                                 enabledBorder:
@@ -246,7 +247,7 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
                 maxLength: 5,
                 textInputAction: TextInputAction.next,
                 decoration: const InputDecoration(
-                    labelText: "Match Code", counterText: ""),
+                    counterText: "", labelText: "Match Code"),
                 validator: (String? content) {
                   if (content == null || content.isEmpty) return "Required";
                   if (_lGoodMatchCode == content) return null;
@@ -299,7 +300,7 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
                               maxLength: 4,
                               textInputAction: TextInputAction.done,
                               decoration: const InputDecoration(
-                                  labelText: "Team #", counterText: ""),
+                                  counterText: "", labelText: "Team #"),
                               validator: (String? content) {
                                 if (content == null || content.isEmpty) {
                                   return "Required";

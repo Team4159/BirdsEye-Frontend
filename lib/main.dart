@@ -22,11 +22,11 @@ void main() async {
         "/": (BuildContext context) => MainScreen()
       },
       color: cardinalred,
-      themeMode: ThemeMode.light,
+      themeMode: ThemeMode.system,
       darkTheme: ThemeData(
         colorScheme: ColorScheme.dark(
             primary: Colors.blue[600]!,
-            secondary: Colors.grey[400]!,
+            secondary: Colors.grey,
             onPrimary: Colors.black,
             surface: cardinalred),
         inputDecorationTheme: InputDecorationTheme(
@@ -55,6 +55,7 @@ void main() async {
             .merge(Typography.englishLike2021)
             .apply(bodyColor: Colors.white, displayColor: Colors.grey[300])
             .copyWith(
+                titleLarge: const TextStyle(fontFamily: "Verdana"),
                 displaySmall: const TextStyle(color: Colors.black),
                 displayMedium: const TextStyle(
                     fontFamily: "VarelaRound", letterSpacing: 2, fontSize: 48)),
@@ -80,7 +81,7 @@ void main() async {
             centerTitle: true),
         textTheme: Typography.blackCupertino
             .merge(Typography.englishLike2021)
-            .apply(bodyColor: Colors.black, displayColor: Colors.black)
+            .apply(bodyColor: Colors.black, displayColor: Colors.white)
             .copyWith(
                 titleLarge: const TextStyle(fontFamily: "Verdana"),
                 displayMedium: const TextStyle(

@@ -11,7 +11,20 @@ class SliderFormField extends FormField<double> {
       super.initialValue = 3,
       String labelText = ""})
       : super(
-            builder: (FormFieldState<double> state) => Stack(
+            builder: (FormFieldState<double> state) => Material(
+                elevation: 2,
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(4))),
+                animationDuration: const Duration(milliseconds: 500),
+                color: Theme.of(state.context).colorScheme.secondary,
+                textStyle: Theme.of(state.context)
+                    .textTheme
+                    .labelLarge!
+                    .copyWith(
+                        fontSize: MediaQuery.of(state.context).size.width < 750
+                            ? 20
+                            : 28),
+                child: Stack(
                     alignment: AlignmentDirectional.center,
                     fit: StackFit.passthrough,
                     children: [
@@ -26,5 +39,5 @@ class SliderFormField extends FormField<double> {
                         divisions: 4,
                       ),
                       FormFieldTitle(labelText),
-                    ]));
+                    ])));
 }
