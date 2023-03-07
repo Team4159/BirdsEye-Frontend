@@ -41,6 +41,7 @@ void main() async {
             titleTextStyle: TextStyle(
                 fontFamily: "Verdana",
                 fontWeight: FontWeight.bold,
+                color: Colors.black,
                 fontSize: 28),
             centerTitle: false),
         progressIndicatorTheme: const ProgressIndicatorThemeData(
@@ -80,6 +81,7 @@ void main() async {
             centerTitle: true),
         textTheme: Typography.blackCupertino
             .merge(Typography.englishLike2021)
+            .apply(bodyColor: Colors.black, displayColor: Colors.black)
             .copyWith(
                 titleLarge: const TextStyle(fontFamily: "Verdana"),
                 displayMedium: const TextStyle(

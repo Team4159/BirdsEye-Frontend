@@ -12,37 +12,39 @@ class CounterFormField extends FormField<int> {
       super.autovalidateMode = AutovalidateMode.disabled,
       String labelText = ""})
       : super(
-            builder: (FormFieldState<int> state) => Stack(
-                  alignment: AlignmentDirectional.center,
-                  fit: StackFit.passthrough,
-                  children: [
-                    ElevatedButton(
-                      child: Center(
-                          child: Text(
-                        state.value.toString(),
-                        style: TextStyle(
-                            fontSize:
-                                MediaQuery.of(state.context).size.width < 750
-                                    ? 20
-                                    : 28),
-                      )),
-                      onPressed: () {
-                        state.didChange(state.value! + 1);
-                      },
-                    ),
-                    Align(
-                        alignment: Alignment.bottomRight,
-                        child: IconButton(
-                          icon: const Icon(Icons.remove),
-                          iconSize: min(
-                              MediaQuery.of(state.context).size.width / 18, 40),
-                          color: Colors.white70,
-                          onPressed: () {
-                            if (state.value! <= 0) return;
-                            state.didChange(state.value! - 1);
-                          },
-                        )),
-                    FormFieldTitle(labelText),
-                  ],
-                ));
+            builder: (FormFieldState<int> state) => Material(
+                elevation: 2,
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(4))),
+                animationDuration: const Duration(milliseconds: 500),
+                color: Theme.of(state.context).colorScheme.primary,
+                textStyle: TextStyle(
+                    fontSize: MediaQuery.of(state.context).size.width < 750
+                        ? 20
+                        : 28),
+                child: InkWell(
+                    onTap: () {
+                      state.didChange(state.value! + 1);
+                    },
+                    child: Stack(
+                      alignment: AlignmentDirectional.center,
+                      fit: StackFit.passthrough,
+                      children: [
+                        Center(child: Text(state.value.toString())),
+                        Align(
+                            alignment: Alignment.bottomRight,
+                            child: IconButton(
+                              icon: const Icon(Icons.remove),
+                              iconSize: min(
+                                  MediaQuery.of(state.context).size.width / 18,
+                                  40),
+                              color: Colors.white70,
+                              onPressed: () {
+                                if (state.value! <= 0) return;
+                                state.didChange(state.value! - 1);
+                              },
+                            )),
+                        FormFieldTitle(labelText),
+                      ],
+                    ))));
 }

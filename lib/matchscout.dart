@@ -235,11 +235,12 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
 
   @override
   Widget build(BuildContext context) => Row(
+          mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.baseline,
           textBaseline: TextBaseline.alphabetic,
           children: [
             ConstrainedBox(
-              constraints: const BoxConstraints(minWidth: 100, maxWidth: 200),
+              constraints: const BoxConstraints(minWidth: 80, maxWidth: 200),
               child: TextFormField(
                 key: _matchCodeKey,
                 keyboardType: TextInputType.text,
@@ -275,9 +276,9 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
                 },
               ),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 20),
             ConstrainedBox(
-                constraints: const BoxConstraints(minWidth: 75, maxWidth: 150),
+                constraints: const BoxConstraints(minWidth: 80, maxWidth: 150),
                 child: Autocomplete(
                     optionsBuilder: (textEditingValue) => _matchCode == null
                         ? Future<Iterable<String>>.value([])
@@ -335,8 +336,9 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
                           },
                         ))),
             Expanded(
-                child: Align(
+                child: Container(
               alignment: Alignment.centerRight,
+              constraints: const BoxConstraints(minWidth: 40),
               child: IconButton(
                 icon: Icon(Icons.delete, color: Colors.red[800]),
                 tooltip: "Reset",
