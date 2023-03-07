@@ -22,7 +22,7 @@ void main() async {
         "/": (BuildContext context) => MainScreen()
       },
       color: cardinalred,
-      themeMode: ThemeMode.light,
+      themeMode: ThemeMode.system,
       darkTheme: ThemeData(
         colorScheme: ColorScheme.dark(
             primary: Colors.blue[600]!,
