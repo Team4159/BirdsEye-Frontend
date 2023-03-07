@@ -235,12 +235,11 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
 
   @override
   Widget build(BuildContext context) => Row(
-          mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.baseline,
           textBaseline: TextBaseline.alphabetic,
           children: [
-            ConstrainedBox(
-              constraints: const BoxConstraints(minWidth: 80, maxWidth: 200),
+            SizedBox(
+              width: 95,
               child: TextFormField(
                 key: _matchCodeKey,
                 keyboardType: TextInputType.text,
@@ -276,9 +275,9 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
                 },
               ),
             ),
-            const SizedBox(width: 20),
-            ConstrainedBox(
-                constraints: const BoxConstraints(minWidth: 80, maxWidth: 150),
+            const SizedBox(width: 15),
+            SizedBox(
+                width: 75,
                 child: Autocomplete(
                     optionsBuilder: (textEditingValue) => _matchCode == null
                         ? Future<Iterable<String>>.value([])
@@ -287,54 +286,56 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
                                 "${SettingsState.season}${prefs.getString('event')}_$_matchCode")
                             .then((val) => val.keys.where((element) =>
                                 element.startsWith(textEditingValue.text))),
-                    fieldViewBuilder: (context, controller, focusNode,
-                            onFieldSubmitted) =>
-                        TextFormField(
-                          key: _teamNumberKey,
-                          controller: controller,
-                          focusNode: focusNode,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly
-                          ],
-                          maxLength: 4,
-                          textInputAction: TextInputAction.done,
-                          decoration: const InputDecoration(
-                              labelText: "Team #", counterText: ""),
-                          validator: (String? content) {
-                            if (content == null || content.isEmpty) {
-                              return "Required";
-                            }
-                            if (_matchCode == null || _matchCode!.isEmpty) {
-                              return "Set Match First!";
-                            }
-                            if (_lGoodTeamNumber == content) return null;
-                            if (_lBadTeamNumber == content) return "Invalid";
-                            tbaStock
-                                .get(
-                                    "${SettingsState.season}${prefs.getString('event')}_$_matchCode")
-                                .then((val) {
-                              if (val.containsKey(content)) {
-                                _lGoodTeamNumber = content;
-                                _teamNumber = int.parse(content);
-                              } else {
-                                _lBadTeamNumber = content;
-                                _teamNumber = null;
-                              }
-                              _teamNumberKey.currentState!.validate();
-                            });
-                            return "Validating";
-                          },
-                          onEditingComplete: () {
-                            _teamNumberKey.currentState!.validate();
-                            onFieldSubmitted();
-                          },
-                          onChanged: (String value) {
-                            if (value != _teamNumber.toString()) {
-                              _teamNumber = null;
-                            }
-                          },
-                        ))),
+                    fieldViewBuilder:
+                        (context, controller, focusNode, onFieldSubmitted) =>
+                            TextFormField(
+                              key: _teamNumberKey,
+                              controller: controller,
+                              focusNode: focusNode,
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly
+                              ],
+                              maxLength: 4,
+                              textInputAction: TextInputAction.done,
+                              decoration: const InputDecoration(
+                                  labelText: "Team #", counterText: ""),
+                              validator: (String? content) {
+                                if (content == null || content.isEmpty) {
+                                  return "Required";
+                                }
+                                if (_matchCode == null || _matchCode!.isEmpty) {
+                                  return "Set Match First!";
+                                }
+                                if (_lGoodTeamNumber == content) return null;
+                                if (_lBadTeamNumber == content) {
+                                  return "Invalid";
+                                }
+                                tbaStock
+                                    .get(
+                                        "${SettingsState.season}${prefs.getString('event')}_$_matchCode")
+                                    .then((val) {
+                                  if (val.containsKey(content)) {
+                                    _lGoodTeamNumber = content;
+                                    _teamNumber = int.parse(content);
+                                  } else {
+                                    _lBadTeamNumber = content;
+                                    _teamNumber = null;
+                                  }
+                                  _teamNumberKey.currentState!.validate();
+                                });
+                                return "Validating";
+                              },
+                              onEditingComplete: () {
+                                _teamNumberKey.currentState!.validate();
+                                onFieldSubmitted();
+                              },
+                              onChanged: (String value) {
+                                if (value != _teamNumber.toString()) {
+                                  _teamNumber = null;
+                                }
+                              },
+                            ))),
             Expanded(
                 child: Container(
               alignment: Alignment.centerRight,
