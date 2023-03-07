@@ -1,5 +1,6 @@
 import 'dart:math' show min;
 
+import 'package:birdseye/settings.dart';
 import 'package:birdseye/widgets/formfieldtitle.dart';
 import 'package:flutter/material.dart';
 
@@ -17,7 +18,7 @@ class CounterFormField extends FormField<int> {
                 shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(4))),
                 animationDuration: const Duration(milliseconds: 500),
-                color: Theme.of(state.context).colorScheme.primary,
+                color: getColor(state.context, labelText),
                 textStyle: Theme.of(state.context)
                     .textTheme
                     .labelLarge!
@@ -51,4 +52,14 @@ class CounterFormField extends FormField<int> {
                         FormFieldTitle(labelText),
                       ],
                     ))));
+  static Color getColor(BuildContext context, String labelText) {
+    // FIXME: Season-Specific
+    return SettingsState.season != 2023
+        ? Theme.of(context).colorScheme.primary
+        : labelText.toLowerCase().startsWith("cone")
+            ? const Color(0xffccc000)
+            : labelText.toLowerCase().startsWith("cube")
+                ? const Color(0xff800080)
+                : Theme.of(context).colorScheme.primary;
+  }
 }

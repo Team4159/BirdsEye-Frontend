@@ -171,7 +171,7 @@ class MatchScoutState extends State<MatchScout> {
                                           _loading = true;
                                         });
                                         postResponse(WebDataTypes.matchScout, {
-                                          "form": _fields,
+                                          ..._fields,
                                           "teamNumber":
                                               MatchInfoFieldsState._teamNumber,
                                           "match":
