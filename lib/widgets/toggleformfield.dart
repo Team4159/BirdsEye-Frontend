@@ -15,7 +15,9 @@ class ToggleFormField extends FormField<bool> {
                 shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(4))),
                 animationDuration: const Duration(milliseconds: 500),
-                color: Color(state.value! ? 0xff1C7C7C : 0xffCF772E),
+                color: state.value!
+                    ? Theme.of(state.context).colorScheme.secondaryContainer
+                    : Theme.of(state.context).colorScheme.tertiaryContainer,
                 textStyle: Theme.of(state.context)
                     .textTheme
                     .labelLarge!

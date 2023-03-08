@@ -29,7 +29,6 @@ class PitScoutState extends State<PitScout> {
       drawer: AppDrawer(),
       body: Form(
           key: _formKey,
-          autovalidateMode: AutovalidateMode.disabled,
           child: FutureBuilder(
               future: stock.get(WebDataTypes.pitScout),
               builder: (context, snapshot) {
@@ -38,110 +37,144 @@ class PitScoutState extends State<PitScout> {
                       ? ErrorContainer(snapshot.error)
                       : const Center(child: CircularProgressIndicator());
                 }
-                return ListView(
+                return SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     controller: _scrollController,
-                    children: <Widget>[
+                    child: Column(
+                        children: <Widget>[
                       Row(children: [
-                        const PitScoutTeamNumberField(),
+                        PitScoutTeamNumberField(key: _teamNumberKey),
                         Expanded(
                             child: Align(
                           alignment: Alignment.centerRight,
                           child: IconButton(
+                            focusNode: FocusNode(skipTraversal: true),
                             icon: Icon(Icons.delete, color: Colors.red[800]),
                             tooltip: "Reset",
                             onPressed: () {
                               _formKey.currentState!.reset();
-                              _teamNumberKey.currentState!.refreshAC();
+                              _teamNumberKey.currentState!.reload();
                             },
                           ),
                         ))
                       ]),
                       const SizedBox(height: 10)
                     ]
-                        .followedBy(
-                            snapshot.data!.entries.map((e) => TextFormField(
-                                  keyboardType: TextInputType.multiline,
-                                  maxLines: null,
-                                  decoration: InputDecoration(
-                                      counterText: null,
-                                      border: const OutlineInputBorder(),
-                                      enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(
-                                              color: Colors.grey[700]!)),
-                                      labelText: e.key),
-                                  onSaved: (String? content) {
-                                    _fields[e.value] = content ?? "";
-                                  },
-                                )))
-                        .followedBy([
-                          ElevatedButton(
-                              onPressed: () {
-                                if (_loading) return;
-                                _fields.clear();
-                                if (!_formKey.currentState!.validate() ||
-                                    _teamNumberKey.currentState?.teamNumber ==
-                                        null) {
-                                  _scrollController.animateTo(0,
-                                      duration:
-                                          const Duration(milliseconds: 200),
-                                      curve: Curves.easeOutCubic);
-                                  return;
-                                }
-                                _formKey.currentState!.save();
-                                var m = ScaffoldMessenger.of(context);
-                                m.showSnackBar(const SnackBar(
-                                    duration: Duration(minutes: 5),
-                                    behavior: SnackBarBehavior.fixed,
-                                    elevation: 0,
-                                    padding: EdgeInsets.zero,
-                                    backgroundColor: Colors.transparent,
-                                    content: LinearProgressIndicator(
-                                      backgroundColor: Colors.transparent,
-                                    )));
-                                setState(() {
-                                  _loading = true;
-                                });
-                                postResponse(WebDataTypes.pitScout, {
-                                  ..._fields,
-                                  "teamNumber":
-                                      _teamNumberKey.currentState!.teamNumber,
-                                  "name": prefs.getString("name")
-                                }).then((response) {
-                                  if (response.statusCode >= 400) {
-                                    throw Exception(
-                                        "Error ${response.statusCode}: ${response.reasonPhrase}");
-                                  }
-                                  _formKey.currentState!.reset();
-                                  _teamNumberKey.currentState!.refreshAC();
-                                  m.hideCurrentSnackBar();
-                                  setState(() {
-                                    _loading = false;
-                                  });
-                                  _scrollController.animateTo(0,
-                                      duration: const Duration(seconds: 1),
-                                      curve: Curves.easeInOutQuad);
-                                  m.showSnackBar(SnackBar(
-                                      content: Text(
-                                          "Response Sent! [${response.statusCode}]")));
-                                }).catchError((e) {
-                                  m.hideCurrentSnackBar();
-                                  setState(() {
-                                    _loading = false;
-                                  });
-                                  m.showSnackBar(
-                                      SnackBar(content: Text(e.toString())));
-                                });
-                              },
-                              child: _loading
-                                  ? const Text("Waiting..")
-                                  : const Text("Submit"))
-                        ])
-                        .map((e) => Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 15, vertical: 6),
-                            child: e))
-                        .toList());
+                            .followedBy(
+                                snapshot.data!.entries.map((e) => Material(
+                                      type: MaterialType.card,
+                                      elevation: 1,
+                                      child: Padding(
+                                          padding: const EdgeInsets.all(8),
+                                          child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(e.key,
+                                                    textAlign: TextAlign.left,
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .labelLarge),
+                                                const SizedBox(height: 10),
+                                                TextFormField(
+                                                  keyboardType:
+                                                      TextInputType.multiline,
+                                                  maxLines: null,
+                                                  decoration: InputDecoration(
+                                                      contentPadding:
+                                                          const EdgeInsets
+                                                                  .symmetric(
+                                                              vertical: 6,
+                                                              horizontal: 8),
+                                                      filled: true,
+                                                      counterText: null,
+                                                      border:
+                                                          const OutlineInputBorder(),
+                                                      enabledBorder:
+                                                          OutlineInputBorder(
+                                                              borderSide: BorderSide(
+                                                                  color: Colors
+                                                                          .grey[
+                                                                      700]!))),
+                                                  onSaved: (String? content) {
+                                                    _fields[e.value] =
+                                                        content ?? "";
+                                                  },
+                                                )
+                                              ])),
+                                    )))
+                            .followedBy([
+                              SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                      onPressed: () {
+                                        if (_loading) return;
+                                        _fields.clear();
+                                        if (_teamNumberKey
+                                                .currentState?.teamNumber ==
+                                            null) {
+                                          _scrollController.animateTo(0,
+                                              duration: const Duration(
+                                                  milliseconds: 200),
+                                              curve: Curves.easeOutCubic);
+                                          return;
+                                        }
+                                        _formKey.currentState!.save();
+                                        var m = ScaffoldMessenger.of(context);
+                                        m.showSnackBar(const SnackBar(
+                                            duration: Duration(minutes: 5),
+                                            behavior: SnackBarBehavior.fixed,
+                                            elevation: 0,
+                                            padding: EdgeInsets.zero,
+                                            backgroundColor: Colors.transparent,
+                                            content: LinearProgressIndicator(
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                            )));
+                                        setState(() {
+                                          _loading = true;
+                                        });
+                                        postResponse(WebDataTypes.pitScout, {
+                                          ..._fields,
+                                          "teamNumber": _teamNumberKey
+                                              .currentState!.teamNumber,
+                                          "name": prefs.getString("name")
+                                        }).then((response) {
+                                          if (response.statusCode >= 400) {
+                                            throw Exception(
+                                                "Error ${response.statusCode}: ${response.reasonPhrase}");
+                                          }
+                                          _formKey.currentState!.reset();
+                                          _teamNumberKey.currentState!.reload();
+                                          m.hideCurrentSnackBar();
+                                          setState(() {
+                                            _loading = false;
+                                          });
+                                          _scrollController.animateTo(0,
+                                              duration:
+                                                  const Duration(seconds: 1),
+                                              curve: Curves.easeInOutQuad);
+                                          m.showSnackBar(SnackBar(
+                                              content: Text(
+                                                  "Response Sent! [${response.statusCode}]")));
+                                        }).catchError((e) {
+                                          m.hideCurrentSnackBar();
+                                          setState(() {
+                                            _loading = false;
+                                          });
+                                          m.showSnackBar(SnackBar(
+                                              content: Text(e.toString())));
+                                        });
+                                      },
+                                      child: _loading
+                                          ? const Text("Waiting..")
+                                          : const Text("Submit")))
+                            ])
+                            .map((e) => Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 15, vertical: 6),
+                                child: e))
+                            .toList()));
               })));
 }
 
@@ -153,21 +186,20 @@ class PitScoutTeamNumberField extends StatefulWidget {
 }
 
 class PitScoutTeamNumberFieldState extends State<PitScoutTeamNumberField> {
-  final GlobalKey<FormFieldState> _key = GlobalKey<FormFieldState>();
-  String _lGoodTeamNumber = "";
-  String _lBadTeamNumber = "";
+  TextEditingController? _controller;
+  String? _errorText;
   int? teamNumber;
   static List<int> _acTeams = [];
 
   @override
   void initState() {
     super.initState();
-    refreshAC();
+    reload();
   }
 
-  void refreshAC() {
-    _lGoodTeamNumber = "";
-    _key.currentState?.reset();
+  void reload() {
+    _controller?.clear();
+    _acTeams = [];
     pitScoutGetUnfilled().then((value) {
       value.sort();
       _acTeams = value;
@@ -178,53 +210,45 @@ class PitScoutTeamNumberFieldState extends State<PitScoutTeamNumberField> {
   Widget build(BuildContext context) => ConstrainedBox(
       constraints: const BoxConstraints(minWidth: 75, maxWidth: 150),
       child: Autocomplete(
+          optionsBuilder: (TextEditingValue textEditingValue) => _acTeams.where(
+              (element) =>
+                  element.toString().startsWith(textEditingValue.text)),
+          onSelected: (int content) => setState(() => teamNumber = content),
           fieldViewBuilder: (BuildContext context,
-                  TextEditingController controller,
-                  FocusNode focusNode,
-                  VoidCallback onFieldSubmitted) =>
-              TextFormField(
-                key: _key,
+              TextEditingController controller,
+              FocusNode focusNode,
+              VoidCallback onSubmitted) {
+            _controller = controller;
+            return TextField(
                 controller: controller,
                 focusNode: focusNode,
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 maxLength: 4,
                 textInputAction: TextInputAction.done,
-                decoration:
-                    const InputDecoration(counterText: "", labelText: "Team #"),
-                validator: (String? content) {
-                  if (content == null || content.isEmpty) {
-                    return "Required";
+                decoration: InputDecoration(
+                    counterText: "",
+                    labelText: "Team #",
+                    errorText: _errorText),
+                onSubmitted: (String content) {
+                  onSubmitted();
+                  teamNumber = null;
+                  if (content.isEmpty) {
+                    return setState(() => _errorText = "Required");
                   }
-                  if (_lGoodTeamNumber == content) return null;
-                  if (_lBadTeamNumber == content) {
-                    return "Invalid";
-                  }
+                  setState(() => _errorText = "Loading");
                   tbaStock
                       .get(
                           "${SettingsState.season}${prefs.getString('event')}_*")
                       .then((val) {
                     if (val.containsKey(content)) {
-                      _lGoodTeamNumber = content;
+                      setState(() => _errorText = null);
                       teamNumber = int.parse(content);
                     } else {
-                      _lBadTeamNumber = content;
+                      setState(() => _errorText = "Invalid");
                       teamNumber = null;
                     }
-                    _key.currentState!.validate();
                   });
-                  return "Validating";
-                },
-                onFieldSubmitted: (String content) {
-                  _key.currentState!.validate();
-                  onFieldSubmitted();
-                },
-                onChanged: (String value) {
-                  _lGoodTeamNumber = "";
-                  teamNumber = null;
-                },
-              ),
-          optionsBuilder: (TextEditingValue textEditingValue) => _acTeams.where(
-              (element) =>
-                  element.toString().startsWith(textEditingValue.text))));
+                });
+          }));
 }

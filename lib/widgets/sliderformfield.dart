@@ -12,11 +12,11 @@ class SliderFormField extends FormField<double> {
       String labelText = ""})
       : super(
             builder: (FormFieldState<double> state) => Material(
+                type: MaterialType.card,
                 elevation: 2,
                 shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(4))),
                 animationDuration: const Duration(milliseconds: 500),
-                color: Theme.of(state.context).colorScheme.secondary,
                 textStyle: Theme.of(state.context)
                     .textTheme
                     .labelLarge!

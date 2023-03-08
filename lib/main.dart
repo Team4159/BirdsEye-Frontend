@@ -26,10 +26,12 @@ void main() async {
       darkTheme: ThemeData(
         colorScheme: ColorScheme.dark(
             primary: Colors.blue[600]!,
-            secondary: Colors.grey,
             onPrimary: Colors.black,
+            secondaryContainer: const Color(0xff1C7C7C),
+            tertiaryContainer: const Color(0xffCF772E),
             surface: cardinalred),
         inputDecorationTheme: InputDecorationTheme(
+            fillColor: Colors.white12,
             border: const UnderlineInputBorder(),
             enabledBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: Colors.grey[350]!))),
@@ -59,18 +61,22 @@ void main() async {
                 displaySmall: const TextStyle(color: Colors.black),
                 displayMedium: const TextStyle(
                     fontFamily: "VarelaRound", letterSpacing: 2, fontSize: 48)),
+        cardColor: Colors.grey[700]!,
         scaffoldBackgroundColor: Colors.black,
       ),
       theme: ThemeData(
         colorScheme: ColorScheme.light(
             primary: Colors.blue[600]!,
             secondary: Colors.grey[400]!,
+            secondaryContainer: const Color(0xff1C7C7C),
+            tertiaryContainer: const Color(0xffCF772E),
             surface: cardinalred,
             background: Colors.grey[300]!),
         inputDecorationTheme: InputDecorationTheme(
+            fillColor: Colors.black12,
             border: const UnderlineInputBorder(),
             enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey[300]!))),
+                borderSide: BorderSide(color: Colors.grey[400]!))),
         appBarTheme: const AppBarTheme(
             backgroundColor: cardinalred,
             titleTextStyle: TextStyle(
@@ -86,6 +92,8 @@ void main() async {
                 titleLarge: const TextStyle(fontFamily: "Verdana"),
                 displayMedium: const TextStyle(
                     fontFamily: "VarelaRound", letterSpacing: 2, fontSize: 48)),
+        cardColor: Colors.grey[400],
+        scaffoldBackgroundColor: Colors.grey[100]!,
       ),
     ),
   );
@@ -135,7 +143,7 @@ class AppDrawer extends Builder {
                       ),
                       onTap: () => Navigator.of(context)
                           .pushReplacement(_createRoute(const PitScout())),
-                    ),
+                    )
                   ],
                 )));
 }

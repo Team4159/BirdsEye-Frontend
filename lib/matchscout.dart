@@ -18,7 +18,8 @@ class MatchScout extends StatefulWidget {
 }
 
 class MatchScoutState extends State<MatchScout> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey();
+  final GlobalKey<MatchInfoFieldsState> _matchInfoKey = GlobalKey();
   final ScrollController _scrollController = ScrollController();
   final Map<String, Map<String, dynamic>> _fields = {};
   bool _loading = false;
@@ -31,7 +32,6 @@ class MatchScoutState extends State<MatchScout> {
       drawer: AppDrawer(),
       body: Form(
           key: _formKey,
-          autovalidateMode: AutovalidateMode.disabled,
           child: FutureBuilder(
               future: stock.get(WebDataTypes.matchScout),
               builder: (context, snapshot) {
@@ -46,6 +46,7 @@ class MatchScoutState extends State<MatchScout> {
                     child: Column(
                         children: <Widget>[
                       MatchInfoFields(
+                          key: _matchInfoKey,
                           reset: () => _formKey.currentState!.reset())
                     ]
                             .followedBy(snapshot.data!.entries.map((e1) {
@@ -146,9 +147,8 @@ class MatchScoutState extends State<MatchScout> {
                                       onPressed: () {
                                         if (_loading) return;
                                         _fields.clear();
-                                        if (!_formKey.currentState!
-                                                .validate() ||
-                                            !MatchInfoFieldsState.isValid) {
+                                        if (!_matchInfoKey
+                                            .currentState!.isValid) {
                                           _scrollController.animateTo(0,
                                               duration: const Duration(
                                                   milliseconds: 200),
@@ -172,10 +172,10 @@ class MatchScoutState extends State<MatchScout> {
                                         });
                                         postResponse(WebDataTypes.matchScout, {
                                           ..._fields,
-                                          "teamNumber":
-                                              MatchInfoFieldsState._teamNumber,
-                                          "match":
-                                              MatchInfoFieldsState._matchCode,
+                                          "teamNumber": _matchInfoKey
+                                              .currentState!.teamNumber,
+                                          "match": _matchInfoKey
+                                              .currentState!.matchCode,
                                           "name": prefs.getString("name")
                                         }).then((response) {
                                           if (response.statusCode >= 400) {
@@ -183,6 +183,7 @@ class MatchScoutState extends State<MatchScout> {
                                                 "Error ${response.statusCode}: ${response.reasonPhrase}");
                                           }
                                           _formKey.currentState!.reset();
+                                          _matchInfoKey.currentState!.reset();
                                           m.hideCurrentSnackBar();
                                           setState(() {
                                             _loading = false;
@@ -222,17 +223,21 @@ class MatchInfoFields extends StatefulWidget {
 }
 
 class MatchInfoFieldsState extends State<MatchInfoFields> {
-  static bool get isValid => _matchCode != null && _teamNumber != null;
+  bool get isValid => matchCode != null && teamNumber != null;
 
-  static int? _teamNumber;
-  final GlobalKey<FormFieldState> _teamNumberKey = GlobalKey<FormFieldState>();
-  String _lGoodTeamNumber = "";
-  String _lBadTeamNumber = "";
+  int? teamNumber;
+  TextEditingController? _teamNumberController;
+  String? _teamNumberError;
 
-  static String? _matchCode;
-  final GlobalKey<FormFieldState> _matchCodeKey = GlobalKey<FormFieldState>();
-  String _lGoodMatchCode = "";
-  String _lBadMatchCode = "";
+  String? matchCode;
+  final TextEditingController _matchCodeController = TextEditingController();
+  String? _matchCodeError;
+
+  void reset() {
+    _teamNumberController?.clear();
+    _matchCodeController.clear();
+    widget.reset();
+  }
 
   @override
   Widget build(BuildContext context) => Row(
@@ -241,110 +246,103 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
           children: [
             SizedBox(
               width: 95,
-              child: TextFormField(
-                key: _matchCodeKey,
-                keyboardType: TextInputType.text,
-                maxLength: 5,
-                textInputAction: TextInputAction.next,
-                decoration: const InputDecoration(
-                    counterText: "", labelText: "Match Code"),
-                validator: (String? content) {
-                  if (content == null || content.isEmpty) return "Required";
-                  if (_lGoodMatchCode == content) return null;
-                  if (_lBadMatchCode == content) return "Invalid";
-                  tbaStock
-                      .get("${SettingsState.season}${prefs.getString('event')}")
-                      .then((val) {
-                    if (val.containsKey(content)) {
-                      _lGoodMatchCode = content;
-                      _matchCode = content;
-                      _lBadTeamNumber = _lGoodTeamNumber = "";
-                      _teamNumberKey.currentState!.validate();
-                    } else {
-                      _lBadMatchCode = content;
-                      _matchCode = null;
+              child: TextField(
+                  controller: _matchCodeController,
+                  keyboardType: TextInputType.text,
+                  maxLength: 5,
+                  textInputAction: TextInputAction.next,
+                  decoration: InputDecoration(
+                      counterText: "",
+                      labelText: "Match Code",
+                      errorText: _matchCodeError),
+                  onSubmitted: (String content) {
+                    if (content.isEmpty) {
+                      return setState(() => _matchCodeError = "Required");
                     }
-                    _matchCodeKey.currentState!.validate();
-                  });
-                  return "Validating";
-                },
-                onEditingComplete: () {
-                  _matchCodeKey.currentState!.validate();
-                },
-                onChanged: (String value) {
-                  if (value != _matchCode.toString()) _matchCode = null;
-                },
-              ),
+                    setState(() => _matchCodeError = "Loading");
+                    tbaStock
+                        .get(
+                            "${SettingsState.season}${prefs.getString('event')}")
+                        .then((val) {
+                      if (val.containsKey(content)) {
+                        setState(() => _matchCodeError = null);
+                        matchCode = content;
+                        _teamNumberController?.clear();
+                      } else {
+                        setState(() => _matchCodeError = "Invalid");
+                        matchCode = null;
+                      }
+                    });
+                  }),
             ),
             const SizedBox(width: 15),
             SizedBox(
                 width: 75,
                 child: Autocomplete(
-                    optionsBuilder: (textEditingValue) => _matchCode == null
-                        ? Future<Iterable<String>>.value([])
+                    optionsBuilder: (textEditingValue) => matchCode == null
+                        ? Future<Iterable<int>>.value([])
                         : tbaStock
                             .get(
-                                "${SettingsState.season}${prefs.getString('event')}_$_matchCode")
-                            .then((val) => val.keys.where((element) =>
-                                element.startsWith(textEditingValue.text))),
+                                "${SettingsState.season}${prefs.getString('event')}_$matchCode")
+                            .then((val) => val.keys
+                                .where((element) => element
+                                    .toString()
+                                    .startsWith(textEditingValue.text))
+                                .map((e) => int.parse(e))),
+                    onSelected: (int content) =>
+                        setState(() => teamNumber = content),
                     fieldViewBuilder:
-                        (context, controller, focusNode, onFieldSubmitted) =>
-                            TextFormField(
-                              key: _teamNumberKey,
-                              controller: controller,
-                              focusNode: focusNode,
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly
-                              ],
-                              maxLength: 4,
-                              textInputAction: TextInputAction.done,
-                              decoration: const InputDecoration(
-                                  counterText: "", labelText: "Team #"),
-                              validator: (String? content) {
-                                if (content == null || content.isEmpty) {
-                                  return "Required";
-                                }
-                                if (_matchCode == null || _matchCode!.isEmpty) {
-                                  return "Set Match First!";
-                                }
-                                if (_lGoodTeamNumber == content) return null;
-                                if (_lBadTeamNumber == content) {
-                                  return "Invalid";
-                                }
-                                tbaStock
-                                    .get(
-                                        "${SettingsState.season}${prefs.getString('event')}_$_matchCode")
-                                    .then((val) {
-                                  if (val.containsKey(content)) {
-                                    _lGoodTeamNumber = content;
-                                    _teamNumber = int.parse(content);
-                                  } else {
-                                    _lBadTeamNumber = content;
-                                    _teamNumber = null;
-                                  }
-                                  _teamNumberKey.currentState!.validate();
-                                });
-                                return "Validating";
-                              },
-                              onEditingComplete: () {
-                                _teamNumberKey.currentState!.validate();
-                                onFieldSubmitted();
-                              },
-                              onChanged: (String value) {
-                                if (value != _teamNumber.toString()) {
-                                  _teamNumber = null;
-                                }
-                              },
-                            ))),
+                        (context, controller, focusNode, onFieldSubmitted) {
+                      _teamNumberController = controller;
+                      return TextField(
+                          controller: controller,
+                          focusNode: focusNode,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
+                          maxLength: 4,
+                          textInputAction: TextInputAction.done,
+                          decoration: InputDecoration(
+                              counterText: "",
+                              labelText: "Team #",
+                              errorText: _teamNumberError),
+                          onSubmitted: (String content) {
+                            teamNumber = null;
+
+                            onFieldSubmitted();
+                            if (content.isEmpty) {
+                              return setState(
+                                  () => _teamNumberError = "Required");
+                            }
+                            if (matchCode == null || matchCode!.isEmpty) {
+                              return setState(
+                                  () => _teamNumberError = "No Match");
+                            }
+                            setState(() => _teamNumberError = "Loading");
+                            tbaStock
+                                .get(
+                                    "${SettingsState.season}${prefs.getString('event')}_$matchCode")
+                                .then((val) {
+                              if (val.containsKey(content)) {
+                                setState(() => _teamNumberError = null);
+                                teamNumber = int.parse(content);
+                              } else {
+                                setState(() => _teamNumberError = "Invalid");
+                                teamNumber = null;
+                              }
+                            });
+                          });
+                    })),
             Expanded(
                 child: Container(
               alignment: Alignment.centerRight,
               constraints: const BoxConstraints(minWidth: 40),
               child: IconButton(
+                focusNode: FocusNode(skipTraversal: true),
                 icon: Icon(Icons.delete, color: Colors.red[800]),
                 tooltip: "Reset",
-                onPressed: widget.reset,
+                onPressed: reset,
               ),
             ))
           ]);
