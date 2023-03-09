@@ -3,6 +3,7 @@ import 'package:birdseye/settings.dart';
 import 'package:birdseye/web.dart';
 import 'package:birdseye/widgets/counterformfield.dart';
 import 'package:birdseye/widgets/errorcontainer.dart';
+import 'package:birdseye/widgets/resetbutton.dart';
 import 'package:birdseye/widgets/sliderformfield.dart';
 import 'package:birdseye/widgets/toggleformfield.dart';
 import 'package:flutter/material.dart';
@@ -335,15 +336,7 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
                           });
                     })),
             Expanded(
-                child: Container(
-              alignment: Alignment.centerRight,
-              constraints: const BoxConstraints(minWidth: 40),
-              child: IconButton(
-                focusNode: FocusNode(skipTraversal: true),
-                icon: Icon(Icons.delete, color: Colors.red[800]),
-                tooltip: "Reset",
-                onPressed: reset,
-              ),
-            ))
+                child: ResetButton(reset: reset)
+                )
           ]);
 }
