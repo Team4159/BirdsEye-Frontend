@@ -2,6 +2,7 @@ import 'package:birdseye/main.dart';
 import 'package:birdseye/settings.dart';
 import 'package:birdseye/web.dart';
 import 'package:birdseye/widgets/errorcontainer.dart';
+import 'package:birdseye/widgets/resetbutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -47,15 +48,10 @@ class PitScoutState extends State<PitScout> {
                         Expanded(
                             child: Align(
                           alignment: Alignment.centerRight,
-                          child: IconButton(
-                            focusNode: FocusNode(skipTraversal: true),
-                            icon: Icon(Icons.delete, color: Colors.red[800]),
-                            tooltip: "Reset",
-                            onPressed: () {
-                              _formKey.currentState!.reset();
-                              _teamNumberKey.currentState!.reload();
-                            },
-                          ),
+                          child: ResetButton(reset: () {
+                            _formKey.currentState!.reset();
+                            _teamNumberKey.currentState!.reload();
+                          }),
                         ))
                       ]),
                       const SizedBox(height: 10)
