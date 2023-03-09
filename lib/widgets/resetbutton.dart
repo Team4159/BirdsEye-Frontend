@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 class ResetButton extends StatefulWidget {
   final Function() reset;
-
   const ResetButton({super.key, required this.reset});
 
   @override
@@ -19,11 +18,9 @@ class _ResetButtonState extends State<ResetButton> {
         focusNode: FocusNode(skipTraversal: true),
         icon: Icon(Icons.delete, color: Colors.red[800]),
         tooltip: "Reset",
-        onPressed: () {
-          showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
+        onPressed: () => showDialog(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
                   title: const Text("Confirm Reset"),
                   content: const Text("Are you sure you want to reset?"),
                   actions: [
@@ -37,9 +34,7 @@ class _ResetButtonState extends State<ResetButton> {
                         },
                         child: const Text("Reset"))
                   ],
-                );
-              });
-        },
+                )),
       ),
     );
   }

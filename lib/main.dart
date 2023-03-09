@@ -55,10 +55,16 @@ void main() async {
                 fontFamily: "Roboto", fontSize: 16, color: Colors.black)),
         textTheme: Typography.whiteHelsinki
             .merge(Typography.englishLike2021)
-            .apply(bodyColor: Colors.white, displayColor: Colors.grey[300])
-            .copyWith(
+            .apply(
+                bodyColor: Colors.white,
+                displayColor: Colors.grey[300],
+                fontFamilyFallback: [
+              "Arial",
+              "Calibri"
+            ]).copyWith(
                 titleLarge: const TextStyle(fontFamily: "Verdana"),
-                displaySmall: const TextStyle(color: Colors.black),
+                displaySmall: const TextStyle(
+                    fontFamily: "OpenSans", color: Colors.black),
                 displayMedium: const TextStyle(
                     fontFamily: "VarelaRound", letterSpacing: 2, fontSize: 48)),
         cardColor: Colors.grey[700]!,
@@ -87,9 +93,15 @@ void main() async {
             centerTitle: true),
         textTheme: Typography.blackCupertino
             .merge(Typography.englishLike2021)
-            .apply(bodyColor: Colors.black, displayColor: Colors.white)
-            .copyWith(
+            .apply(
+                bodyColor: Colors.black,
+                displayColor: Colors.white,
+                fontFamilyFallback: [
+              "Arial",
+              "Calibri"
+            ]).copyWith(
                 titleLarge: const TextStyle(fontFamily: "Verdana"),
+                displaySmall: const TextStyle(fontFamily: "OpenSans"),
                 displayMedium: const TextStyle(
                     fontFamily: "VarelaRound", letterSpacing: 2, fontSize: 48)),
         cardColor: Colors.grey[400],
