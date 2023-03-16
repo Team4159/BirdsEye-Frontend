@@ -1,3 +1,4 @@
+import 'package:birdseye/adminpanel.dart';
 import 'package:birdseye/matchscout.dart';
 import 'package:birdseye/pitscout.dart';
 import 'package:birdseye/settings.dart';
@@ -19,7 +20,8 @@ void main() async {
       routes: {
         "/matchscout": (BuildContext context) => const MatchScout(),
         "/pitscout": (BuildContext context) => const PitScout(),
-        "/": (BuildContext context) => MainScreen()
+        "/": (BuildContext context) => MainScreen(),
+        "/admin": (BuildContext context) => AdminPanel()
       },
       color: cardinalred,
       themeMode: ThemeMode.system,
