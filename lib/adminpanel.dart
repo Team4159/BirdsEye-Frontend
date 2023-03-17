@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:birdseye/settings.dart';
 import 'package:birdseye/web.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 
@@ -34,15 +35,24 @@ class _AdminPanelState extends State<AdminPanel> {
           controller: _eventController,
           maxLength: 4,
           textInputAction: TextInputAction.done,
-          decoration: const InputDecoration(labelText: "Event Code (Optional)"),
+          decoration: const InputDecoration(labelText: "Event Code"),
         ),
         MenuItemButton(
             onPressed: () {
+              if (_yearController.text.isEmpty) {
+                return showSnackBar(const Text("Missing required fields"));
+              }
+
               setState(() {});
             },
             child: const Text("Get Event List")),
         MenuItemButton(
             onPressed: () async {
+              if (_yearController.text.isEmpty ||
+                  _eventController.text.isEmpty) {
+                return showSnackBar(const Text("Missing required fields"));
+              }
+
               Response res = await createEvent(
                   _yearController.text, _eventController.text);
 
@@ -56,6 +66,7 @@ class _AdminPanelState extends State<AdminPanel> {
               setState(() {});
             },
             child: const Text("Add Event")),
+        Text("Events", style: Theme.of(context).textTheme.titleLarge),
         FutureBuilder(
             future: getEventList(int.parse(_yearController.text)),
             builder: (BuildContext context, AsyncSnapshot<Object?> snapshot) {
@@ -71,9 +82,12 @@ class _AdminPanelState extends State<AdminPanel> {
               return ListView.builder(
                   shrinkWrap: true,
                   itemBuilder: (BuildContext context, int i) {
-                    if (res == null || jsonDecode(res.body).length <= i) {
+                    if (jsonDecode(res.body).length <= i) {
                       if (i == 0) {
-                        showSnackBar(const Text("No events"));
+                        SchedulerBinding.instance
+                            .addPostFrameCallback((timeStamp) {
+                          showSnackBar(const Text("No events"));
+                        });
                       }
 
                       return null;
