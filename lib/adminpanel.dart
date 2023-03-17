@@ -47,10 +47,10 @@ class _AdminPanelState extends State<AdminPanel> {
                   _yearController.text, _eventController.text);
 
               if (res.statusCode == 200) {
-                print("Success");
+                showSnackBar(const Text("Success!"));
               } else {
-                print("ERROR ${res.statusCode}: ${res.reasonPhrase}");
-                return;
+                return showSnackBar(
+                    Text("ERROR ${res.statusCode}: ${res.reasonPhrase}"));
               }
 
               setState(() {});
@@ -66,9 +66,11 @@ class _AdminPanelState extends State<AdminPanel> {
                   shrinkWrap: true,
                   itemBuilder: (BuildContext context, int i) {
                     if (res == null || jsonDecode(res.body).length <= i) {
-                      return (i == 0)
-                          ? const ListTile(title: Text("No events"))
-                          : null;
+                      if (i == 0) {
+                        showSnackBar(const Text("No events"));
+                      }
+
+                      return null;
                     }
 
                     return ListTile(
@@ -78,5 +80,9 @@ class _AdminPanelState extends State<AdminPanel> {
             }),
       ]),
     );
+  }
+
+  void showSnackBar(Widget content) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: content));
   }
 }
