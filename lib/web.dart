@@ -87,5 +87,9 @@ Future<List<int>> pitScoutGetUnfilled() => client
     .then((resp) => List<int>.from(json.decode(resp.body), growable: false));
 
 Future<Response> getEventList(int season) {
-  return client.get(parseURI("api/$season/listEvents", ip: "127.0.0.1:5000"));
+  return client.get(parseURI("api/$season/listEvents"));
+}
+
+Future<Response> createEvent(String season, String eventCode) {
+  return client.put(parseURI("api/$season/createEvent"), body: eventCode);
 }

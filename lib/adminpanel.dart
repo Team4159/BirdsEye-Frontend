@@ -6,11 +6,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 
-class AdminPanel extends StatelessWidget {
+class AdminPanel extends StatefulWidget {
+  const AdminPanel({super.key});
+
+  @override
+  State<AdminPanel> createState() => _AdminPanelState();
+}
+
+class _AdminPanelState extends State<AdminPanel> {
   final TextEditingController _yearController =
       TextEditingController(text: "2023");
-
-  AdminPanel({super.key});
+  final TextEditingController _eventController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -22,14 +28,34 @@ class AdminPanel extends StatelessWidget {
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           maxLength: 4,
           textInputAction: TextInputAction.done,
-          decoration: const InputDecoration(counterText: "", labelText: "Year"),
+          decoration: const InputDecoration(labelText: "Year"),
         ),
-        const TextField(
+        TextField(
+          controller: _eventController,
           maxLength: 4,
           textInputAction: TextInputAction.done,
-          decoration: InputDecoration(counterText: "", labelText: "Event Code"),
+          decoration: const InputDecoration(labelText: "Event Code (Optional)"),
         ),
-        TextButton(onPressed: () {}, child: const Text("Get Event List")),
+        MenuItemButton(
+            onPressed: () {
+              setState(() {});
+            },
+            child: const Text("Get Event List")),
+        MenuItemButton(
+            onPressed: () async {
+              Response res = await createEvent(
+                  _yearController.text, _eventController.text);
+
+              if (res.statusCode == 200) {
+                print("Success");
+              } else {
+                print("ERROR ${res.statusCode}: ${res.reasonPhrase}");
+                return;
+              }
+
+              setState(() {});
+            },
+            child: const Text("Add Event")),
         FutureBuilder(
             future: getEventList(int.parse(_yearController.text)),
             builder: (BuildContext context, AsyncSnapshot<Object?> snapshot) {
@@ -40,7 +66,9 @@ class AdminPanel extends StatelessWidget {
                   shrinkWrap: true,
                   itemBuilder: (BuildContext context, int i) {
                     if (res == null || jsonDecode(res.body).length <= i) {
-                      return null;
+                      return (i == 0)
+                          ? const ListTile(title: Text("No events"))
+                          : null;
                     }
 
                     return ListTile(
