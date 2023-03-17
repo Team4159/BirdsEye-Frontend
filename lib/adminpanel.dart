@@ -59,8 +59,14 @@ class _AdminPanelState extends State<AdminPanel> {
         FutureBuilder(
             future: getEventList(int.parse(_yearController.text)),
             builder: (BuildContext context, AsyncSnapshot<Object?> snapshot) {
-              Response? res =
-                  snapshot.inState(ConnectionState.done).data as Response?;
+              if (snapshot.connectionState != ConnectionState.done) {
+                return ListView(
+                  shrinkWrap: true,
+                );
+              }
+
+              Response res =
+                  snapshot.inState(ConnectionState.done).data as Response;
 
               return ListView.builder(
                   shrinkWrap: true,
