@@ -85,3 +85,10 @@ Future<List<int>> pitScoutGetUnfilled() => client
         "api/bluealliance/${SettingsState.season}/${prefs.getString('event')}/*",
         params: {"onlyUnfilled": "true"}))
     .then((resp) => List<int>.from(json.decode(resp.body), growable: false));
+
+Future<List<String>> getTableList(int season) => client
+    .get(parseURI("api/$season/listEvents"))
+    .then((resp) => List<String>.from(json.decode(resp.body), growable: false));
+
+Future<Response> createTables(int season, String eventCode) =>
+    client.put(parseURI("api/$season/createEvent"), body: eventCode);
