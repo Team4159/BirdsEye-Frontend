@@ -86,10 +86,9 @@ Future<List<int>> pitScoutGetUnfilled() => client
         params: {"onlyUnfilled": "true"}))
     .then((resp) => List<int>.from(json.decode(resp.body), growable: false));
 
-Future<Response> getEventList(int season) {
-  return client.get(parseURI("api/$season/listEvents"));
-}
+Future<List<String>> getTableList(int season) => client
+    .get(parseURI("api/$season/listEvents"))
+    .then((resp) => List<String>.from(json.decode(resp.body), growable: false));
 
-Future<Response> createEvent(String season, String eventCode) {
-  return client.put(parseURI("api/$season/createEvent"), body: eventCode);
-}
+Future<Response> createTables(int season, String eventCode) =>
+    client.put(parseURI("api/$season/createEvent"), body: eventCode);

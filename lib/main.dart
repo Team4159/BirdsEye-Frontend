@@ -3,6 +3,7 @@ import 'package:birdseye/matchscout.dart';
 import 'package:birdseye/pitscout.dart';
 import 'package:birdseye/settings.dart';
 import 'package:birdseye/web.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -11,7 +12,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   prefs = await SharedPreferences.getInstance();
   if (prefs.getString("ip") == null) {
-    prefs.setString("ip", "scouting.team4159.org");
+    prefs.setString(
+        "ip", kDebugMode ? "127.0.0.1:5000" : "scouting.team4159.org");
   }
   runApp(
     MaterialApp(
@@ -21,7 +23,7 @@ void main() async {
         "/matchscout": (BuildContext context) => const MatchScout(),
         "/pitscout": (BuildContext context) => const PitScout(),
         "/": (BuildContext context) => MainScreen(),
-        "/admin": (BuildContext context) => AdminPanel()
+        "/admin": (BuildContext context) => const AdminPanel()
       },
       color: cardinalred,
       themeMode: ThemeMode.system,
