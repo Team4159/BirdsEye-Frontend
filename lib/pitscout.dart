@@ -209,7 +209,7 @@ class PitScoutTeamNumberFieldState extends State<PitScoutTeamNumberField> {
           optionsBuilder: (TextEditingValue textEditingValue) => _acTeams.where(
               (element) =>
                   element.toString().startsWith(textEditingValue.text)),
-          onSelected: (int content) => setState(() => teamNumber = content),
+          onSelected: (int content) => setState(() {teamNumber = content; _errorText = null;}),
           fieldViewBuilder: (BuildContext context,
               TextEditingController controller,
               FocusNode focusNode,

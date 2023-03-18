@@ -83,8 +83,8 @@ class ConfigDialogState extends State<ConfigDialog> {
         title: const Text("Event Config"),
         contentPadding: const EdgeInsets.all(10),
         children: [
-          SizedBox(
-              width: 100,
+          Padding(
+              padding: const EdgeInsets.only(bottom: 20, left: 5, right: 5),
               child: Autocomplete(
                   optionsBuilder: (textEditingValue) => tbaStock
                       .get(widget.getSeason().toString())
@@ -113,7 +113,10 @@ class ConfigDialogState extends State<ConfigDialog> {
                           });
                         },
                       ),
-                  onSelected: (value) => _eventCode = value)),
+                  onSelected: (value) {
+                    _eventCode = value;
+                    setState(() => _eventError = null);
+                  })),
           TextButton(
               onPressed: () {
                 if (_eventCode == null) return;

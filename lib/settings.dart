@@ -84,7 +84,26 @@ class SettingsState extends State<Settings> {
                   reloadEvents();
                 },
               )),
-          NameConfigField(),
+          ShiftingFit(
+            Text(
+              "Your Name",
+              style: Theme.of(context).textTheme.titleMedium,
+              textAlign: TextAlign.left,
+            ),
+            TextField(
+              style: Theme.of(context).textTheme.bodyMedium,
+              decoration:
+                  InputDecoration(hintText: "Required ", hintStyle: TextStyle(color: Colors.red.withOpacity(0.5)), counterText: ""),
+              maxLength: 64,
+              textAlign: TextAlign.right,
+              keyboardType: TextInputType.name,
+              controller: TextEditingController(text: prefs.getString("name")),
+              onSubmitted: (String value) => prefs
+                  .setString("name", value)
+                  .then((value) => ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Set Name!")))),
+            ),
+          ),
           const IPConfigField()
         ])),
         const VerticalDivider(width: 22, thickness: 3),
@@ -161,40 +180,6 @@ class SettingsState extends State<Settings> {
           ignoreBasline: true,
         )),
       ]));
-}
-
-class NameConfigField extends StatelessWidget {
-  NameConfigField({super.key});
-
-  final TextEditingController _controller =
-      TextEditingController(text: prefs.getString("name"));
-  final FocusNode _node = FocusNode();
-
-  @override
-  Widget build(BuildContext context) => ShiftingFit(
-        Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              "Your Name",
-              style: Theme.of(context).textTheme.titleMedium,
-              textAlign: TextAlign.left,
-            )),
-        TextField(
-          style: Theme.of(context).textTheme.bodyMedium,
-          decoration: const InputDecoration(counterText: ""),
-          maxLength: 64,
-          textAlign: TextAlign.right,
-          keyboardType: TextInputType.name,
-          controller: _controller,
-          focusNode: _node,
-          onEditingComplete: () =>
-              prefs.setString("name", _controller.text).then((value) {
-            _node.unfocus();
-            ScaffoldMessenger.of(context)
-                .showSnackBar(const SnackBar(content: Text("Set Name!")));
-          }),
-        ),
-      );
 }
 
 class IPConfigField extends StatefulWidget {

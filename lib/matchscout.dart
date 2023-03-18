@@ -257,6 +257,8 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
                       labelText: "Match Code",
                       errorText: _matchCodeError),
                   onSubmitted: (String content) {
+                    matchCode = null;
+
                     if (content.isEmpty) {
                       return setState(() => _matchCodeError = "Required");
                     }
@@ -291,7 +293,10 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
                                     .startsWith(textEditingValue.text))
                                 .map((e) => int.parse(e))),
                     onSelected: (int content) =>
-                        setState(() => teamNumber = content),
+                        setState(() {
+                          teamNumber = content;
+                          _teamNumberError = null;
+                        }),
                     fieldViewBuilder:
                         (context, controller, focusNode, onFieldSubmitted) {
                       _teamNumberController = controller;
@@ -318,7 +323,7 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
                             }
                             if (matchCode == null || matchCode!.isEmpty) {
                               return setState(
-                                  () => _teamNumberError = "No Match");
+                                  () {_teamNumberError = "No Match"; _matchCodeError = "Required";});
                             }
                             setState(() => _teamNumberError = "Loading");
                             tbaStock
