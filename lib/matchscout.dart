@@ -87,6 +87,10 @@ class MatchScoutState extends State<MatchScout> {
                                             maxLines: null,
                                             expands: true,
                                             decoration: InputDecoration(
+                                                contentPadding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 2,
+                                                        horizontal: 4),
                                                 counterText: null,
                                                 border:
                                                     const OutlineInputBorder(),
@@ -292,8 +296,7 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
                                     .toString()
                                     .startsWith(textEditingValue.text))
                                 .map((e) => int.parse(e))),
-                    onSelected: (int content) =>
-                        setState(() {
+                    onSelected: (int content) => setState(() {
                           teamNumber = content;
                           _teamNumberError = null;
                         }),
@@ -322,8 +325,10 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
                                   () => _teamNumberError = "Required");
                             }
                             if (matchCode == null || matchCode!.isEmpty) {
-                              return setState(
-                                  () {_teamNumberError = "No Match"; _matchCodeError = "Required";});
+                              return setState(() {
+                                _teamNumberError = "No Match";
+                                _matchCodeError = "Required";
+                              });
                             }
                             setState(() => _teamNumberError = "Loading");
                             tbaStock
@@ -340,8 +345,6 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
                             });
                           });
                     })),
-            Expanded(
-                child: ResetButton(reset: reset)
-                )
+            Expanded(child: ResetButton(reset: reset))
           ]);
 }

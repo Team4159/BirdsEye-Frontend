@@ -1,4 +1,4 @@
-# birdseye
+# BirdsEye-Frontend
 
 FRC Scouting App @ [scouting](https://scouting.team4159.org/)
 
