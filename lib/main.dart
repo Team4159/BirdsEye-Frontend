@@ -3,6 +3,7 @@ import 'package:birdseye/matchscout.dart';
 import 'package:birdseye/pitscout.dart';
 import 'package:birdseye/settings.dart';
 import 'package:birdseye/web.dart';
+import 'package:birdseye/matchscoutteamassignment.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
