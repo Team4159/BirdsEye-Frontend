@@ -1,6 +1,7 @@
 import 'dart:convert' show json;
 
 import 'package:birdseye/main.dart';
+import 'package:birdseye/matchscout.dart';
 import 'package:birdseye/settings.dart';
 import 'package:http/http.dart' show Client, Response;
 import 'package:stock/stock.dart';
@@ -20,16 +21,21 @@ enum WebDataTypes { pitScout, matchScout }
 
 final stock = Stock<WebDataTypes, Map<String, dynamic>>(
   fetcher: Fetcher.ofFuture<WebDataTypes, Map<String, dynamic>>((dataType) {
-    late Uri uri;
     switch (dataType) {
       case WebDataTypes.pitScout:
-        uri = parseURI("/api/${SettingsState.season}/pitschema");
-        break;
+        return client
+            .get(parseURI("/api/${SettingsState.season}/pitschema"))
+            .then((resp) => json.decode(resp.body));
       case WebDataTypes.matchScout:
-        uri = parseURI("/api/${SettingsState.season}/matchschema");
-        break;
+        return client
+            .get(parseURI("/api/${SettingsState.season}/matchschema"))
+            .then((resp) => Map.castFrom(json.decode(resp.body)))
+            .then((data) => data.map((k, v) => MapEntry<String, dynamic>(
+                k,
+                Map.fromEntries(v.entries.where((e) => MatchScoutQuestionTypes
+                    .values
+                    .any((element) => e.value == element.name))))));
     }
-    return client.get(uri).then((resp) => json.decode(resp.body));
   }),
   sourceOfTruth: CachedSourceOfTruth(),
 );
