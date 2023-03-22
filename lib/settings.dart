@@ -128,7 +128,7 @@ class SettingsState extends State<Settings> {
                       children: [
                           for (int i = 0; i < _events!.length; i++)
                             ListTile(
-                                key: ValueKey(_events![i].key),
+                              visualDensity: VisualDensity.adaptivePlatformDensity,
                                 onTap: () async {
                                   await prefs.setString(
                                       "event", _events![i].key);
