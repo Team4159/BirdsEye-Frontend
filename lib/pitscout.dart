@@ -66,11 +66,14 @@ class PitScoutState extends State<PitScout> {
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
-                                                Text(e.key,
-                                                    textAlign: TextAlign.left,
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .labelLarge),
+                                                Text(
+                                                  e.key,
+                                                  textAlign: TextAlign.left,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .labelLarge,
+                                                  textScaleFactor: 1.2,
+                                                ),
                                                 const SizedBox(height: 10),
                                                 TextFormField(
                                                   keyboardType:
@@ -209,7 +212,10 @@ class PitScoutTeamNumberFieldState extends State<PitScoutTeamNumberField> {
           optionsBuilder: (TextEditingValue textEditingValue) => _acTeams.where(
               (element) =>
                   element.toString().startsWith(textEditingValue.text)),
-          onSelected: (int content) => setState(() {teamNumber = content; _errorText = null;}),
+          onSelected: (int content) => setState(() {
+                teamNumber = content;
+                _errorText = null;
+              }),
           fieldViewBuilder: (BuildContext context,
               TextEditingController controller,
               FocusNode focusNode,

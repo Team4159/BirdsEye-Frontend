@@ -17,13 +17,7 @@ class SliderFormField extends FormField<double> {
                 shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(4))),
                 animationDuration: const Duration(milliseconds: 500),
-                textStyle: Theme.of(state.context)
-                    .textTheme
-                    .labelLarge!
-                    .copyWith(
-                        fontSize: MediaQuery.of(state.context).size.width < 750
-                            ? 20
-                            : 28),
+                textStyle: Theme.of(state.context).textTheme.labelLarge,
                 child: Stack(
                     alignment: AlignmentDirectional.center,
                     fit: StackFit.passthrough,

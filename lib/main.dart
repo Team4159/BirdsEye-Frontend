@@ -66,7 +66,6 @@ void main() async {
               "Arial",
               "Calibri"
             ]).copyWith(
-              labelLarge: const TextStyle(fontSize: 15),
                 titleLarge: const TextStyle(fontFamily: "Verdana"),
                 displaySmall: const TextStyle(
                     fontFamily: "OpenSans", color: Colors.black),
@@ -105,8 +104,6 @@ void main() async {
               "Arial",
               "Calibri"
             ]).copyWith(
-                            labelLarge: const TextStyle(fontSize: 15),
-
                 titleLarge: const TextStyle(fontFamily: "Verdana"),
                 displaySmall: const TextStyle(fontFamily: "OpenSans"),
                 displayMedium: const TextStyle(
