@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 
 class ShiftingFit extends LayoutBuilder {
-  ShiftingFit(Widget a, Widget b, {super.key, bool ignoreBasline = false})
+  ShiftingFit(String a, Widget b, {super.key, bool ignoreBasline = false})
       : super(builder: (BuildContext context, BoxConstraints constraints) {
+          final title = Text(
+            a,
+            style: Theme.of(context).textTheme.titleMedium,
+            textAlign: TextAlign.left,
+          );
           if (constraints.maxWidth < 300) {
             return Padding(
                 padding: const EdgeInsets.only(top: 5),
@@ -11,7 +16,7 @@ class ShiftingFit extends LayoutBuilder {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.baseline,
                     textBaseline: TextBaseline.alphabetic,
-                    children: [a, Flexible(fit: FlexFit.loose, child: b)]));
+                    children: [title, Flexible(fit: FlexFit.loose, child: b)]));
           } else {
             return Row(
               crossAxisAlignment: ignoreBasline
@@ -19,7 +24,8 @@ class ShiftingFit extends LayoutBuilder {
                   : CrossAxisAlignment.baseline,
               textBaseline: TextBaseline.alphabetic,
               children: [
-                Expanded(child: Align(alignment: Alignment.topLeft, child: a)),
+                Expanded(
+                    child: Align(alignment: Alignment.topLeft, child: title)),
                 Align(
                     alignment: Alignment.topRight,
                     child: LimitedBox(

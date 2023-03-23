@@ -66,11 +66,7 @@ class SettingsState extends State<Settings> {
         Expanded(
             child: Column(children: [
           ShiftingFit(
-              Text(
-                "Current Season",
-                style: Theme.of(context).textTheme.titleMedium,
-                textAlign: TextAlign.left,
-              ),
+              "Current Season",
               TextField(
                 style: Theme.of(context).textTheme.bodyMedium,
                 decoration: const InputDecoration(counterText: ""),
@@ -85,15 +81,11 @@ class SettingsState extends State<Settings> {
                 },
               )),
           ShiftingFit(
-            Text(
-              "Your Name",
-              style: Theme.of(context).textTheme.titleMedium,
-              textAlign: TextAlign.left,
-            ),
+            "Your Name",
             TextField(
               style: Theme.of(context).textTheme.bodyMedium,
               decoration: InputDecoration(
-                  hintText: "Required ",
+                  hintText: "Required  ",
                   hintStyle: TextStyle(color: Colors.red.withOpacity(0.7)),
                   counterText: ""),
               maxLength: 64,
@@ -110,77 +102,81 @@ class SettingsState extends State<Settings> {
         ])),
         const VerticalDivider(width: 22, thickness: 3),
         Expanded(
-            child: ShiftingFit(
-          Padding(
-              padding: const EdgeInsets.all(10),
-              child: Text(
-                "Current Event",
-                style: Theme.of(context).textTheme.titleMedium,
-                textAlign: TextAlign.left,
-              )),
-          _events == null
-              ? const ErrorContainer("Error")
-              : _events!.isEmpty
-                  ? const Center(child: CircularProgressIndicator())
-                  : ListView(
-                      controller: _controller,
-                      shrinkWrap: true,
-                      children: [
-                          for (int i = 0; i < _events!.length; i++)
-                            ListTile(
-                                key: ValueKey(_events![i].key),
-                                onTap: () async {
-                                  await prefs.setString(
-                                      "event", _events![i].key);
-                                  _controller.animateTo(0,
-                                      duration:
-                                          const Duration(milliseconds: 500),
-                                      curve: Curves.easeOutCubic);
-                                  var event = _events![i].key;
-                                  setState(() {
-                                    _events!.sort(
-                                      (a, b) => a.key == event
-                                          ? -1
-                                          : b.key == event
-                                              ? 1
-                                              : 0,
-                                    );
-                                  });
-                                },
-                                title: Text(
-                                  _events![i].value,
-                                  overflow: TextOverflow.clip,
-                                  maxLines: 1,
-                                  textAlign: TextAlign.right,
-                                  style: _events![i].key ==
-                                          prefs.getString('event')
-                                      ? Theme.of(context)
-                                          .textTheme
-                                          .titleLarge!
-                                          .copyWith(fontWeight: FontWeight.w800)
-                                      : Theme.of(context).textTheme.titleLarge,
-                                ),
-                                trailing: ConstrainedBox(
-                                  constraints: const BoxConstraints(
-                                      minWidth: 60, maxWidth: 60),
-                                  child: Text(_events![i].key,
-                                      textAlign: TextAlign.right,
-                                      style: _events![i].key ==
-                                              prefs.getString('event')
-                                          ? Theme.of(context)
-                                              .textTheme
-                                              .titleMedium!
-                                              .copyWith(
-                                                  fontWeight: FontWeight.w900)
-                                          : Theme.of(context)
-                                              .textTheme
-                                              .titleMedium!
-                                              .copyWith(
-                                                  fontWeight: FontWeight.w500)),
-                                ))
-                        ]),
-          ignoreBasline: true,
-        )),
+            child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: ShiftingFit(
+                  "Current Event",
+                  _events == null
+                      ? const ErrorContainer("Error")
+                      : _events!.isEmpty
+                          ? const Center(child: CircularProgressIndicator())
+                          : ListView(
+                              controller: _controller,
+                              shrinkWrap: true,
+                              children: [
+                                  for (int i = 0; i < _events!.length; i++)
+                                    ListTile(
+                                        visualDensity: VisualDensity
+                                            .adaptivePlatformDensity,
+                                        onTap: () async {
+                                          await prefs.setString(
+                                              "event", _events![i].key);
+                                          _controller.animateTo(0,
+                                              duration: const Duration(
+                                                  milliseconds: 500),
+                                              curve: Curves.easeOutCubic);
+                                          var event = _events![i].key;
+                                          setState(() {
+                                            _events!.sort(
+                                              (a, b) => a.key == event
+                                                  ? -1
+                                                  : b.key == event
+                                                      ? 1
+                                                      : 0,
+                                            );
+                                          });
+                                        },
+                                        title: Text(
+                                          _events![i].value,
+                                          overflow: TextOverflow.fade,
+                                          softWrap: false,
+                                          maxLines: 1,
+                                          textAlign: TextAlign.right,
+                                          style: _events![i].key ==
+                                                  prefs.getString('event')
+                                              ? Theme.of(context)
+                                                  .textTheme
+                                                  .titleLarge!
+                                                  .copyWith(
+                                                      fontWeight:
+                                                          FontWeight.w800)
+                                              : Theme.of(context)
+                                                  .textTheme
+                                                  .titleLarge,
+                                        ),
+                                        trailing: ConstrainedBox(
+                                          constraints: const BoxConstraints(
+                                              minWidth: 60, maxWidth: 60),
+                                          child: Text(_events![i].key,
+                                              textAlign: TextAlign.right,
+                                              style: _events![i].key ==
+                                                      prefs.getString('event')
+                                                  ? Theme.of(context)
+                                                      .textTheme
+                                                      .titleMedium!
+                                                      .copyWith(
+                                                          fontWeight:
+                                                              FontWeight.w900)
+                                                  : Theme.of(context)
+                                                      .textTheme
+                                                      .titleMedium!
+                                                      .copyWith(
+                                                          fontWeight:
+                                                              FontWeight.w500)),
+                                        ))
+                                ]),
+                  ignoreBasline: true,
+                ))),
       ]));
 }
 
@@ -197,20 +193,14 @@ class IPConfigFieldState extends State<IPConfigField> {
 
   @override
   Widget build(BuildContext context) => ShiftingFit(
-        Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              "Server IP",
-              style: Theme.of(context).textTheme.titleMedium,
-              textAlign: TextAlign.left,
-            )),
+        "Server IP",
         TextField(
           enabled: _enabled,
           decoration: const InputDecoration(counterText: ""),
           style: Theme.of(context).textTheme.bodyMedium,
-          textAlign: TextAlign.right,
           maxLines: 1,
           maxLength: 64,
+          textAlign: TextAlign.right,
           keyboardType: TextInputType.url,
           controller: _controller,
           textCapitalization: TextCapitalization.none,

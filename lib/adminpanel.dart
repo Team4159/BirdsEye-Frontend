@@ -27,35 +27,41 @@ class _AdminPanelState extends State<AdminPanel> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: SizedBox(
-                        width: 100,
-                        child: TextField(
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly
-                          ],
-                          decoration: const InputDecoration(
-                              labelText: "Season", counterText: ""),
-                          maxLength: 4,
-                          onSubmitted: (value) {
-                            _season = int.parse(value);
-                            refreshTables();
-                          },
-                        ))),
-                ElevatedButton(
-                    onPressed: () => _season == null
-                        ? null
-                        : showDialog(
-                            context: context,
-                            builder: (lctx) => ConfigDialog(
-                                  getSeason: () => _season!,
-                                  onFinished: () => refreshTables(),
-                                )),
-                    child: const Text("Create Event")),
+                Row(
+                  children: [
+                    Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: SizedBox(
+                            width: 100,
+                            child: TextField(
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly
+                              ],
+                              decoration: const InputDecoration(
+                                  labelText: "Season", counterText: ""),
+                              maxLength: 4,
+                              onSubmitted: (value) {
+                                _season = int.parse(value);
+                                refreshTables();
+                              },
+                            ))),
+                    const SizedBox(width: 20),
+                    ElevatedButton(
+                        onPressed: () => _season == null
+                            ? null
+                            : showDialog(
+                                context: context,
+                                builder: (lctx) => TableConfigDialog(
+                                      getSeason: () => _season!,
+                                      onFinished: () => refreshTables(),
+                                    )),
+                        child: const Text("Create Event")),
+                  ],
+                ),
                 tableList == null
                     ? const SizedBox(height: 0)
-                    : ListView(
+                    : GridView.count(
+                        crossAxisCount: 8,
                         shrinkWrap: true,
                         children: tableList!
                             .map((tableName) => Text(tableName))
@@ -66,16 +72,17 @@ class _AdminPanelState extends State<AdminPanel> {
   }
 }
 
-class ConfigDialog extends StatefulWidget {
+class TableConfigDialog extends StatefulWidget {
   final int Function() getSeason;
   final VoidCallback? onFinished;
-  const ConfigDialog({super.key, required this.getSeason, this.onFinished});
+  const TableConfigDialog(
+      {super.key, required this.getSeason, this.onFinished});
 
   @override
-  State<StatefulWidget> createState() => ConfigDialogState();
+  State<StatefulWidget> createState() => TableConfigDialogState();
 }
 
-class ConfigDialogState extends State<ConfigDialog> {
+class TableConfigDialogState extends State<TableConfigDialog> {
   String? _eventCode;
   String? _eventError;
   @override

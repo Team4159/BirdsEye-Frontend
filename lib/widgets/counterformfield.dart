@@ -19,13 +19,7 @@ class CounterFormField extends FormField<int> {
                     borderRadius: BorderRadius.all(Radius.circular(4))),
                 animationDuration: const Duration(milliseconds: 500),
                 color: getColor(state.context, labelText),
-                textStyle: Theme.of(state.context)
-                    .textTheme
-                    .labelLarge!
-                    .copyWith(
-                        fontSize: MediaQuery.of(state.context).size.width < 750
-                            ? 20
-                            : 28),
+                textStyle: Theme.of(state.context).textTheme.labelLarge,
                 child: InkWell(
                     onTap: () {
                       state.didChange(state.value! + 1);
@@ -34,7 +28,17 @@ class CounterFormField extends FormField<int> {
                       alignment: AlignmentDirectional.center,
                       fit: StackFit.passthrough,
                       children: [
-                        Center(child: Text(state.value.toString())),
+                        Center(
+                            child: Padding(
+                                padding: const EdgeInsets.only(top: 5),
+                                child: Text(
+                                  state.value.toString(),
+                                  textScaleFactor:
+                                      MediaQuery.of(state.context).size.width <
+                                              750
+                                          ? 1.7
+                                          : 2,
+                                ))),
                         Align(
                             alignment: Alignment.bottomRight,
                             child: IconButton(
@@ -59,7 +63,7 @@ class CounterFormField extends FormField<int> {
         : labelText.toLowerCase().startsWith("cone")
             ? const Color(0xffccc000)
             : labelText.toLowerCase().startsWith("cube")
-                ? const Color(0xff800080)
+                ? const Color(0xffa000a0)
                 : Theme.of(context).colorScheme.primary;
   }
 }

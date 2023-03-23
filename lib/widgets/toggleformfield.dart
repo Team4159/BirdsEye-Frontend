@@ -18,13 +18,7 @@ class ToggleFormField extends FormField<bool> {
                 color: state.value!
                     ? Theme.of(state.context).colorScheme.secondaryContainer
                     : Theme.of(state.context).colorScheme.tertiaryContainer,
-                textStyle: Theme.of(state.context)
-                    .textTheme
-                    .labelLarge!
-                    .copyWith(
-                        fontSize: MediaQuery.of(state.context).size.width < 750
-                            ? 20
-                            : 28),
+                textStyle: Theme.of(state.context).textTheme.labelLarge,
                 child: InkWell(
                     onTap: () {
                       state.didChange(!state.value!);
@@ -34,10 +28,16 @@ class ToggleFormField extends FormField<bool> {
                         fit: StackFit.passthrough,
                         children: [
                           Center(
-                              child: Text(Theme.of(state.context).brightness ==
-                                      Brightness.light
-                                  ? (state.value! ? "Yes" : "No")
-                                  : state.value.toString())),
+                              child: Text(
+                            Theme.of(state.context).brightness ==
+                                    Brightness.light
+                                ? (state.value! ? "Yes" : "No")
+                                : state.value.toString(),
+                            textScaleFactor:
+                                MediaQuery.of(state.context).size.width < 750
+                                    ? 1.7
+                                    : 2,
+                          )),
                           FormFieldTitle(labelText),
                         ]))));
 }
