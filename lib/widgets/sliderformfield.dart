@@ -2,14 +2,10 @@ import 'package:birdseye/widgets/formfieldtitle.dart';
 import 'package:flutter/material.dart';
 
 class SliderFormField extends FormField<double> {
-  static final List<String> labels = ["poor", "okay", "avg", "good", "nice"];
+  static final List<String> labels = ["poor", "bad", "okay", "good", "pro"];
 
   SliderFormField(
-      {super.key,
-      super.onSaved,
-      super.validator,
-      super.initialValue = 3,
-      String labelText = ""})
+      {super.key, super.onSaved, super.initialValue = 3, String labelText = ""})
       : super(
             builder: (FormFieldState<double> state) => Material(
                 type: MaterialType.card,
@@ -23,11 +19,9 @@ class SliderFormField extends FormField<double> {
                     fit: StackFit.passthrough,
                     children: [
                       Slider(
+                        onChanged: (double value) => state.didChange(value),
                         label: labels[state.value!.toInt() - 1],
                         value: state.value ?? initialValue!,
-                        onChanged: (double value) {
-                          state.didChange(value);
-                        },
                         min: 1,
                         max: 5,
                         divisions: 4,

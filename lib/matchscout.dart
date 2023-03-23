@@ -5,7 +5,9 @@ import 'package:birdseye/widgets/counterformfield.dart';
 import 'package:birdseye/widgets/errorcontainer.dart';
 import 'package:birdseye/widgets/resetbutton.dart';
 import 'package:birdseye/widgets/sliderformfield.dart';
+import 'package:birdseye/widgets/stextformfield.dart';
 import 'package:birdseye/widgets/toggleformfield.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -50,14 +52,16 @@ class MatchScoutState extends State<MatchScout> {
                     key: _formKey,
                     autovalidateMode: AutovalidateMode.disabled,
                     child: CustomScrollView(
+                        cacheExtent: double.infinity,
                         slivers: <Widget>[
-                      SliverPadding(
-                          padding: const EdgeInsets.all(15),
-                          sliver: SliverToBoxAdapter(
-                              child: MatchInfoFields(
-                                  key: _matchInfoKey,
-                                  reset: () => _formKey.currentState!.reset())))
-                    ]
+                          SliverPadding(
+                              padding: const EdgeInsets.all(15),
+                              sliver: SliverToBoxAdapter(
+                                  child: MatchInfoFields(
+                                      key: _matchInfoKey,
+                                      reset: () =>
+                                          _formKey.currentState!.reset())))
+                        ]
                             .followedBy(snapshot.data!.entries.expand((e1) => [
                                   SliverAppBar(
                                       primary: false,
@@ -83,144 +87,111 @@ class MatchScoutState extends State<MatchScout> {
                                           crossAxisSpacing: 10,
                                           children: List.from(
                                               e1.value.entries.map((e2) {
+                                            if (!_fields.containsKey(e1.key)) {
+                                              _fields[e1.key] = {};
+                                            }
                                             switch (MatchScoutQuestionTypes
                                                 .values
                                                 .byName(e2.value)) {
                                               case MatchScoutQuestionTypes.text:
-                                                return TextFormField(
-                                                  keyboardType:
-                                                      TextInputType.multiline,
-                                                  maxLines: null,
-                                                  expands: true,
-                                                  decoration: InputDecoration(
-                                                      contentPadding:
-                                                          const EdgeInsets.only(
-                                                              bottom: 4,
-                                                              top: 10,
-                                                              left: 10,
-                                                              right: 10),
-                                                      counterText: null,
-                                                      border:
-                                                          const OutlineInputBorder(),
-                                                      enabledBorder:
-                                                          OutlineInputBorder(
-                                                              borderSide: BorderSide(
-                                                                  color: Colors
-                                                                          .grey[
-                                                                      700]!)),
-                                                      labelText: e2.key),
-                                                  onSaved: (String? content) {
-                                                    _fields[e1.key] =
-                                                        _fields[e1.key] ?? {};
-
-                                                    _fields[e1.key]![e2.key] =
-                                                        content;
-                                                  },
+                                                return STextFormField(
+                                                  labelText: e2.key,
+                                                  onSaved: (content) =>
+                                                      _fields[e1.key]![e2.key] =
+                                                          content,
                                                 );
                                               case MatchScoutQuestionTypes
                                                   .counter:
                                                 return CounterFormField(
-                                                    initialValue: 0,
                                                     labelText: e2.key,
-                                                    onSaved: (int? content) {
-                                                      _fields[e1.key] =
-                                                          _fields[e1.key] ?? {};
-
-                                                      _fields[e1.key]![e2.key] =
-                                                          content;
-                                                    });
+                                                    onSaved: (content) =>
+                                                        _fields[e1.key]![
+                                                            e2.key] = content);
                                               case MatchScoutQuestionTypes
                                                   .toggle:
                                                 return ToggleFormField(
                                                     labelText: e2.key,
-                                                    onSaved: (bool? content) {
-                                                      _fields[e1.key] =
-                                                          _fields[e1.key] ?? {};
-
-                                                      _fields[e1.key]![e2.key] =
-                                                          content;
-                                                    });
+                                                    onSaved: (content) =>
+                                                        _fields[e1.key]![
+                                                            e2.key] = content);
                                               case MatchScoutQuestionTypes
                                                   .slider:
                                                 return SliderFormField(
                                                     labelText: e2.key,
-                                                    onSaved:
-                                                        (double? contentd) {
-                                                      _fields[e1.key] =
-                                                          _fields[e1.key] ?? {};
-
-                                                      int? content =
-                                                          contentd?.toInt();
-                                                      _fields[e1.key]![e2.key] =
-                                                          content;
-                                                    });
+                                                    onSaved: (content) =>
+                                                        _fields[e1.key]![
+                                                                e2.key] =
+                                                            content?.toInt());
                                             }
                                           }), growable: false)))
                                 ]))
                             .followedBy([
-                      SliverPadding(
-                          padding: const EdgeInsets.all(10),
-                          sliver: SliverToBoxAdapter(
-                              child: ElevatedButton(
-                                  onPressed: () {
-                                    if (_loading) return;
-                                    _fields.clear();
-                                    if (!_matchInfoKey.currentState!.isValid) {
-                                      _scrollController.animateTo(0,
-                                          duration:
-                                              const Duration(milliseconds: 200),
-                                          curve: Curves.easeOutCubic);
-                                      return;
-                                    }
-                                    _formKey.currentState!.save();
-                                    var m = ScaffoldMessenger.of(context);
-                                    m.showSnackBar(const SnackBar(
-                                        duration: Duration(minutes: 5),
-                                        behavior: SnackBarBehavior.fixed,
-                                        elevation: 0,
-                                        padding: EdgeInsets.zero,
-                                        backgroundColor: Colors.transparent,
-                                        content: LinearProgressIndicator(
-                                          backgroundColor: Colors.transparent,
-                                        )));
-                                    setState(() {
-                                      _loading = true;
-                                    });
-                                    postResponse(WebDataTypes.matchScout, {
-                                      ..._fields,
-                                      "teamNumber": _matchInfoKey
-                                          .currentState!.teamNumber,
-                                      "match":
-                                          _matchInfoKey.currentState!.matchCode,
-                                      "name": prefs.getString("name")
-                                    }).then((response) {
-                                      if (response.statusCode >= 400) {
-                                        throw Exception(
-                                            "Error ${response.statusCode}: ${response.reasonPhrase}");
-                                      }
-                                      _formKey.currentState!.reset();
-                                      _matchInfoKey.currentState!.reset();
-                                      m.hideCurrentSnackBar();
-                                      setState(() {
-                                        _loading = false;
-                                      });
-                                      _scrollController.animateTo(0,
-                                          duration: const Duration(seconds: 1),
-                                          curve: Curves.easeInOutQuad);
-                                      m.showSnackBar(SnackBar(
-                                          content: Text(
-                                              "Response Sent! [${response.statusCode}]")));
-                                    }).catchError((e) {
-                                      m.hideCurrentSnackBar();
-                                      setState(() {
-                                        _loading = false;
-                                      });
-                                      m.showSnackBar(SnackBar(
-                                          content: Text(e.toString())));
-                                    });
-                                  },
-                                  child: const Text("Submit"))))
-                    ]).toList()));
+                          SliverPadding(
+                              padding: const EdgeInsets.all(10),
+                              sliver: SliverToBoxAdapter(
+                                  child: ElevatedButton(
+                                      onPressed: () {
+                                        if (_loading) return;
+                                        _fields.clear();
+                                        if (!_matchInfoKey
+                                            .currentState!.isValid) {
+                                          _scrollController.animateTo(0,
+                                              duration: const Duration(
+                                                  milliseconds: 200),
+                                              curve: Curves.easeOutCubic);
+                                          return;
+                                        }
+                                        _formKey.currentState!.save();
+                                        var m = ScaffoldMessenger.of(context);
+                                        m.showSnackBar(const SnackBar(
+                                            duration: Duration(minutes: 5),
+                                            behavior: SnackBarBehavior.fixed,
+                                            elevation: 0,
+                                            padding: EdgeInsets.zero,
+                                            backgroundColor: Colors.transparent,
+                                            content: LinearProgressIndicator(
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                            )));
+                                        setState(() {
+                                          _loading = true;
+                                        });
+                                        postResponse(WebDataTypes.matchScout, {
+                                          ..._fields,
+                                          "teamNumber": _matchInfoKey
+                                              .currentState!.teamNumber,
+                                          "match": _matchInfoKey
+                                              .currentState!.matchCode,
+                                          "name": prefs.getString("name")
+                                        }).then((response) {
+                                          if (response.statusCode >= 400) {
+                                            throw Exception(
+                                                "Error ${response.statusCode}: ${response.reasonPhrase}");
+                                          }
+                                          _formKey.currentState!.reset();
+                                          _matchInfoKey.currentState!.reset();
+                                          m.hideCurrentSnackBar();
+                                          setState(() {
+                                            _loading = false;
+                                          });
+                                          _scrollController.animateTo(0,
+                                              duration:
+                                                  const Duration(seconds: 1),
+                                              curve: Curves.easeInOutQuad);
+                                          m.showSnackBar(SnackBar(
+                                              content: Text(
+                                                  "Response Sent! [${response.statusCode}]")));
+                                        }).catchError((e) {
+                                          m.hideCurrentSnackBar();
+                                          setState(() {
+                                            _loading = false;
+                                          });
+                                          m.showSnackBar(SnackBar(
+                                              content: Text(e.toString())));
+                                        });
+                                      },
+                                      child: const Text("Submit"))))
+                        ]).toList()));
               })));
 }
 

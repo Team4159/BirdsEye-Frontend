@@ -6,12 +6,7 @@ import 'package:flutter/material.dart';
 
 class CounterFormField extends FormField<int> {
   CounterFormField(
-      {super.key,
-      super.onSaved,
-      super.validator,
-      super.initialValue = 0,
-      super.autovalidateMode = AutovalidateMode.disabled,
-      String labelText = ""})
+      {super.key, super.onSaved, super.initialValue = 0, String labelText = ""})
       : super(
             builder: (FormFieldState<int> state) => Material(
                 elevation: 2,
@@ -21,9 +16,7 @@ class CounterFormField extends FormField<int> {
                 color: getColor(state.context, labelText),
                 textStyle: Theme.of(state.context).textTheme.labelLarge,
                 child: InkWell(
-                    onTap: () {
-                      state.didChange(state.value! + 1);
-                    },
+                    onTap: () => state.didChange(state.value! + 1),
                     child: Stack(
                       alignment: AlignmentDirectional.center,
                       fit: StackFit.passthrough,

@@ -5,9 +5,7 @@ class ToggleFormField extends FormField<bool> {
   ToggleFormField(
       {super.key,
       super.onSaved,
-      super.validator,
       super.initialValue = false,
-      super.autovalidateMode = AutovalidateMode.disabled,
       String labelText = ""})
       : super(
             builder: (FormFieldState<bool> state) => Material(
@@ -20,9 +18,7 @@ class ToggleFormField extends FormField<bool> {
                     : Theme.of(state.context).colorScheme.tertiaryContainer,
                 textStyle: Theme.of(state.context).textTheme.labelLarge,
                 child: InkWell(
-                    onTap: () {
-                      state.didChange(!state.value!);
-                    },
+                    onTap: () => state.didChange(!state.value!),
                     child: Stack(
                         alignment: Alignment.center,
                         fit: StackFit.passthrough,
