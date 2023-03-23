@@ -67,7 +67,7 @@ class PitScoutState extends State<PitScout> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  e.key,
+                                                  e.value,
                                                   textAlign: TextAlign.left,
                                                   style: Theme.of(context)
                                                       .textTheme
@@ -96,7 +96,7 @@ class PitScoutState extends State<PitScout> {
                                                                           .grey[
                                                                       700]!))),
                                                   onSaved: (String? content) {
-                                                    _fields[e.value] =
+                                                    _fields[e.key] =
                                                         content ?? "";
                                                   },
                                                 )
