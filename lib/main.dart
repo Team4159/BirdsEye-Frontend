@@ -8,6 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const cardinalred = Color(0xffcf2e2e);
+final frcColors = {
+  "red": const Color(0xffed1c24),
+  "blue": const Color(0xff0066b3)
+};
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   prefs = await SharedPreferences.getInstance();

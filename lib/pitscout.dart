@@ -106,6 +106,8 @@ class PitScoutState extends State<PitScout> {
                               SizedBox(
                                   width: double.infinity,
                                   child: ElevatedButton(
+                                      style: ButtonStyle(
+                                          enableFeedback: !_loading),
                                       onPressed: () {
                                         if (_loading) return;
                                         _fields.clear();
@@ -165,9 +167,7 @@ class PitScoutState extends State<PitScout> {
                                               content: Text(e.toString())));
                                         });
                                       },
-                                      child: _loading
-                                          ? const Text("Waiting..")
-                                          : const Text("Submit")))
+                                      child: const Text("Submit")))
                             ])
                             .map((e) => Padding(
                                 padding: const EdgeInsets.symmetric(

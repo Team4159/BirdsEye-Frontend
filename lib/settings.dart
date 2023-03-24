@@ -77,6 +77,7 @@ class SettingsState extends State<Settings> {
                 controller: TextEditingController(text: season.toString()),
                 onSubmitted: (content) {
                   season = int.parse(content);
+                  stock.clearAll();
                   reloadEvents();
                 },
               )),
@@ -138,7 +139,7 @@ class SettingsState extends State<Settings> {
                                         },
                                         title: Text(
                                           _events![i].value,
-                                          overflow: TextOverflow.fade,
+                                          // overflow: TextOverflow.fade,
                                           softWrap: false,
                                           maxLines: 1,
                                           textAlign: TextAlign.right,

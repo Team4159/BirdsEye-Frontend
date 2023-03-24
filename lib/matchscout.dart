@@ -7,9 +7,7 @@ import 'package:birdseye/widgets/resetbutton.dart';
 import 'package:birdseye/widgets/sliderformfield.dart';
 import 'package:birdseye/widgets/stextformfield.dart';
 import 'package:birdseye/widgets/toggleformfield.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 enum MatchScoutQuestionTypes { text, counter, toggle, slider }
 
@@ -87,41 +85,62 @@ class MatchScoutState extends State<MatchScout> {
                                           crossAxisSpacing: 10,
                                           children: List.from(
                                               e1.value.entries.map((e2) {
-                                            if (!_fields.containsKey(e1.key)) {
-                                              _fields[e1.key] = {};
-                                            }
                                             switch (MatchScoutQuestionTypes
                                                 .values
                                                 .byName(e2.value)) {
                                               case MatchScoutQuestionTypes.text:
                                                 return STextFormField(
                                                   labelText: e2.key,
-                                                  onSaved: (content) =>
-                                                      _fields[e1.key]![e2.key] =
-                                                          content,
+                                                  onSaved: (content) {
+                                                    if (!_fields
+                                                        .containsKey(e1.key)) {
+                                                      _fields[e1.key] = {};
+                                                    }
+
+                                                    _fields[e1.key]![e2.key] =
+                                                        content;
+                                                  },
                                                 );
                                               case MatchScoutQuestionTypes
                                                   .counter:
                                                 return CounterFormField(
                                                     labelText: e2.key,
-                                                    onSaved: (content) =>
-                                                        _fields[e1.key]![
-                                                            e2.key] = content);
+                                                    onSaved: (content) {
+                                                      if (!_fields.containsKey(
+                                                          e1.key)) {
+                                                        _fields[e1.key] = {};
+                                                      }
+
+                                                      _fields[e1.key]![e2.key] =
+                                                          content;
+                                                    });
                                               case MatchScoutQuestionTypes
                                                   .toggle:
                                                 return ToggleFormField(
                                                     labelText: e2.key,
-                                                    onSaved: (content) =>
-                                                        _fields[e1.key]![
-                                                            e2.key] = content);
+                                                    onSaved: (content) {
+                                                      if (!_fields.containsKey(
+                                                          e1.key)) {
+                                                        _fields[e1.key] = {};
+                                                      }
+
+                                                      _fields[e1.key]![e2.key] =
+                                                          content;
+                                                    });
                                               case MatchScoutQuestionTypes
                                                   .slider:
                                                 return SliderFormField(
-                                                    labelText: e2.key,
-                                                    onSaved: (content) =>
-                                                        _fields[e1.key]![
-                                                                e2.key] =
-                                                            content?.toInt());
+                                                  labelText: e2.key,
+                                                  onSaved: (content) {
+                                                    if (!_fields
+                                                        .containsKey(e1.key)) {
+                                                      _fields[e1.key] = {};
+                                                    }
+
+                                                    _fields[e1.key]![e2.key] =
+                                                        content?.toInt();
+                                                  },
+                                                );
                                             }
                                           }), growable: false)))
                                 ]))
@@ -130,6 +149,8 @@ class MatchScoutState extends State<MatchScout> {
                               padding: const EdgeInsets.all(10),
                               sliver: SliverToBoxAdapter(
                                   child: ElevatedButton(
+                                      style: ButtonStyle(
+                                          enableFeedback: !_loading),
                                       onPressed: () {
                                         if (_loading) return;
                                         _fields.clear();
@@ -141,6 +162,9 @@ class MatchScoutState extends State<MatchScout> {
                                               curve: Curves.easeOutCubic);
                                           return;
                                         }
+                                        setState(() {
+                                          _loading = true;
+                                        });
                                         _formKey.currentState!.save();
                                         var m = ScaffoldMessenger.of(context);
                                         m.showSnackBar(const SnackBar(
@@ -153,9 +177,6 @@ class MatchScoutState extends State<MatchScout> {
                                               backgroundColor:
                                                   Colors.transparent,
                                             )));
-                                        setState(() {
-                                          _loading = true;
-                                        });
                                         postResponse(WebDataTypes.matchScout, {
                                           ..._fields,
                                           "teamNumber": _matchInfoKey
@@ -204,123 +225,89 @@ class MatchInfoFields extends StatefulWidget {
 }
 
 class MatchInfoFieldsState extends State<MatchInfoFields> {
+  static final matchRobotIDregex = RegExp("(?<color>red|blue)(?<number>[1-3])");
   bool get isValid => matchCode != null && teamNumber != null;
 
   int? teamNumber;
-  TextEditingController? _teamNumberController;
-  String? _teamNumberError;
 
   String? matchCode;
   final TextEditingController _matchCodeController = TextEditingController();
   String? _matchCodeError;
 
   void reset() {
-    _teamNumberController?.clear();
+    teamNumber = null;
     _matchCodeController.clear();
+    matchCode = null;
     widget.reset();
   }
 
   @override
-  Widget build(BuildContext context) => Row(
-          crossAxisAlignment: CrossAxisAlignment.baseline,
-          textBaseline: TextBaseline.alphabetic,
-          children: [
-            SizedBox(
-              width: 95,
-              child: TextField(
-                  controller: _matchCodeController,
-                  keyboardType: TextInputType.text,
-                  maxLength: 5,
-                  textInputAction: TextInputAction.next,
-                  decoration: InputDecoration(
-                      counterText: "",
-                      labelText: "Match Code",
-                      errorText: _matchCodeError),
-                  onSubmitted: (String content) {
+  Widget build(BuildContext context) =>
+      Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+        TextField(
+            controller: _matchCodeController,
+            keyboardType: TextInputType.text,
+            maxLength: 5,
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+                constraints: const BoxConstraints(maxWidth: 95),
+                counterText: "",
+                hintText: "Match Code",
+                errorText: _matchCodeError),
+            onSubmitted: (String content) {
+              setState(() => matchCode = null);
+
+              if (content.isEmpty) {
+                return setState(() => _matchCodeError = "Required");
+              }
+              setState(() => _matchCodeError = "Loading");
+              tbaStock
+                  .get("${SettingsState.season}${prefs.getString('event')}")
+                  .then((val) {
+                if (val.containsKey(content)) {
+                  setState(() {
+                    _matchCodeError = null;
+                    matchCode = content;
+                  });
+                } else {
+                  setState(() {
+                    _matchCodeError = "Invalid";
                     matchCode = null;
-
-                    if (content.isEmpty) {
-                      return setState(() => _matchCodeError = "Required");
-                    }
-                    setState(() => _matchCodeError = "Loading");
-                    tbaStock
-                        .get(
-                            "${SettingsState.season}${prefs.getString('event')}")
-                        .then((val) {
-                      if (val.containsKey(content)) {
-                        setState(() => _matchCodeError = null);
-                        matchCode = content;
-                        _teamNumberController?.clear();
-                      } else {
-                        setState(() => _matchCodeError = "Invalid");
-                        matchCode = null;
+                  });
+                }
+              });
+            }),
+        const SizedBox(width: 15),
+        FutureBuilder(
+            future: tbaStock
+                .get(
+                    "${SettingsState.season}${prefs.getString('event')}_$matchCode")
+                .then((data) {
+              final out = data.entries
+                  .map((e) => MapEntry<int, String>(int.parse(e.key), e.value))
+                  .toList();
+              out.sort((a, b) => a.value.compareTo(b.value));
+              return Map.fromEntries(out);
+            }),
+            initialData: const <int, String>{},
+            builder: (context, snapshot) => DropdownButton<int>(
+                hint: const Text("Team #"),
+                value: teamNumber,
+                items: snapshot.data?.entries.map((e) {
+                      final match = matchRobotIDregex.firstMatch(e.value);
+                      if (match == null) {
+                        throw Exception("Invalid Match Robot Identifier!");
                       }
-                    });
-                  }),
-            ),
-            const SizedBox(width: 15),
-            SizedBox(
-                width: 75,
-                child: Autocomplete(
-                    optionsBuilder: (textEditingValue) => matchCode == null
-                        ? Future<Iterable<int>>.value([])
-                        : tbaStock
-                            .get(
-                                "${SettingsState.season}${prefs.getString('event')}_$matchCode")
-                            .then((val) => val.keys
-                                .where((element) => element
-                                    .toString()
-                                    .startsWith(textEditingValue.text))
-                                .map((e) => int.parse(e))),
-                    onSelected: (int content) => setState(() {
-                          teamNumber = content;
-                          _teamNumberError = null;
-                        }),
-                    fieldViewBuilder:
-                        (context, controller, focusNode, onFieldSubmitted) {
-                      _teamNumberController = controller;
-                      return TextField(
-                          controller: controller,
-                          focusNode: focusNode,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly
-                          ],
-                          maxLength: 4,
-                          textInputAction: TextInputAction.done,
-                          decoration: InputDecoration(
-                              counterText: "",
-                              labelText: "Team #",
-                              errorText: _teamNumberError),
-                          onSubmitted: (String content) {
-                            teamNumber = null;
-
-                            onFieldSubmitted();
-                            if (content.isEmpty) {
-                              return setState(
-                                  () => _teamNumberError = "Required");
-                            }
-                            if (matchCode == null || matchCode!.isEmpty) {
-                              return setState(() {
-                                _teamNumberError = "No Match";
-                                _matchCodeError = "Required";
-                              });
-                            }
-                            setState(() => _teamNumberError = "Loading");
-                            tbaStock
-                                .get(
-                                    "${SettingsState.season}${prefs.getString('event')}_$matchCode")
-                                .then((val) {
-                              if (val.containsKey(content)) {
-                                setState(() => _teamNumberError = null);
-                                teamNumber = int.parse(content);
-                              } else {
-                                setState(() => _teamNumberError = "Invalid");
-                                teamNumber = null;
-                              }
-                            });
-                          });
-                    })),
-            Expanded(child: ResetButton(reset: reset))
-          ]);
+                      return DropdownMenuItem<int>(
+                          value: e.key,
+                          child: Text(
+                              "${match.namedGroup('number')} | ${e.key}",
+                              style: TextStyle(
+                                  backgroundColor:
+                                      frcColors[match.namedGroup("color")])));
+                    }).toList() ??
+                    [],
+                onChanged: (content) => setState(() => teamNumber = content))),
+        Expanded(child: ResetButton(reset: reset))
+      ]);
 }
