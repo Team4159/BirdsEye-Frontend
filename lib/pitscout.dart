@@ -50,7 +50,7 @@ class PitScoutState extends State<PitScout> {
                           alignment: Alignment.centerRight,
                           child: ResetButton(reset: () {
                             _formKey.currentState!.reset();
-                            _teamNumberKey.currentState!.reload();
+                            _teamNumberKey.currentState!.reset();
                           }),
                         ))
                       ]),
@@ -66,11 +66,14 @@ class PitScoutState extends State<PitScout> {
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
-                                                Text(e.key,
-                                                    textAlign: TextAlign.left,
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .labelLarge),
+                                                Text(
+                                                  e.value,
+                                                  textAlign: TextAlign.left,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .labelLarge,
+                                                  textScaleFactor: 1.2,
+                                                ),
                                                 const SizedBox(height: 10),
                                                 TextFormField(
                                                   keyboardType:
@@ -93,7 +96,7 @@ class PitScoutState extends State<PitScout> {
                                                                           .grey[
                                                                       700]!))),
                                                   onSaved: (String? content) {
-                                                    _fields[e.value] =
+                                                    _fields[e.key] =
                                                         content ?? "";
                                                   },
                                                 )
@@ -103,6 +106,8 @@ class PitScoutState extends State<PitScout> {
                               SizedBox(
                                   width: double.infinity,
                                   child: ElevatedButton(
+                                      style: ButtonStyle(
+                                          enableFeedback: !_loading),
                                       onPressed: () {
                                         if (_loading) return;
                                         _fields.clear();
@@ -141,7 +146,7 @@ class PitScoutState extends State<PitScout> {
                                                 "Error ${response.statusCode}: ${response.reasonPhrase}");
                                           }
                                           _formKey.currentState!.reset();
-                                          _teamNumberKey.currentState!.reload();
+                                          _teamNumberKey.currentState!.reset();
                                           m.hideCurrentSnackBar();
                                           setState(() {
                                             _loading = false;
@@ -162,9 +167,7 @@ class PitScoutState extends State<PitScout> {
                                               content: Text(e.toString())));
                                         });
                                       },
-                                      child: _loading
-                                          ? const Text("Waiting..")
-                                          : const Text("Submit")))
+                                      child: const Text("Submit")))
                             ])
                             .map((e) => Padding(
                                 padding: const EdgeInsets.symmetric(
@@ -190,10 +193,10 @@ class PitScoutTeamNumberFieldState extends State<PitScoutTeamNumberField> {
   @override
   void initState() {
     super.initState();
-    reload();
+    reset();
   }
 
-  void reload() {
+  void reset() {
     _controller?.clear();
     _acTeams = [];
     pitScoutGetUnfilled().then((value) {
@@ -203,48 +206,46 @@ class PitScoutTeamNumberFieldState extends State<PitScoutTeamNumberField> {
   }
 
   @override
-  Widget build(BuildContext context) => ConstrainedBox(
-      constraints: const BoxConstraints(minWidth: 75, maxWidth: 150),
-      child: Autocomplete(
-          optionsBuilder: (TextEditingValue textEditingValue) => _acTeams.where(
-              (element) =>
-                  element.toString().startsWith(textEditingValue.text)),
-          onSelected: (int content) => setState(() {teamNumber = content; _errorText = null;}),
-          fieldViewBuilder: (BuildContext context,
-              TextEditingController controller,
-              FocusNode focusNode,
-              VoidCallback onSubmitted) {
-            _controller = controller;
-            return TextField(
-                controller: controller,
-                focusNode: focusNode,
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                maxLength: 4,
-                textInputAction: TextInputAction.done,
-                decoration: InputDecoration(
-                    counterText: "",
-                    labelText: "Team #",
-                    errorText: _errorText),
-                onSubmitted: (String content) {
-                  onSubmitted();
+  Widget build(BuildContext context) => Autocomplete(
+      optionsBuilder: (TextEditingValue textEditingValue) => _acTeams.where(
+          (element) => element.toString().startsWith(textEditingValue.text)),
+      onSelected: (int content) => setState(() {
+            teamNumber = content;
+            _errorText = null;
+          }),
+      fieldViewBuilder: (BuildContext context, TextEditingController controller,
+          FocusNode focusNode, VoidCallback onSubmitted) {
+        _controller = controller;
+        return TextField(
+            controller: controller,
+            focusNode: focusNode,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            maxLength: 4,
+            textInputAction: TextInputAction.done,
+            decoration: InputDecoration(
+                constraints: const BoxConstraints(minWidth: 75, maxWidth: 150),
+                counterText: "",
+                labelText: "Team #",
+                errorText: _errorText),
+            onSubmitted: (String content) {
+              onSubmitted();
+              teamNumber = null;
+              if (content.isEmpty) {
+                return setState(() => _errorText = "Required");
+              }
+              setState(() => _errorText = "Loading");
+              tbaStock
+                  .get("${SettingsState.season}${prefs.getString('event')}_*")
+                  .then((val) {
+                if (val.containsKey(content)) {
+                  setState(() => _errorText = null);
+                  teamNumber = int.parse(content);
+                } else {
+                  setState(() => _errorText = "Invalid");
                   teamNumber = null;
-                  if (content.isEmpty) {
-                    return setState(() => _errorText = "Required");
-                  }
-                  setState(() => _errorText = "Loading");
-                  tbaStock
-                      .get(
-                          "${SettingsState.season}${prefs.getString('event')}_*")
-                      .then((val) {
-                    if (val.containsKey(content)) {
-                      setState(() => _errorText = null);
-                      teamNumber = int.parse(content);
-                    } else {
-                      setState(() => _errorText = "Invalid");
-                      teamNumber = null;
-                    }
-                  });
-                });
-          }));
+                }
+              });
+            });
+      });
 }

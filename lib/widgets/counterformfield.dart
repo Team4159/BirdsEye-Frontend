@@ -6,12 +6,7 @@ import 'package:flutter/material.dart';
 
 class CounterFormField extends FormField<int> {
   CounterFormField(
-      {super.key,
-      super.onSaved,
-      super.validator,
-      super.initialValue = 0,
-      super.autovalidateMode = AutovalidateMode.disabled,
-      String labelText = ""})
+      {super.key, super.onSaved, super.initialValue = 0, String labelText = ""})
       : super(
             builder: (FormFieldState<int> state) => Material(
                 elevation: 2,
@@ -19,22 +14,24 @@ class CounterFormField extends FormField<int> {
                     borderRadius: BorderRadius.all(Radius.circular(4))),
                 animationDuration: const Duration(milliseconds: 500),
                 color: getColor(state.context, labelText),
-                textStyle: Theme.of(state.context)
-                    .textTheme
-                    .labelLarge!
-                    .copyWith(
-                        fontSize: MediaQuery.of(state.context).size.width < 750
-                            ? 20
-                            : 28),
+                textStyle: Theme.of(state.context).textTheme.labelLarge,
                 child: InkWell(
-                    onTap: () {
-                      state.didChange(state.value! + 1);
-                    },
+                    onTap: () => state.didChange(state.value! + 1),
                     child: Stack(
                       alignment: AlignmentDirectional.center,
                       fit: StackFit.passthrough,
                       children: [
-                        Center(child: Text(state.value.toString())),
+                        Center(
+                            child: Padding(
+                                padding: const EdgeInsets.only(top: 5),
+                                child: Text(
+                                  state.value.toString(),
+                                  textScaleFactor:
+                                      MediaQuery.of(state.context).size.width <
+                                              750
+                                          ? 1.7
+                                          : 2,
+                                ))),
                         Align(
                             alignment: Alignment.bottomRight,
                             child: IconButton(
@@ -59,7 +56,7 @@ class CounterFormField extends FormField<int> {
         : labelText.toLowerCase().startsWith("cone")
             ? const Color(0xffccc000)
             : labelText.toLowerCase().startsWith("cube")
-                ? const Color(0xff800080)
+                ? const Color(0xffa000a0)
                 : Theme.of(context).colorScheme.primary;
   }
 }
