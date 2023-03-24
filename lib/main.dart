@@ -25,7 +25,8 @@ void main() async {
       title: "Bird's Eye",
       initialRoute: "/",
       routes: {
-        "/matchscout": (BuildContext context) => const MatchScout(),
+        "/matchscout": (BuildContext context) =>
+            const MatchScoutTeamAssignment(),
         "/pitscout": (BuildContext context) => const PitScout(),
         "/": (BuildContext context) => MainScreen(),
         "/admin": (BuildContext context) => const AdminPanel()
@@ -156,8 +157,8 @@ class AppDrawer extends Builder {
                         "Match Scouting",
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
-                      onTap: () => Navigator.of(context)
-                          .pushReplacement(_createRoute(const MatchScout())),
+                      onTap: () => Navigator.of(context).pushReplacement(
+                          _createRoute(const MatchScoutTeamAssignment())),
                     ),
                     ListTile(
                       title: Text(

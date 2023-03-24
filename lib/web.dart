@@ -1,4 +1,4 @@
-import 'dart:convert' show json;
+import 'dart:convert' show json, jsonDecode;
 
 import 'package:birdseye/main.dart';
 import 'package:birdseye/matchscout.dart';
@@ -84,6 +84,26 @@ Future<Response> postResponse(
               "/api/${SettingsState.season}/${prefs.getString('event')}/match"),
           body: json.encode(body));
   }
+}
+
+class TeamAssignmentResponse {
+  String teamNumber;
+
+  TeamAssignmentResponse(this.teamNumber);
+
+  factory TeamAssignmentResponse.fromJson(dynamic json) {
+    return TeamAssignmentResponse(json["team_number"] as String);
+  }
+}
+
+Future<TeamAssignmentResponse> getScoutingAssignment(String matchId) {
+  return client.post(
+      parseURI(
+          "/${SettingsState.season}/events/${prefs.getString('event')}/matches/$matchId/scout"),
+      body: {}).then((value) {
+    print(value.body);
+    return TeamAssignmentResponse.fromJson(jsonDecode(value.body));
+  });
 }
 
 Future<List<int>> pitScoutGetUnfilled() => client

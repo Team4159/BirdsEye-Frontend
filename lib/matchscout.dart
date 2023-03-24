@@ -12,7 +12,10 @@ import 'package:flutter/material.dart';
 enum MatchScoutQuestionTypes { text, counter, toggle, slider }
 
 class MatchScout extends StatefulWidget {
-  const MatchScout({super.key});
+  MatchScout({super.key, required this.teamNumber, required this.matchId});
+
+  String teamNumber;
+  String matchId;
 
   @override
   State<StatefulWidget> createState() => MatchScoutState();
