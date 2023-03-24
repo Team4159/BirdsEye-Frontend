@@ -235,79 +235,96 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
   String? _matchCodeError;
 
   void reset() {
-    teamNumber = null;
     _matchCodeController.clear();
-    matchCode = null;
+    setState(() => teamNumber = matchCode = null);
     widget.reset();
   }
 
   @override
-  Widget build(BuildContext context) =>
-      Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-        TextField(
-            controller: _matchCodeController,
-            keyboardType: TextInputType.text,
-            maxLength: 5,
-            textInputAction: TextInputAction.next,
-            decoration: InputDecoration(
-                constraints: const BoxConstraints(maxWidth: 95),
-                counterText: "",
-                hintText: "Match Code",
-                errorText: _matchCodeError),
-            onSubmitted: (String content) {
-              setState(() => matchCode = null);
+  Widget build(BuildContext context) => Theme(
+      data: Theme.of(context).copyWith(
+          inputDecorationTheme: Theme.of(context).inputDecorationTheme.copyWith(
+                constraints: const BoxConstraints(
+                    maxWidth: 100,
+                    minHeight: kMinInteractiveDimension * 1.2,
+                    maxHeight: kMinInteractiveDimension * 1.2),
+              )),
+      child: Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            TextField(
+                controller: _matchCodeController,
+                keyboardType: TextInputType.text,
+                maxLength: 5,
+                textInputAction: TextInputAction.next,
+                decoration: InputDecoration(
+                    counterText: "",
+                    hintText: "Match Code",
+                    errorText: _matchCodeError),
+                onSubmitted: (String content) {
+                  setState(() => teamNumber = matchCode = null);
 
-              if (content.isEmpty) {
-                return setState(() => _matchCodeError = "Required");
-              }
-              setState(() => _matchCodeError = "Loading");
-              tbaStock
-                  .get("${SettingsState.season}${prefs.getString('event')}")
-                  .then((val) {
-                if (val.containsKey(content)) {
-                  setState(() {
-                    _matchCodeError = null;
-                    matchCode = content;
+                  if (content.isEmpty) {
+                    return setState(() => _matchCodeError = "Required");
+                  }
+                  setState(() => _matchCodeError = "Loading");
+                  tbaStock
+                      .get("${SettingsState.season}${prefs.getString('event')}")
+                      .then((val) {
+                    if (val.containsKey(content)) {
+                      setState(() {
+                        _matchCodeError = null;
+                        matchCode = content;
+                      });
+                    } else {
+                      setState(() {
+                        _matchCodeError = "Invalid";
+                        teamNumber = matchCode = null;
+                      });
+                    }
                   });
-                } else {
-                  setState(() {
-                    _matchCodeError = "Invalid";
-                    matchCode = null;
-                  });
-                }
-              });
-            }),
-        const SizedBox(width: 15),
-        FutureBuilder(
-            future: tbaStock
-                .get(
-                    "${SettingsState.season}${prefs.getString('event')}_$matchCode")
-                .then((data) {
-              final out = data.entries
-                  .map((e) => MapEntry<int, String>(int.parse(e.key), e.value))
-                  .toList();
-              out.sort((a, b) => a.value.compareTo(b.value));
-              return Map.fromEntries(out);
-            }),
-            initialData: const <int, String>{},
-            builder: (context, snapshot) => DropdownButton<int>(
-                hint: const Text("Team #"),
-                value: teamNumber,
-                items: snapshot.data?.entries.map((e) {
-                      final match = matchRobotIDregex.firstMatch(e.value);
-                      if (match == null) {
-                        throw Exception("Invalid Match Robot Identifier!");
-                      }
-                      return DropdownMenuItem<int>(
-                          value: e.key,
-                          child: Text(
-                              "${match.namedGroup('number')} | ${e.key}",
-                              style: TextStyle(
-                                  backgroundColor:
-                                      frcColors[match.namedGroup("color")])));
-                    }).toList() ??
-                    [],
-                onChanged: (content) => setState(() => teamNumber = content))),
-        Expanded(child: ResetButton(reset: reset))
-      ]);
+                }),
+            const SizedBox(width: 15),
+            FutureBuilder(
+                future: matchCode == null
+                    ? null
+                    : tbaStock
+                        .get(
+                            "${SettingsState.season}${prefs.getString('event')}_$matchCode")
+                        .then((data) {
+                        final out = data.entries
+                            .map((e) => MapEntry<int, String>(
+                                int.parse(e.key), e.value))
+                            .toList();
+                        out.sort((a, b) => a.value.compareTo(b.value));
+                        return Map.fromEntries(out);
+                      }),
+                builder: (context, snapshot) => DropdownButton<int>(
+                      hint: const Text("Team #"),
+                      value: teamNumber,
+                      items: snapshot.data?.entries.map((e) {
+                            final match = matchRobotIDregex.firstMatch(e.value);
+                            if (match == null) {
+                              throw Exception(
+                                  "Invalid Match Robot Identifier!");
+                            }
+                            return DropdownMenuItem<int>(
+                                value: e.key,
+                                child: Text(
+                                    "${match.namedGroup('number')} | ${e.key}",
+                                    style: TextStyle(
+                                        backgroundColor: frcColors[
+                                            match.namedGroup("color")])));
+                          }).toList() ??
+                          [],
+                      onChanged: (content) => setState(() => teamNumber =
+                          matchCode != null &&
+                                  snapshot.data != null &&
+                                  snapshot.data!.containsKey(content)
+                              ? content
+                              : null),
+                    )),
+            Expanded(child: ResetButton(reset: reset))
+          ]));
 }
