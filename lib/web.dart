@@ -87,23 +87,27 @@ Future<Response> postResponse(
 }
 
 class TeamAssignmentResponse {
-  String teamNumber;
+  int teamNumber;
 
   TeamAssignmentResponse(this.teamNumber);
 
   factory TeamAssignmentResponse.fromJson(dynamic json) {
-    return TeamAssignmentResponse(json["team_number"] as String);
+    return TeamAssignmentResponse(json["team_number"] as int);
   }
 }
 
 Future<TeamAssignmentResponse> getScoutingAssignment(String matchId) {
-  return client.post(
-      parseURI(
-          "/${SettingsState.season}/events/${prefs.getString('event')}/matches/$matchId/scout"),
-      body: {}).then((value) {
+  return client.get(parseURI('/testroute')).then((value) {
     print(value.body);
-    return TeamAssignmentResponse.fromJson(jsonDecode(value.body));
+    return TeamAssignmentResponse(604);
   });
+  // return client.post(
+  //     parseURI(
+  //         "/api/${SettingsState.season}/events/${prefs.getString('event')}/matches/$matchId/scout"),
+  //     body: {}).then((value) {
+  //   print(value.body);
+  //   return TeamAssignmentResponse.fromJson(jsonDecode(value.body));
+  // });
 }
 
 Future<List<int>> pitScoutGetUnfilled() => client

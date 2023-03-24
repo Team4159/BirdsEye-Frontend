@@ -14,7 +14,7 @@ enum MatchScoutQuestionTypes { text, counter, toggle, slider }
 class MatchScout extends StatefulWidget {
   MatchScout({super.key, required this.teamNumber, required this.matchId});
 
-  String teamNumber;
+  int teamNumber;
   String matchId;
 
   @override
@@ -221,7 +221,14 @@ class MatchScoutState extends State<MatchScout> {
 
 class MatchInfoFields extends StatefulWidget {
   final void Function() reset;
-  const MatchInfoFields({super.key, required this.reset});
+  final String matchCode;
+  final int teamNumber;
+
+  const MatchInfoFields(
+      {super.key,
+      required this.reset,
+      required this.matchCode,
+      required this.teamNumber});
 
   @override
   State<StatefulWidget> createState() => MatchInfoFieldsState();
@@ -236,6 +243,16 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
   String? matchCode;
   final TextEditingController _matchCodeController = TextEditingController();
   String? _matchCodeError;
+
+  @override
+  void initState() {
+    super.initState();
+
+    matchCode = widget.matchCode;
+    teamNumber = widget.teamNumber;
+    _matchCodeController.text = widget.matchCode;
+    _teamNumberController?.text = widget.teamNumber.toString();
+  }
 
   void reset() {
     _matchCodeController.clear();

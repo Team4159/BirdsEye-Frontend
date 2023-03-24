@@ -39,12 +39,12 @@ class MatchScoutTeamAssignmentState extends State<MatchScoutTeamAssignment> {
     // assign result to _matches
 
     _matches = [
-      MatchModel("Qualifier 15", [
+      MatchModel("qa15", [
         TeamAssignment(4159, true),
         TeamAssignment(254, false),
         TeamAssignment(604, true),
       ]),
-      MatchModel("Qualifier 15", [
+      MatchModel("qa16", [
         TeamAssignment(4159, false),
         TeamAssignment(254, true),
         TeamAssignment(604, true),
