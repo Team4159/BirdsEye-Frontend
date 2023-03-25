@@ -25,7 +25,7 @@ class PitScoutState extends State<PitScout> {
   final ScrollController _scrollController = ScrollController();
   final Map<String, String> _fields = {};
   bool _loading = false;
-  int? lastSubmittedResponseTeamNumber = 299; // TODO fix
+  int? _lastSubmittedResponseTeamNumber = 299; // TODO remove when done testing
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -56,7 +56,7 @@ class PitScoutState extends State<PitScout> {
                           child: TextButton(
                               onPressed: () async {
                                 if (prefs.getString("name") == null ||
-                                    lastSubmittedResponseTeamNumber == null) {
+                                    _lastSubmittedResponseTeamNumber == null) {
                                   showSnackBar(const SnackBar(
                                       content: Text(
                                           "No previous submitted pit response!")));
@@ -65,8 +65,9 @@ class PitScoutState extends State<PitScout> {
                                 Response res =
                                     await getResponse(WebDataTypes.pitScout, {
                                   "name": prefs.getString("name")!,
-                                  "teamNumber": lastSubmittedResponseTeamNumber!
-                                      .toString(),
+                                  "teamNumber":
+                                      _lastSubmittedResponseTeamNumber!
+                                          .toString(),
                                 });
 
                                 if (res.statusCode != 200) {
@@ -87,8 +88,12 @@ class PitScoutState extends State<PitScout> {
                                           "Cannot load previous pit response")));
                                 }
 
+                                print(await stock.get(WebDataTypes.pitScout));
+
                                 navigatorPushReplacement(createRoute(
                                     PitScoutEdit(
+                                        pitQuestions: await stock
+                                            .get(WebDataTypes.pitScout),
                                         pitResponse:
                                             body[0] as Map<String, dynamic>)));
                               },
@@ -190,6 +195,9 @@ class PitScoutState extends State<PitScout> {
                                             throw Exception(
                                                 "Error ${response.statusCode}: ${response.reasonPhrase}");
                                           }
+                                          _lastSubmittedResponseTeamNumber =
+                                              _teamNumberKey
+                                                  .currentState!.teamNumber;
                                           _formKey.currentState!.reset();
                                           _teamNumberKey.currentState!.reset();
                                           m.hideCurrentSnackBar();
