@@ -112,3 +112,9 @@ Future<List<String>> getTableList(int season) => client
 
 Future<Response> createTables(int season, String eventCode) =>
     client.put(parseURI("api/$season/tables"), body: eventCode);
+
+Future<Response> updatePitScouting(Map<String, dynamic> body) {
+  return client.patch(
+      parseURI("/api/${SettingsState.season}/${prefs.getString('event')}/pit"),
+      body: json.encode(body));
+}

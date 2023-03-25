@@ -25,7 +25,7 @@ class PitScoutState extends State<PitScout> {
   final ScrollController _scrollController = ScrollController();
   final Map<String, String> _fields = {};
   bool _loading = false;
-  int? _lastSubmittedResponseTeamNumber = 299; // TODO remove when done testing
+  int? _lastSubmittedResponseTeamNumber;
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -57,7 +57,7 @@ class PitScoutState extends State<PitScout> {
                               onPressed: () async {
                                 if (prefs.getString("name") == null ||
                                     _lastSubmittedResponseTeamNumber == null) {
-                                  showSnackBar(const SnackBar(
+                                  return showSnackBar(const SnackBar(
                                       content: Text(
                                           "No previous submitted pit response!")));
                                 }
@@ -70,7 +70,7 @@ class PitScoutState extends State<PitScout> {
                                           .toString(),
                                 });
 
-                                if (res.statusCode != 200) {
+                                if (res.statusCode >= 400) {
                                   return showSnackBar(SnackBar(
                                       content: Text(
                                           "ERROR: ${res.statusCode} ${res.reasonPhrase}")));
@@ -88,7 +88,7 @@ class PitScoutState extends State<PitScout> {
                                           "Cannot load previous pit response")));
                                 }
 
-                                print(await stock.get(WebDataTypes.pitScout));
+                                hideCurrentSnackBar();
 
                                 navigatorPushReplacement(createRoute(
                                     PitScoutEdit(
@@ -230,7 +230,13 @@ class PitScoutState extends State<PitScout> {
               })));
 
   // To satisfy dart use_build_context_synchronously in async functions
+  void hideCurrentSnackBar() {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+  }
+
+  // To satisfy dart use_build_context_synchronously in async functions
   void showSnackBar(SnackBar snackbar) {
+    hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
 

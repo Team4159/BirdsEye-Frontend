@@ -1,7 +1,9 @@
 import 'package:birdseye/main.dart';
+import 'package:birdseye/pitscout.dart';
 import 'package:birdseye/web.dart';
 import 'package:birdseye/widgets/errorcontainer.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 
 class PitScoutEdit extends StatefulWidget {
   final Map<String, dynamic> pitQuestions;
@@ -23,7 +25,8 @@ class _PitScoutEditState extends State<PitScoutEdit> {
   @override
   Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
-        title: const Text("Edit Pit Scout Response"),
+        title: Text(
+            "Editing Pit Scout Response For Team ${widget.pitResponse["teamNumber"]}"),
       ),
       drawer: AppDrawer(),
       body: Form(
@@ -33,6 +36,7 @@ class _PitScoutEditState extends State<PitScoutEdit> {
               controller: _scrollController,
               child: Column(
                 children: widget.pitResponse.entries
+                    .where((e) => widget.pitQuestions.containsKey(e.key))
                     .map<Widget>((e) => Material(
                           type: MaterialType.card,
                           elevation: 1,
@@ -42,7 +46,7 @@ class _PitScoutEditState extends State<PitScoutEdit> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      e.key,
+                                      widget.pitQuestions[e.key].toString(),
                                       textAlign: TextAlign.left,
                                       style: Theme.of(context)
                                           .textTheme
@@ -51,6 +55,9 @@ class _PitScoutEditState extends State<PitScoutEdit> {
                                     ),
                                     const SizedBox(height: 10),
                                     TextFormField(
+                                      controller: TextEditingController(
+                                          text: widget.pitResponse[e.key]
+                                              .toString()),
                                       keyboardType: TextInputType.multiline,
                                       maxLines: null,
                                       decoration: InputDecoration(
@@ -63,7 +70,7 @@ class _PitScoutEditState extends State<PitScoutEdit> {
                                           enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
                                                   color: Colors.grey[700]!))),
-                                      onSaved: (String? content) {
+                                      onChanged: (String? content) {
                                         _fields[e.key] = content ?? "";
                                       },
                                     )
@@ -74,7 +81,51 @@ class _PitScoutEditState extends State<PitScoutEdit> {
                           width: double.infinity,
                           child: ElevatedButton(
                               style: ButtonStyle(enableFeedback: !_loading),
-                              onPressed: () {},
+                              onPressed: () {
+                                if (_loading) return;
+                                ScaffoldMessengerState m =
+                                    ScaffoldMessenger.of(context);
+                                m.showSnackBar(const SnackBar(
+                                    duration: Duration(minutes: 5),
+                                    behavior: SnackBarBehavior.fixed,
+                                    elevation: 0,
+                                    padding: EdgeInsets.zero,
+                                    backgroundColor: Colors.transparent,
+                                    content: LinearProgressIndicator(
+                                      backgroundColor: Colors.transparent,
+                                    )));
+                                setState(() {
+                                  _loading = true;
+                                });
+                                updatePitScouting({
+                                  "edits": {..._fields},
+                                  "teamNumber":
+                                      widget.pitResponse["teamNumber"],
+                                  "name": widget.pitResponse["name"],
+                                }).then((Response res) {
+                                  if (res.statusCode >= 400) {
+                                    throw Exception(
+                                        "Error ${res.statusCode}: ${res.reasonPhrase}");
+                                  }
+
+                                  setState(() {
+                                    _loading = false;
+                                  });
+                                  m.hideCurrentSnackBar();
+                                  m.showSnackBar(SnackBar(
+                                      content: Text(
+                                          "Response Sent! [${res.statusCode}]")));
+                                  Navigator.of(context).pushReplacement(
+                                      createRoute(const PitScout()));
+                                }).catchError((e) {
+                                  m.hideCurrentSnackBar();
+                                  setState(() {
+                                    _loading = false;
+                                  });
+                                  m.showSnackBar(
+                                      SnackBar(content: Text(e.toString())));
+                                });
+                              },
                               child: const Text("Submit")))
                     ])
                     .map((e) => Padding(
