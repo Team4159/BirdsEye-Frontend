@@ -1,10 +1,14 @@
+import 'dart:convert';
+
 import 'package:birdseye/main.dart';
+import 'package:birdseye/pitscoutedit.dart';
 import 'package:birdseye/settings.dart';
 import 'package:birdseye/web.dart';
 import 'package:birdseye/widgets/errorcontainer.dart';
 import 'package:birdseye/widgets/resetbutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart';
 
 enum PitScoutQuestionTypes { text }
 
@@ -21,6 +25,7 @@ class PitScoutState extends State<PitScout> {
   final ScrollController _scrollController = ScrollController();
   final Map<String, String> _fields = {};
   bool _loading = false;
+  int? lastSubmittedResponseTeamNumber = 299; // TODO fix
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -48,11 +53,51 @@ class PitScoutState extends State<PitScout> {
                         Expanded(
                             child: Align(
                           alignment: Alignment.centerRight,
-                          child: ResetButton(reset: () {
-                            _formKey.currentState!.reset();
-                            _teamNumberKey.currentState!.reset();
-                          }),
-                        ))
+                          child: TextButton(
+                              onPressed: () async {
+                                if (prefs.getString("name") == null ||
+                                    lastSubmittedResponseTeamNumber == null) {
+                                  showSnackBar(const SnackBar(
+                                      content: Text(
+                                          "No previous submitted pit response!")));
+                                }
+
+                                Response res =
+                                    await getResponse(WebDataTypes.pitScout, {
+                                  "name": prefs.getString("name")!,
+                                  "teamNumber": lastSubmittedResponseTeamNumber!
+                                      .toString(),
+                                });
+
+                                if (res.statusCode != 200) {
+                                  return showSnackBar(SnackBar(
+                                      content: Text(
+                                          "ERROR: ${res.statusCode} ${res.reasonPhrase}")));
+                                }
+
+                                showSnackBar(const SnackBar(
+                                    content:
+                                        Text("Loading previous pit response")));
+
+                                List<dynamic> body = jsonDecode(res.body);
+
+                                if (body.isEmpty) {
+                                  return showSnackBar(const SnackBar(
+                                      content: Text(
+                                          "Cannot load previous pit response")));
+                                }
+
+                                navigatorPushReplacement(createRoute(
+                                    PitScoutEdit(
+                                        pitResponse:
+                                            body[0] as Map<String, dynamic>)));
+                              },
+                              child: const Text("Edit Last Response")),
+                        )),
+                        ResetButton(reset: () {
+                          _formKey.currentState!.reset();
+                          _teamNumberKey.currentState!.reset();
+                        })
                       ]),
                       const SizedBox(height: 10)
                     ]
@@ -175,6 +220,16 @@ class PitScoutState extends State<PitScout> {
                                 child: e))
                             .toList()));
               })));
+
+  // To satisfy dart use_build_context_synchronously in async functions
+  void showSnackBar(SnackBar snackbar) {
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+  }
+
+  // To satisfy dart use_build_context_synchronously in async functions
+  void navigatorPushReplacement(Route route) {
+    Navigator.of(context).pushReplacement(route);
+  }
 }
 
 class PitScoutTeamNumberField extends StatefulWidget {

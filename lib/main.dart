@@ -146,7 +146,7 @@ class AppDrawer extends Builder {
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       onTap: () => Navigator.of(context)
-                          .pushReplacement(_createRoute(MainScreen())),
+                          .pushReplacement(createRoute(MainScreen())),
                     ),
                     ListTile(
                       title: Text(
@@ -154,7 +154,7 @@ class AppDrawer extends Builder {
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       onTap: () => Navigator.of(context)
-                          .pushReplacement(_createRoute(const MatchScout())),
+                          .pushReplacement(createRoute(const MatchScout())),
                     ),
                     ListTile(
                       title: Text(
@@ -162,7 +162,7 @@ class AppDrawer extends Builder {
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       onTap: () => Navigator.of(context)
-                          .pushReplacement(_createRoute(const PitScout())),
+                          .pushReplacement(createRoute(const PitScout())),
                     )
                   ],
                 )));
@@ -228,7 +228,7 @@ class MainScreen extends StatelessWidget {
       );
 }
 
-Route _createRoute(Widget widget) => PageRouteBuilder(
+Route createRoute(Widget widget) => PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => widget,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var tween = Tween(begin: const Offset(1, 0), end: Offset.zero)

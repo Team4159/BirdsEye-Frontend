@@ -86,6 +86,20 @@ Future<Response> postResponse(
   }
 }
 
+Future<Response> getResponse(
+    WebDataTypes dataType, Map<String, String> params) {
+  switch (dataType) {
+    case WebDataTypes.pitScout:
+      return client.get(parseURI(
+          "/api/${SettingsState.season}/${prefs.getString('event')}/pit",
+          params: params));
+    case WebDataTypes.matchScout:
+      return client.get(parseURI(
+          "/api/${SettingsState.season}/${prefs.getString('event')}/match",
+          params: params));
+  }
+}
+
 Future<List<int>> pitScoutGetUnfilled() => client
     .get(parseURI(
         "api/bluealliance/${SettingsState.season}/${prefs.getString('event')}/*",
