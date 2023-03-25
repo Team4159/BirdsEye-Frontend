@@ -1,4 +1,5 @@
 import 'dart:convert' show json, jsonDecode;
+import 'dart:ffi';
 
 import 'package:birdseye/main.dart';
 import 'package:birdseye/matchscout.dart';
@@ -97,17 +98,72 @@ class TeamAssignmentResponse {
 }
 
 Future<TeamAssignmentResponse> getScoutingAssignment(String matchId) {
-  return client.get(parseURI('/testroute')).then((value) {
+  var uri = parseURI(
+      "/${SettingsState.season}/events/${prefs.getString('event')}/matches/$matchId/scout");
+  print('uri: $uri');
+  return client.post(uri, body: {}).then((value) {
     print(value.body);
-    return TeamAssignmentResponse(604);
+    return TeamAssignmentResponse.fromJson(jsonDecode(value.body));
   });
-  // return client.post(
-  //     parseURI(
-  //         "/api/${SettingsState.season}/events/${prefs.getString('event')}/matches/$matchId/scout"),
-  //     body: {}).then((value) {
-  //   print(value.body);
-  //   return TeamAssignmentResponse.fromJson(jsonDecode(value.body));
-  // });
+}
+
+Future<List<CurrentMatchesResponse>> getCurrentMatches() {
+  var uri = parseURI(
+      "/${SettingsState.season}/events/${prefs.getString('event')}/current_matches");
+  print('uri: $uri');
+  return client.get(uri).then((value) {
+    print(value.body);
+    return List<CurrentMatchesResponse>.from(jsonDecode(value.body));
+  });
+}
+
+enum TeamColor {
+  blue,
+  red;
+
+  static TeamColor fromString(String str) {
+    if (str == 'blue') {
+      return TeamColor.blue;
+    } else if (str == 'red') {
+      return TeamColor.red;
+    }
+
+    throw 'invalid team color';
+  }
+}
+
+/*
+
+{
+  number: 604,
+  isAssigned: true,
+  color: "red" 
+}
+*/
+
+class TeamAssignment {
+  int teamNumber;
+  bool isAssigned;
+  TeamColor color;
+
+  TeamAssignment(this.teamNumber, this.isAssigned, this.color);
+
+  factory TeamAssignment.fromJson(dynamic json) {
+    return TeamAssignment(json['number'] as int, json['isAssigned'] as bool,
+        TeamColor.fromString(json['color'] as String));
+  }
+}
+
+class CurrentMatchesResponse {
+  String key;
+  List<TeamAssignment> teams;
+
+  CurrentMatchesResponse(this.key, this.teams);
+
+  factory CurrentMatchesResponse.fromJson(dynamic json) {
+    return CurrentMatchesResponse(
+        json['key'], List<TeamAssignment>.from(json['teams']));
+  }
 }
 
 Future<List<int>> pitScoutGetUnfilled() => client

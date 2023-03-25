@@ -28,9 +28,8 @@ class TeamAssignment {
 
 class MatchScoutTeamAssignmentState extends State<MatchScoutTeamAssignment> {
   final ScrollController _scrollController = ScrollController();
-  final Map<String, Map<String, dynamic>> _fields = {};
-  bool _loading = false;
   List<MatchModel>? _matches;
+  String? errorMessage;
 
   @override
   void initState() {
@@ -38,18 +37,32 @@ class MatchScoutTeamAssignmentState extends State<MatchScoutTeamAssignment> {
     // make call to backend to get current matches
     // assign result to _matches
 
-    _matches = [
-      MatchModel("qa15", [
-        TeamAssignment(4159, true),
-        TeamAssignment(254, false),
-        TeamAssignment(604, true),
-      ]),
-      MatchModel("qa16", [
-        TeamAssignment(4159, false),
-        TeamAssignment(254, true),
-        TeamAssignment(604, true),
-      ]),
-    ];
+    getCurrentMatches().then((value) {
+      setState(() {
+        if (value.isEmpty) {
+          errorMessage = 'No active matches';
+        }
+        _matches = value.map((match) {
+          return MatchModel(
+              match.key,
+              match.teams.map((team) {
+                return TeamAssignment(team.teamNumber, team.isAssigned);
+              }).toList());
+        }).toList();
+      });
+    });
+    // _matches = [
+    //   MatchModel("qm15", [
+    //     TeamAssignment(4159, true),
+    //     TeamAssignment(254, false),
+    //     TeamAssignment(604, true),
+    //   ]),
+    //   MatchModel("qm16", [
+    //     TeamAssignment(4159, false),
+    //     TeamAssignment(254, true),
+    //     TeamAssignment(604, true),
+    //   ]),
+    // ];
   }
 
   @override
@@ -58,15 +71,17 @@ class MatchScoutTeamAssignmentState extends State<MatchScoutTeamAssignment> {
           title: const Text("Match Scouting"),
         ),
         drawer: AppDrawer(),
-        body: Center(
-          child: Column(children: [
-            Row(
-              children: _matches != null
-                  ? matches()
-                  : [const Center(child: CircularProgressIndicator())],
-            )
-          ]),
-        ),
+        body: errorMessage != null
+            ? Text(errorMessage!)
+            : Center(
+                child: Column(children: [
+                  Row(
+                    children: _matches != null
+                        ? matches()
+                        : [const Center(child: CircularProgressIndicator())],
+                  )
+                ]),
+              ),
       );
 
   List<Widget> matches() {
