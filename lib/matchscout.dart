@@ -1,4 +1,5 @@
 import 'package:birdseye/main.dart';
+import 'package:birdseye/matchscoutteamassignment.dart';
 import 'package:birdseye/settings.dart';
 import 'package:birdseye/web.dart';
 import 'package:birdseye/widgets/counterformfield.dart';
@@ -251,7 +252,6 @@ class MatchInfoFieldsState extends State<MatchInfoFields> {
     matchCode = widget.matchCode;
     teamNumber = widget.teamNumber;
     _matchCodeController.text = widget.matchCode;
-    _teamNumberController?.text = widget.teamNumber.toString();
   }
 
   void reset() {

@@ -113,7 +113,18 @@ Future<List<CurrentMatchesResponse>> getCurrentMatches() {
   print('uri: $uri');
   return client.get(uri).then((value) {
     print(value.body);
-    return List<CurrentMatchesResponse>.from(jsonDecode(value.body));
+    var list = jsonDecode(value.body) as List;
+    return list.map((e) => CurrentMatchesResponse.fromJson(e)).toList();
+  });
+}
+
+Future<Response> freeScoutingAssignment(String matchId, int teamNumber) {
+  var uri = parseURI(
+      "/${SettingsState.season}/events/${prefs.getString('event')}/matches/$matchId/stop_scouting/$teamNumber");
+  print('uri: $uri');
+  return client.post(uri, body: {}).then((value) {
+    print(value.body);
+    return value;
   });
 }
 
@@ -161,8 +172,9 @@ class CurrentMatchesResponse {
   CurrentMatchesResponse(this.key, this.teams);
 
   factory CurrentMatchesResponse.fromJson(dynamic json) {
-    return CurrentMatchesResponse(
-        json['key'], List<TeamAssignment>.from(json['teams']));
+    var list = json['teams'] as List;
+    var teamsList = list.map((e) => TeamAssignment.fromJson(e)).toList();
+    return CurrentMatchesResponse(json['key'], teamsList);
   }
 }
 
