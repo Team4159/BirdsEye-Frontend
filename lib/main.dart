@@ -3,6 +3,7 @@ import 'package:birdseye/matchscout.dart';
 import 'package:birdseye/pitscout.dart';
 import 'package:birdseye/settings.dart';
 import 'package:birdseye/web.dart';
+import 'package:birdseye/matchscoutteamassignment.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,7 +25,8 @@ void main() async {
       title: "Bird's Eye",
       initialRoute: "/",
       routes: {
-        "/matchscout": (BuildContext context) => const MatchScout(),
+        "/matchscout": (BuildContext context) =>
+            const MatchScoutTeamAssignment(),
         "/pitscout": (BuildContext context) => const PitScout(),
         "/": (BuildContext context) => MainScreen(),
         "/admin": (BuildContext context) => const AdminPanel()
@@ -63,13 +65,14 @@ void main() async {
                 fontFamily: "Roboto", fontSize: 16, color: Colors.black)),
         textTheme: Typography.whiteHelsinki
             .merge(Typography.englishLike2021)
-            .apply(
-                bodyColor: Colors.white,
-                displayColor: Colors.grey[300],
-                fontFamilyFallback: [
-              "Arial",
-              "Calibri"
-            ]).copyWith(
+            .apply(bodyColor: Colors.white, displayColor: Colors.grey[300]
+                // ,
+                // fontFamilyFallback: [
+                //   "Arial",
+                //   "Calibri"
+                // ]
+                )
+            .copyWith(
                 titleLarge: const TextStyle(fontFamily: "Verdana"),
                 displaySmall: const TextStyle(
                     fontFamily: "OpenSans", color: Colors.black),
@@ -101,13 +104,14 @@ void main() async {
             centerTitle: true),
         textTheme: Typography.blackCupertino
             .merge(Typography.englishLike2021)
-            .apply(
-                bodyColor: Colors.black,
-                displayColor: Colors.white,
-                fontFamilyFallback: [
-              "Arial",
-              "Calibri"
-            ]).copyWith(
+            .apply(bodyColor: Colors.black, displayColor: Colors.white
+                // ,
+                // fontFamilyFallback: [
+                //   "Arial",
+                //   "Calibri"
+                // ]
+                )
+            .copyWith(
                 titleLarge: const TextStyle(fontFamily: "Verdana"),
                 displaySmall: const TextStyle(fontFamily: "OpenSans"),
                 displayMedium: const TextStyle(
@@ -153,8 +157,8 @@ class AppDrawer extends Builder {
                         "Match Scouting",
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
-                      onTap: () => Navigator.of(context)
-                          .pushReplacement(_createRoute(const MatchScout())),
+                      onTap: () => Navigator.of(context).pushReplacement(
+                          _createRoute(const MatchScoutTeamAssignment())),
                     ),
                     ListTile(
                       title: Text(
