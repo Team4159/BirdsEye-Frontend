@@ -51,18 +51,6 @@ class MatchScoutTeamAssignmentState extends State<MatchScoutTeamAssignment> {
         }).toList();
       });
     });
-    // _matches = [
-    //   MatchModel("qm15", [
-    //     TeamAssignment(4159, true),
-    //     TeamAssignment(254, false),
-    //     TeamAssignment(604, true),
-    //   ]),
-    //   MatchModel("qm16", [
-    //     TeamAssignment(4159, false),
-    //     TeamAssignment(254, true),
-    //     TeamAssignment(604, true),
-    //   ]),
-    // ];
   }
 
   @override
@@ -91,7 +79,9 @@ class MatchScoutTeamAssignmentState extends State<MatchScoutTeamAssignment> {
               Column(children: teamsList(match)),
               TextButton(
                   onPressed: (() {
-                    print("did press");
+                    // Make reqeust to server requesting a team assignment
+                    // Move to next screen on success passing through match
+                    // and team information.
                     getScoutingAssignment(match.name)
                         .then((value) => {
                               Navigator.push(
@@ -103,12 +93,7 @@ class MatchScoutTeamAssignmentState extends State<MatchScoutTeamAssignment> {
                                         )),
                               )
                             })
-                        .catchError((error) {
-                      print("error $error");
-                    });
-                    // Make reqeust to server requesting a team assignment
-                    // Move to next screen on success passing through match
-                    // and team information.
+                        .catchError((error) {});
                   }),
                   child: const Text("Start")),
             ]))
@@ -122,60 +107,5 @@ class MatchScoutTeamAssignmentState extends State<MatchScoutTeamAssignment> {
               ? const TextStyle(decoration: TextDecoration.lineThrough)
               : null);
     }).toList();
-  }
-}
-
-class ScoutingWidget extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Scoutin'),
-      ),
-      body: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildScoutingCard('First Scouting List'),
-            SizedBox(width: 16),
-            _buildScoutingCard('Second Scouting List'),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildScoutingCard(String title) {
-    return Card(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            title: Text(
-              title,
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: 10, // replace with actual item count
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text('Item $index'),
-                );
-              },
-            ),
-          ),
-          SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              // handle button press
-            },
-            child: Text('Start Scouting'),
-          ),
-          SizedBox(height: 16),
-        ],
-      ),
-    );
   }
 }

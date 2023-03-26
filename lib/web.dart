@@ -100,9 +100,7 @@ class TeamAssignmentResponse {
 Future<TeamAssignmentResponse> getScoutingAssignment(String matchId) {
   var uri = parseURI(
       "/${SettingsState.season}/events/${prefs.getString('event')}/matches/$matchId/scout");
-  print('uri: $uri');
   return client.post(uri, body: {}).then((value) {
-    print(value.body);
     return TeamAssignmentResponse.fromJson(jsonDecode(value.body));
   });
 }
@@ -110,9 +108,7 @@ Future<TeamAssignmentResponse> getScoutingAssignment(String matchId) {
 Future<List<CurrentMatchesResponse>> getCurrentMatches() {
   var uri = parseURI(
       "/${SettingsState.season}/events/${prefs.getString('event')}/current_matches");
-  print('uri: $uri');
   return client.get(uri).then((value) {
-    print(value.body);
     var list = jsonDecode(value.body) as List;
     return list.map((e) => CurrentMatchesResponse.fromJson(e)).toList();
   });
@@ -121,9 +117,7 @@ Future<List<CurrentMatchesResponse>> getCurrentMatches() {
 Future<Response> freeScoutingAssignment(String matchId, int teamNumber) {
   var uri = parseURI(
       "/${SettingsState.season}/events/${prefs.getString('event')}/matches/$matchId/stop_scouting/$teamNumber");
-  print('uri: $uri');
   return client.post(uri, body: {}).then((value) {
-    print(value.body);
     return value;
   });
 }
@@ -142,15 +136,6 @@ enum TeamColor {
     throw 'invalid team color';
   }
 }
-
-/*
-
-{
-  number: 604,
-  isAssigned: true,
-  color: "red" 
-}
-*/
 
 class TeamAssignment {
   int teamNumber;
