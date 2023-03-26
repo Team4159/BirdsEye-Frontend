@@ -143,7 +143,7 @@ class PitScoutState extends State<PitScout> {
                                         }).then((response) {
                                           if (response.statusCode >= 400) {
                                             throw Exception(
-                                                "Error ${response.statusCode}: ${response.reasonPhrase}");
+                                                "Error ${response.statusCode}: ${response.body}");
                                           }
                                           _formKey.currentState!.reset();
                                           _teamNumberKey.currentState!.reset();

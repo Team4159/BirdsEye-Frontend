@@ -60,8 +60,8 @@ class _AdminPanelState extends State<AdminPanel> {
                 ),
                 tableList == null
                     ? const SizedBox(height: 0)
-                    : GridView.count(
-                        crossAxisCount: 8,
+                    : GridView.extent(
+                        maxCrossAxisExtent: 50,
                         shrinkWrap: true,
                         children: tableList!
                             .map((tableName) => Text(tableName))
