@@ -60,6 +60,8 @@ class MatchScoutState extends State<MatchScout> {
                               padding: const EdgeInsets.all(15),
                               sliver: SliverToBoxAdapter(
                                   child: MatchInfoFields(
+                                      teamNumber: widget.teamNumber,
+                                      matchCode: widget.matchId,
                                       key: _matchInfoKey,
                                       reset: () =>
                                           _formKey.currentState!.reset())))
@@ -152,7 +154,9 @@ class MatchScoutState extends State<MatchScout> {
                           SliverPadding(
                               padding: const EdgeInsets.all(10),
                               sliver: SliverToBoxAdapter(
-                                  child: ElevatedButton(
+                                  child: Row(
+                                children: [
+                                  ElevatedButton(
                                       style: ButtonStyle(
                                           enableFeedback: !_loading),
                                       onPressed: () {
@@ -206,6 +210,11 @@ class MatchScoutState extends State<MatchScout> {
                                           m.showSnackBar(SnackBar(
                                               content: Text(
                                                   "Response Sent! [${response.statusCode}]")));
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const MatchScoutTeamAssignment()));
                                         }).catchError((e) {
                                           m.hideCurrentSnackBar();
                                           setState(() {
@@ -215,7 +224,103 @@ class MatchScoutState extends State<MatchScout> {
                                               content: Text(e.toString())));
                                         });
                                       },
-                                      child: const Text("Submit"))))
+                                      child: const Text("Submit")),
+                                  ElevatedButton(
+                                      onPressed: () {
+                                        if (_loading) return;
+                                        _fields.clear();
+                                        if (!_matchInfoKey
+                                            .currentState!.isValid) {
+                                          _scrollController.animateTo(0,
+                                              duration: const Duration(
+                                                  milliseconds: 200),
+                                              curve: Curves.easeOutCubic);
+                                          return;
+                                        }
+                                        _formKey.currentState!.save();
+                                        var m = ScaffoldMessenger.of(context);
+                                        m.showSnackBar(const SnackBar(
+                                            duration: Duration(minutes: 5),
+                                            behavior: SnackBarBehavior.fixed,
+                                            elevation: 0,
+                                            padding: EdgeInsets.zero,
+                                            backgroundColor: Colors.transparent,
+                                            content: LinearProgressIndicator(
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                            )));
+                                        setState(() {
+                                          _loading = true;
+                                        });
+                                        // Free the original team assignment rather than the new team assignment
+                                        freeScoutingAssignment(widget.matchId,
+                                                widget.teamNumber)
+                                            .then((response) {
+                                          setState(() {
+                                            _loading = false;
+                                          });
+                                          if (response.statusCode >= 400) {
+                                            throw Exception(
+                                                "Error ${response.statusCode}: ${response.reasonPhrase}");
+                                          }
+
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const MatchScoutTeamAssignment()));
+                                        }).catchError((error) {
+                                          m.hideCurrentSnackBar();
+                                          setState(() {
+                                            _loading = false;
+                                          });
+                                          m.showSnackBar(SnackBar(
+                                              content: Text(error.toString())));
+                                        });
+                                        postResponse(WebDataTypes.matchScout, {
+                                          ..._fields,
+                                          "teamNumber": _matchInfoKey
+                                              .currentState!.teamNumber,
+                                          "match": _matchInfoKey
+                                              .currentState!.matchCode,
+                                          "name": prefs.getString("name")
+                                        }).then((response) {
+                                          if (response.statusCode >= 400) {
+                                            throw Exception(
+                                                "Error ${response.statusCode}: ${response.reasonPhrase}");
+                                          }
+                                          _formKey.currentState!.reset();
+                                          _matchInfoKey.currentState!.reset();
+                                          m.hideCurrentSnackBar();
+                                          setState(() {
+                                            _loading = false;
+                                          });
+                                          _scrollController.animateTo(0,
+                                              duration:
+                                                  const Duration(seconds: 1),
+                                              curve: Curves.easeInOutQuad);
+                                          m.showSnackBar(SnackBar(
+                                              content: Text(
+                                                  "Response Sent! [${response.statusCode}]")));
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const MatchScoutTeamAssignment()));
+                                        }).catchError((e) {
+                                          m.hideCurrentSnackBar();
+                                          setState(() {
+                                            _loading = false;
+                                          });
+                                          m.showSnackBar(SnackBar(
+                                              content: Text(e.toString())));
+                                        });
+                                      },
+                                      child: _loading
+                                          ? const Text("Waiting..")
+                                          : const Text("Cancel"))
+                                ],
+                              )))
                         ]).toList()));
               })));
 }
