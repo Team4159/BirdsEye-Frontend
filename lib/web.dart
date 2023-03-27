@@ -9,42 +9,11 @@ import 'package:stock/stock.dart';
 final client = Client();
 
 final hasLetter = RegExp(r"[a-z]", caseSensitive: false);
-
 Uri parseURI(String path, {String? ip, Map<String, dynamic>? params}) {
   ip ??= prefs.getString("ip")!;
   return hasLetter.hasMatch(ip)
       ? Uri.https(ip, path, params)
       : Uri.http(ip, path, params);
-}
-
-enum WebDataTypes { pitScout, matchScout }
-
-final stock = Stock<WebDataTypes, Map<String, dynamic>>(
-  fetcher: Fetcher.ofFuture<WebDataTypes, Map<String, dynamic>>((dataType) {
-    switch (dataType) {
-      case WebDataTypes.pitScout:
-        return client
-            .get(parseURI("/api/${SettingsState.season}/pitschema"))
-            .then((resp) => json.decode(resp.body));
-      case WebDataTypes.matchScout:
-        return client
-            .get(parseURI("/api/${SettingsState.season}/matchschema"))
-            .then((resp) => Map.castFrom(json.decode(resp.body)))
-            .then((data) => data.map((k, v) => MapEntry<String, dynamic>(
-                k,
-                Map.fromEntries(v.entries.where((e) => MatchScoutQuestionTypes
-                    .values
-                    .any((element) => e.value == element.name))))));
-    }
-  }),
-  sourceOfTruth: CachedSourceOfTruth(),
-);
-
-Future<bool> getStatus(String ip) {
-  return client
-      .get(parseURI("", ip: ip))
-      .then((resp) => resp.body == "BirdsEye Scouting Server Online!")
-      .onError((_, __) => false);
 }
 
 final tbaRegex = RegExp(
@@ -70,6 +39,29 @@ final tbaStock = Stock<String, Map<String, String>>(
     }),
     sourceOfTruth: tbaSoT);
 
+enum WebDataTypes { pitScout, matchScout }
+
+final stock = Stock<WebDataTypes, Map<String, dynamic>>(
+  fetcher: Fetcher.ofFuture<WebDataTypes, Map<String, dynamic>>((dataType) {
+    switch (dataType) {
+      case WebDataTypes.pitScout:
+        return client
+            .get(parseURI("/api/${SettingsState.season}/pitschema"))
+            .then((resp) => json.decode(resp.body));
+      case WebDataTypes.matchScout:
+        return client
+            .get(parseURI("/api/${SettingsState.season}/matchschema"))
+            .then((resp) => Map.castFrom(json.decode(resp.body)))
+            .then((data) => data.map((k, v) => MapEntry<String, dynamic>(
+                k,
+                Map.fromEntries(v.entries.where((e) => MatchScoutQuestionTypes
+                    .values
+                    .any((element) => e.value == element.name))))));
+    }
+  }),
+  sourceOfTruth: CachedSourceOfTruth(),
+);
+
 Future<Response> postResponse(
     WebDataTypes dataType, Map<String, dynamic> body) {
   switch (dataType) {
@@ -84,6 +76,13 @@ Future<Response> postResponse(
               "/api/${SettingsState.season}/${prefs.getString('event')}/match"),
           body: json.encode(body));
   }
+}
+
+Future<bool> getStatus(String ip) {
+  return client
+      .get(parseURI("", ip: ip))
+      .then((resp) => resp.body == "BirdsEye Scouting Server Online!")
+      .onError((_, __) => false);
 }
 
 Future<List<int>> pitScoutGetUnfilled() => client

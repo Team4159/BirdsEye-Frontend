@@ -223,7 +223,7 @@ class MainScreen extends StatelessWidget {
             onPressed: () {
               stock.clearAll();
               tbaStock.clearAll();
-              _settingsKey.currentState!.reloadEvents();
+              _settingsKey.currentState!.reload();
             }),
       );
 }
