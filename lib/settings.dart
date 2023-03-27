@@ -86,7 +86,7 @@ class SettingsState extends State<Settings> {
             TextField(
               style: Theme.of(context).textTheme.bodyMedium,
               decoration: InputDecoration(
-                  hintText: "Required  ",
+                  hintText: "Required ",
                   hintStyle: TextStyle(color: Colors.red.withOpacity(0.7)),
                   counterText: ""),
               maxLength: 64,
