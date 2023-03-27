@@ -13,7 +13,7 @@ class _AdminPanelState extends State<AdminPanel> {
   int? _season;
   List<String>? tableList;
 
-  refreshTables() {
+  void reload() {
     tableList = [];
     getTableList(_season!).then((value) => setState(() => tableList = value));
   }
@@ -42,7 +42,7 @@ class _AdminPanelState extends State<AdminPanel> {
                               maxLength: 4,
                               onSubmitted: (value) {
                                 _season = int.parse(value);
-                                refreshTables();
+                                reload();
                               },
                             ))),
                     const SizedBox(width: 20),
@@ -53,15 +53,16 @@ class _AdminPanelState extends State<AdminPanel> {
                                 context: context,
                                 builder: (lctx) => TableConfigDialog(
                                       getSeason: () => _season!,
-                                      onFinished: () => refreshTables(),
+                                      onFinished: () => reload(),
                                     )),
                         child: const Text("Create Event")),
                   ],
                 ),
                 tableList == null
                     ? const SizedBox(height: 0)
-                    : GridView.count(
-                        crossAxisCount: 8,
+                    : GridView.extent(
+                        maxCrossAxisExtent: 200,
+                        childAspectRatio: 5 / 1,
                         shrinkWrap: true,
                         children: tableList!
                             .map((tableName) => Text(tableName))

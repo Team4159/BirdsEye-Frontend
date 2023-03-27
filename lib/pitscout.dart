@@ -50,7 +50,7 @@ class PitScoutState extends State<PitScout> {
                           alignment: Alignment.centerRight,
                           child: ResetButton(reset: () {
                             _formKey.currentState!.reset();
-                            _teamNumberKey.currentState!.reset();
+                            _teamNumberKey.currentState!.reload();
                           }),
                         ))
                       ]),
@@ -143,10 +143,10 @@ class PitScoutState extends State<PitScout> {
                                         }).then((response) {
                                           if (response.statusCode >= 400) {
                                             throw Exception(
-                                                "Error ${response.statusCode}: ${response.reasonPhrase}");
+                                                "Error ${response.statusCode}: ${response.body}");
                                           }
                                           _formKey.currentState!.reset();
-                                          _teamNumberKey.currentState!.reset();
+                                          _teamNumberKey.currentState!.reload();
                                           m.hideCurrentSnackBar();
                                           setState(() {
                                             _loading = false;
@@ -193,10 +193,10 @@ class PitScoutTeamNumberFieldState extends State<PitScoutTeamNumberField> {
   @override
   void initState() {
     super.initState();
-    reset();
+    reload();
   }
 
-  void reset() {
+  void reload() {
     _controller?.clear();
     _acTeams = [];
     pitScoutGetUnfilled().then((value) {

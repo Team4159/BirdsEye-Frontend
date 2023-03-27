@@ -4,7 +4,7 @@ import 'package:birdseye/web.dart';
 import 'package:birdseye/widgets/counterformfield.dart';
 import 'package:birdseye/widgets/errorcontainer.dart';
 import 'package:birdseye/widgets/resetbutton.dart';
-import 'package:birdseye/widgets/sliderformfield.dart';
+import 'package:birdseye/widgets/ratingformfield.dart';
 import 'package:birdseye/widgets/stextformfield.dart';
 import 'package:birdseye/widgets/toggleformfield.dart';
 import 'package:flutter/material.dart';
@@ -129,7 +129,7 @@ class MatchScoutState extends State<MatchScout> {
                                                     });
                                               case MatchScoutQuestionTypes
                                                   .slider:
-                                                return SliderFormField(
+                                                return RatingFormField(
                                                   labelText: e2.key,
                                                   onSaved: (content) {
                                                     if (!_fields
@@ -187,7 +187,7 @@ class MatchScoutState extends State<MatchScout> {
                                         }).then((response) {
                                           if (response.statusCode >= 400) {
                                             throw Exception(
-                                                "Error ${response.statusCode}: ${response.reasonPhrase}");
+                                                "Error ${response.statusCode}: ${response.body}");
                                           }
                                           _formKey.currentState!.reset();
                                           _matchInfoKey.currentState!.reset();

@@ -20,10 +20,10 @@ class SettingsState extends State<Settings> {
   @override
   void initState() {
     super.initState();
-    reloadEvents();
+    reload();
   }
 
-  void reloadEvents() {
+  void reload() {
     _events = [];
     tbaStock
         .get(SettingsState.season.toString())
@@ -78,7 +78,7 @@ class SettingsState extends State<Settings> {
                 onSubmitted: (content) {
                   season = int.parse(content);
                   stock.clearAll();
-                  reloadEvents();
+                  reload();
                 },
               )),
           ShiftingFit(
