@@ -35,6 +35,7 @@ void main() async {
         colorScheme: ColorScheme.dark(
             primary: Colors.blue[600]!,
             onPrimary: Colors.black,
+            secondary: Colors.grey[600]!,
             secondaryContainer: const Color(0xff1C7C7C),
             tertiaryContainer: const Color(0xffCF772E),
             surface: cardinalred),

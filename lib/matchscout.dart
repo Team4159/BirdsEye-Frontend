@@ -1,12 +1,9 @@
 import 'package:birdseye/main.dart';
 import 'package:birdseye/settings.dart';
 import 'package:birdseye/web.dart';
-import 'package:birdseye/widgets/counterformfield.dart';
+import 'package:birdseye/widgets/matchformfields.dart';
 import 'package:birdseye/widgets/errorcontainer.dart';
 import 'package:birdseye/widgets/resetbutton.dart';
-import 'package:birdseye/widgets/ratingformfield.dart';
-import 'package:birdseye/widgets/stextformfield.dart';
-import 'package:birdseye/widgets/toggleformfield.dart';
 import 'package:flutter/material.dart';
 
 enum MatchScoutQuestionTypes { text, counter, toggle, slider }
@@ -91,55 +88,39 @@ class MatchScoutState extends State<MatchScout> {
                                               case MatchScoutQuestionTypes.text:
                                                 return STextFormField(
                                                   labelText: e2.key,
-                                                  onSaved: (content) {
-                                                    if (!_fields
-                                                        .containsKey(e1.key)) {
-                                                      _fields[e1.key] = {};
-                                                    }
-
-                                                    _fields[e1.key]![e2.key] =
-                                                        content;
-                                                  },
+                                                  onSaved: (content) =>
+                                                      (_fields[e1.key] =
+                                                              _fields[e1.key] ??
+                                                                  {})[e2.key] =
+                                                          content,
                                                 );
                                               case MatchScoutQuestionTypes
                                                   .counter:
                                                 return CounterFormField(
                                                     labelText: e2.key,
-                                                    onSaved: (content) {
-                                                      if (!_fields.containsKey(
-                                                          e1.key)) {
-                                                        _fields[e1.key] = {};
-                                                      }
-
-                                                      _fields[e1.key]![e2.key] =
-                                                          content;
-                                                    });
+                                                    onSaved: (content) =>
+                                                        (_fields[e1.key] =
+                                                            _fields[e1.key] ??
+                                                                {})[e2
+                                                            .key] = content);
                                               case MatchScoutQuestionTypes
                                                   .toggle:
                                                 return ToggleFormField(
                                                     labelText: e2.key,
-                                                    onSaved: (content) {
-                                                      if (!_fields.containsKey(
-                                                          e1.key)) {
-                                                        _fields[e1.key] = {};
-                                                      }
-
-                                                      _fields[e1.key]![e2.key] =
-                                                          content;
-                                                    });
+                                                    onSaved: (content) =>
+                                                        (_fields[e1.key] =
+                                                            _fields[e1.key] ??
+                                                                {})[e2
+                                                            .key] = content);
                                               case MatchScoutQuestionTypes
                                                   .slider:
                                                 return RatingFormField(
                                                   labelText: e2.key,
-                                                  onSaved: (content) {
-                                                    if (!_fields
-                                                        .containsKey(e1.key)) {
-                                                      _fields[e1.key] = {};
-                                                    }
-
-                                                    _fields[e1.key]![e2.key] =
-                                                        content?.toInt();
-                                                  },
+                                                  onSaved: (content) =>
+                                                      (_fields[e1.key] =
+                                                              _fields[e1.key] ??
+                                                                  {})[e2.key] =
+                                                          content,
                                                 );
                                             }
                                           }), growable: false)))
@@ -150,7 +131,14 @@ class MatchScoutState extends State<MatchScout> {
                               sliver: SliverToBoxAdapter(
                                   child: ElevatedButton(
                                       style: ButtonStyle(
-                                          enableFeedback: !_loading),
+                                          backgroundColor:
+                                              MaterialStateProperty.all(_loading
+                                                  ? Theme.of(context)
+                                                      .colorScheme
+                                                      .secondary
+                                                  : Theme.of(context)
+                                                      .colorScheme
+                                                      .primary)),
                                       onPressed: () {
                                         if (_loading) return;
                                         _fields.clear();
@@ -162,21 +150,24 @@ class MatchScoutState extends State<MatchScout> {
                                               curve: Curves.easeOutCubic);
                                           return;
                                         }
-                                        setState(() {
-                                          _loading = true;
-                                        });
+                                        setState(() => _loading = true);
                                         _formKey.currentState!.save();
-                                        var m = ScaffoldMessenger.of(context);
-                                        m.showSnackBar(const SnackBar(
-                                            duration: Duration(minutes: 5),
-                                            behavior: SnackBarBehavior.fixed,
-                                            elevation: 0,
-                                            padding: EdgeInsets.zero,
-                                            backgroundColor: Colors.transparent,
-                                            content: LinearProgressIndicator(
-                                              backgroundColor:
-                                                  Colors.transparent,
-                                            )));
+                                        ScaffoldMessengerState m =
+                                            ScaffoldMessenger.of(context)
+                                              ..showSnackBar(const SnackBar(
+                                                  duration:
+                                                      Duration(minutes: 5),
+                                                  behavior:
+                                                      SnackBarBehavior.fixed,
+                                                  elevation: 0,
+                                                  padding: EdgeInsets.zero,
+                                                  backgroundColor:
+                                                      Colors.transparent,
+                                                  content:
+                                                      LinearProgressIndicator(
+                                                    backgroundColor:
+                                                        Colors.transparent,
+                                                  )));
                                         postResponse(WebDataTypes.matchScout, {
                                           ..._fields,
                                           "teamNumber": _matchInfoKey
@@ -192,9 +183,7 @@ class MatchScoutState extends State<MatchScout> {
                                           _formKey.currentState!.reset();
                                           _matchInfoKey.currentState!.reset();
                                           m.hideCurrentSnackBar();
-                                          setState(() {
-                                            _loading = false;
-                                          });
+                                          setState(() => _loading = false);
                                           _scrollController.animateTo(0,
                                               duration:
                                                   const Duration(seconds: 1),
@@ -203,12 +192,11 @@ class MatchScoutState extends State<MatchScout> {
                                               content: Text(
                                                   "Response Sent! [${response.statusCode}]")));
                                         }).catchError((e) {
-                                          m.hideCurrentSnackBar();
-                                          setState(() {
-                                            _loading = false;
-                                          });
-                                          m.showSnackBar(SnackBar(
-                                              content: Text(e.toString())));
+                                          setState(() => _loading = false);
+                                          m
+                                            ..hideCurrentSnackBar()
+                                            ..showSnackBar(SnackBar(
+                                                content: Text(e.toString())));
                                         });
                                       },
                                       child: const Text("Submit"))))

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class ResetButton extends StatefulWidget {
   final Function() reset;
@@ -29,6 +30,7 @@ class _ResetButtonState extends State<ResetButton> {
                         child: const Text("Cancel")),
                     TextButton(
                         onPressed: () {
+                          HapticFeedback.mediumImpact();
                           Navigator.of(context).pop();
                           widget.reset();
                         },

@@ -62,14 +62,19 @@ final stock = Stock<WebDataTypes, Map<String, dynamic>>(
   sourceOfTruth: CachedSourceOfTruth(),
 );
 
-Future<Response> postResponse(
-    WebDataTypes dataType, Map<String, dynamic> body) {
+Future<Response> postResponse(WebDataTypes dataType, Map<String, dynamic> body,
+    {bool patch = false}) {
   switch (dataType) {
     case WebDataTypes.pitScout:
-      return client.post(
-          parseURI(
-              "/api/${SettingsState.season}/${prefs.getString('event')}/pit"),
-          body: json.encode(body));
+      return patch
+          ? client.patch(
+              parseURI(
+                  "/api/${SettingsState.season}/${prefs.getString('event')}/pit"),
+              body: json.encode(body))
+          : client.post(
+              parseURI(
+                  "/api/${SettingsState.season}/${prefs.getString('event')}/pit"),
+              body: json.encode(body));
     case WebDataTypes.matchScout:
       return client.post(
           parseURI(
@@ -78,18 +83,34 @@ Future<Response> postResponse(
   }
 }
 
-Future<bool> getStatus(String ip) {
-  return client
-      .get(parseURI("", ip: ip))
-      .then((resp) => resp.body == "BirdsEye Scouting Server Online!")
-      .onError((_, __) => false);
-}
+Future<bool> getStatus(String ip) => client
+    .get(parseURI("", ip: ip))
+    .then((resp) => resp.body == "BirdsEye Scouting Server Online!")
+    .onError((_, __) => false);
 
 Future<List<int>> pitScoutGetUnfilled() => client
-    .get(parseURI(
-        "api/bluealliance/${SettingsState.season}/${prefs.getString('event')}/*",
-        params: {"onlyUnfilled": "true"}))
-    .then((resp) => List<int>.from(json.decode(resp.body), growable: false));
+        .get(parseURI(
+            "api/bluealliance/${SettingsState.season}/${prefs.getString('event')}/*",
+            params: {"onlyUnfilled": "true"}))
+        .then((resp) => List<int>.from(json.decode(resp.body), growable: false))
+        .then((data) {
+      data.sort();
+      return data;
+    });
+
+Future<Map<String, String>> pitScoutGetMyResponse(int teamNumber) => client
+        .get(parseURI(
+            "api/${SettingsState.season}/${prefs.getString('event')}/pit",
+            params: {
+              "name": prefs.getString('name'),
+              "teamNumber": teamNumber.toString()
+            }))
+        .then((resp) => Map<String, dynamic>.from(json.decode(resp.body)[0]))
+        .then((data) {
+      data.removeWhere((k, v) =>
+          {"teamNumber", "name"}.contains(k) || v is! String || v.isEmpty);
+      return data.cast<String, String>();
+    });
 
 Future<List<String>> getTableList(int season) => client
     .get(parseURI("api/$season/tables"))
