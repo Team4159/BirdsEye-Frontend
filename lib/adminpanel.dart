@@ -80,7 +80,7 @@ class TableConfigDialog extends StatefulWidget {
       {super.key, required this.getSeason, this.onFinished});
 
   @override
-  State<StatefulWidget> createState() => TableConfigDialogState();
+  State<TableConfigDialog> createState() => TableConfigDialogState();
 }
 
 class TableConfigDialogState extends State<TableConfigDialog> {

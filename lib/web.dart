@@ -110,7 +110,7 @@ Future<Map<String, String>> pitScoutGetMyResponse(int teamNumber) => client
       data.removeWhere((k, v) =>
           {"teamNumber", "name"}.contains(k) || v is! String || v.isEmpty);
       return data.cast<String, String>();
-    });
+    }).catchError((e) => <String, String>{});
 
 Future<List<String>> getTableList(int season) => client
     .get(parseURI("api/$season/tables"))

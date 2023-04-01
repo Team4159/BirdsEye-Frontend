@@ -9,7 +9,7 @@ class Settings extends StatefulWidget {
   const Settings({super.key});
 
   @override
-  State<StatefulWidget> createState() => SettingsState();
+  State<Settings> createState() => SettingsState();
 }
 
 class SettingsState extends State<Settings> {
@@ -50,9 +50,7 @@ class SettingsState extends State<Settings> {
       },
     ).catchError((error) {
       if (mounted) {
-        setState(() {
-          _events = null;
-        });
+        setState(() => _events = null);
       } else {
         _events = null; // yeah whatever you deal with it
       }
@@ -128,15 +126,13 @@ class SettingsState extends State<Settings> {
                                                   milliseconds: 500),
                                               curve: Curves.easeOutCubic);
                                           var event = _events![i].key;
-                                          setState(() {
-                                            _events!.sort(
-                                              (a, b) => a.key == event
-                                                  ? -1
-                                                  : b.key == event
-                                                      ? 1
-                                                      : 0,
-                                            );
-                                          });
+                                          setState(() => _events!.sort(
+                                                (a, b) => a.key == event
+                                                    ? -1
+                                                    : b.key == event
+                                                        ? 1
+                                                        : 0,
+                                              ));
                                         },
                                         title: Text(
                                           _events![i].value,
@@ -186,7 +182,7 @@ class IPConfigField extends StatefulWidget {
   const IPConfigField({super.key});
 
   @override
-  State<StatefulWidget> createState() => IPConfigFieldState();
+  State<IPConfigField> createState() => IPConfigFieldState();
 }
 
 class IPConfigFieldState extends State<IPConfigField> {
@@ -207,9 +203,7 @@ class IPConfigFieldState extends State<IPConfigField> {
           controller: _controller,
           textCapitalization: TextCapitalization.none,
           onSubmitted: (content) {
-            setState(() {
-              _enabled = false;
-            });
+            setState(() => _enabled = false);
             getStatus(content).then((value) {
               if (value) {
                 prefs.setString("ip", content);
@@ -220,9 +214,7 @@ class IPConfigFieldState extends State<IPConfigField> {
                 ScaffoldMessenger.of(context)
                     .showSnackBar(const SnackBar(content: Text("Invalid IP!")));
               }
-              setState(() {
-                _enabled = true;
-              });
+              setState(() => _enabled = true);
             });
           },
         ),

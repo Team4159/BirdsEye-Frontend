@@ -12,12 +12,12 @@ class MatchScout extends StatefulWidget {
   const MatchScout({super.key});
 
   @override
-  State<StatefulWidget> createState() => MatchScoutState();
+  State<MatchScout> createState() => MatchScoutState();
 }
 
 class MatchScoutState extends State<MatchScout> {
-  final GlobalKey<FormState> _formKey = GlobalKey();
   final GlobalKey<MatchInfoFieldsState> _matchInfoKey = GlobalKey();
+  final GlobalKey<FormState> _formKey = GlobalKey();
   final ScrollController _scrollController = ScrollController();
   final Map<String, Map<String, dynamic>> _fields = {};
   bool _loading = false;
@@ -209,7 +209,7 @@ class MatchInfoFields extends StatefulWidget {
   const MatchInfoFields({super.key, required this.reset});
 
   @override
-  State<StatefulWidget> createState() => MatchInfoFieldsState();
+  State<MatchInfoFields> createState() => MatchInfoFieldsState();
 }
 
 class MatchInfoFieldsState extends State<MatchInfoFields> {
