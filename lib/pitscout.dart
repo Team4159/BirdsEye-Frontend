@@ -10,7 +10,7 @@ class PitScout extends StatefulWidget {
   const PitScout({super.key});
 
   @override
-  State<StatefulWidget> createState() => PitScoutState();
+  State<PitScout> createState() => PitScoutState();
 }
 
 class PitScoutState extends State<PitScout> {
@@ -19,7 +19,7 @@ class PitScoutState extends State<PitScout> {
   final Map<String, TextEditingController> _controllers = {};
   int? _teamNumber;
   bool _loading = false;
-  bool _dirty = false;
+  bool _editing = false;
 
   void reset() {
     for (final controller in _controllers.values) {
@@ -27,7 +27,7 @@ class PitScoutState extends State<PitScout> {
     }
     _teamNumberKey.currentState!.reload();
     _teamNumber = null;
-    _dirty = false;
+    _editing = false;
   }
 
   @override
@@ -67,7 +67,7 @@ class PitScoutState extends State<PitScout> {
                                         vals[entry.key]!;
                               }
                             }
-                            _dirty = true;
+                            _editing = true;
                           });
                         },
                         icon: const Icon(Icons.save_as),
@@ -166,7 +166,7 @@ class PitScoutState extends State<PitScout> {
                                       "teamNumber": _teamNumber,
                                       "name": prefs.getString("name")
                                     },
-                                    patch: _dirty)
+                                    patch: _editing)
                                 .then((response) {
                               if (response.statusCode >= 400) {
                                 throw Exception(
@@ -199,7 +199,8 @@ class PitScoutTeamNumberField extends StatefulWidget {
   const PitScoutTeamNumberField({super.key, required this.onSubmitted});
 
   @override
-  State<StatefulWidget> createState() => PitScoutTeamNumberFieldState();
+  State<PitScoutTeamNumberField> createState() =>
+      PitScoutTeamNumberFieldState();
 }
 
 class PitScoutTeamNumberFieldState extends State<PitScoutTeamNumberField> {
