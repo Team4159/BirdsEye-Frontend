@@ -5,6 +5,7 @@ import 'package:birdseye/widgets/errorcontainer.dart';
 import 'package:birdseye/widgets/resetbutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class PitScout extends StatefulWidget {
   const PitScout({super.key});
@@ -19,7 +20,6 @@ class PitScoutState extends State<PitScout> {
   final Map<String, TextEditingController> _controllers = {};
   int? _teamNumber;
   bool _loading = false;
-  bool _editing = false;
 
   void reset() {
     for (final controller in _controllers.values) {
@@ -27,7 +27,6 @@ class PitScoutState extends State<PitScout> {
     }
     _teamNumberKey.currentState!.reload();
     _teamNumber = null;
-    _editing = false;
   }
 
   @override
@@ -55,9 +54,22 @@ class PitScoutState extends State<PitScout> {
                             setState(() => _teamNumber = teamNumber)),
                     IconButton(
                         onPressed: () {
-                          if (_teamNumber == null ||
-                              prefs.getString("name") == null) return;
-                          pitScoutGetMyResponse(_teamNumber!).then((vals) {
+                          if (_teamNumber == null) return;
+                          Supabase.instance.client
+                              .from("${SettingsState.season}_pit")
+                              .select<Map<String, dynamic>?>()
+                              .eq("event", prefs.getString('event'))
+                              .eq("scouter",
+                                  Supabase.instance.client.auth.currentUser!.id)
+                              .eq("team", _teamNumber)
+                              .maybeSingle()
+                              .then((data) {
+                            data?.removeWhere((k, v) =>
+                                {"event", "scouter", "team"}.contains(k) ||
+                                v is! String ||
+                                v.isEmpty);
+                            return data?.cast<String, String>() ?? {};
+                          }).then((vals) {
                             for (final entry in _controllers.entries) {
                               if (vals[entry.key] != null &&
                                   !entry.value.text
@@ -67,16 +79,13 @@ class PitScoutState extends State<PitScout> {
                                         vals[entry.key]!;
                               }
                             }
-                            _editing = true;
                           });
                         },
                         icon: const Icon(Icons.save_as),
                         alignment: AlignmentDirectional.topStart,
                         tooltip: "Load Previous Responses",
-                        color: _teamNumber != null &&
-                                prefs.getString("name") != null
-                            ? Colors.green
-                            : Colors.grey),
+                        color:
+                            _teamNumber != null ? Colors.green : Colors.grey),
                     Expanded(
                         child: Align(
                       alignment: Alignment.centerRight,
@@ -158,29 +167,22 @@ class PitScoutState extends State<PitScout> {
                                         backgroundColor: Colors.transparent,
                                       )));
                             setState(() => _loading = true);
-                            postResponse(
-                                    WebDataTypes.pitScout,
-                                    {
-                                      ..._controllers.map((k, v) =>
-                                          MapEntry<String, String>(k, v.text)),
-                                      "teamNumber": _teamNumber,
-                                      "name": prefs.getString("name")
-                                    },
-                                    patch: _editing)
-                                .then((response) {
-                              if (response.statusCode >= 400) {
-                                throw Exception(
-                                    "Error ${response.statusCode}: ${response.body}");
-                              }
+                            Supabase.instance.client
+                                .from("${SettingsState.season}_pit")
+                                .upsert({
+                              ..._controllers.map((k, v) =>
+                                  MapEntry<String, String>(k, v.text)),
+                              "event": prefs.getString('event'),
+                              "team": _teamNumber
+                            }).then((response) {
                               reset();
                               m.hideCurrentSnackBar();
                               setState(() => _loading = false);
                               _scrollController.animateTo(0,
                                   duration: const Duration(seconds: 1),
                                   curve: Curves.easeInOutQuad);
-                              m.showSnackBar(SnackBar(
-                                  content: Text(
-                                      "Response Sent! [${response.statusCode}]")));
+                              m.showSnackBar(const SnackBar(
+                                  content: Text("Response Sent!")));
                             }).catchError((e) {
                               setState(() => _loading = false);
                               m

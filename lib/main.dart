@@ -1,11 +1,10 @@
-import 'package:birdseye/adminpanel.dart';
 import 'package:birdseye/matchscout.dart';
 import 'package:birdseye/pitscout.dart';
 import 'package:birdseye/settings.dart';
 import 'package:birdseye/web.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 const cardinalred = Color(0xffcf2e2e);
 final frcColors = {
@@ -15,10 +14,14 @@ final frcColors = {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   prefs = await SharedPreferences.getInstance();
-  if (prefs.getString("ip") == null) {
-    prefs.setString(
-        "ip", kDebugMode ? "127.0.0.1:5000" : "scouting.team4159.org");
-  }
+  await Supabase.initialize(
+    url: 'https://zcckkiwosxzupxblocff.supabase.co',
+    anonKey: const String.fromEnvironment('SUPABASE_KEY',
+        defaultValue:
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjY2traXdvc3h6dXB4YmxvY2ZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE2ODY4NDk3MzMsImV4cCI6MjAwMjQyNTczM30.IVIT9yIxQ9JiwbDB6v10ZI8eP7c1oQhwoWZejoODllQ"),
+  );
+  // await Supabase.instance.client.auth.signInWithOAuth(Provider.github,
+  //     authScreenLaunchMode: LaunchMode.externalNonBrowserApplication);
   runApp(
     MaterialApp(
       title: "Bird's Eye",
@@ -26,18 +29,14 @@ void main() async {
       routes: {
         "/matchscout": (BuildContext context) => const MatchScout(),
         "/pitscout": (BuildContext context) => const PitScout(),
-        "/": (BuildContext context) => MainScreen(),
-        "/admin": (BuildContext context) => const AdminPanel()
+        "/": (BuildContext context) => MainScreen()
       },
       color: cardinalred,
       themeMode: ThemeMode.system,
       darkTheme: ThemeData(
-        colorScheme: ColorScheme.dark(
-            primary: Colors.blue[600]!,
-            onPrimary: Colors.black,
-            secondary: Colors.grey[600]!,
-            secondaryContainer: const Color(0xff1C7C7C),
-            tertiaryContainer: const Color(0xffCF772E),
+        colorScheme: const ColorScheme.dark(
+            secondaryContainer: Color(0xff1C7C7C),
+            tertiaryContainer: Color(0xffCF772E),
             surface: cardinalred),
         inputDecorationTheme: InputDecorationTheme(
             fillColor: Colors.white12,
@@ -179,45 +178,7 @@ class MainScreen extends StatelessWidget {
           title: const Text("Configuration"),
         ),
         drawer: AppDrawer(),
-        body: Theme(
-            data: Theme.of(context).brightness == Brightness.light
-                ? ThemeData(
-                    textTheme: const TextTheme(
-                        bodyMedium: TextStyle(fontFamily: "Arial"),
-                        titleLarge: TextStyle(fontSize: 18)),
-                    inputDecorationTheme: Theme.of(context)
-                        .inputDecorationTheme
-                        .copyWith(
-                            focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .primary))),
-                  )
-                : ThemeData(
-                    colorScheme: ColorScheme.dark(primary: Colors.green[800]!),
-                    dividerColor: Colors.green[600],
-                    inputDecorationTheme: const InputDecorationTheme(
-                        enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.transparent))),
-                    textSelectionTheme:
-                        TextSelectionThemeData(cursorColor: Colors.green[900]),
-                    textTheme: const TextTheme(
-                        titleLarge: TextStyle(
-                            fontFamily: "OpenSans",
-                            fontSize: 16,
-                            fontWeight: FontWeight.w200),
-                        titleMedium: TextStyle(
-                            fontFamily: "RobotoMono",
-                            fontWeight: FontWeight.w900,
-                            fontSize: 16,
-                            letterSpacing: 1),
-                        bodyMedium: TextStyle(
-                          fontFamily: "Calibri",
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                        )).apply(bodyColor: Colors.green[700])),
-            child: Settings(key: _settingsKey)),
+        body: Settings(key: _settingsKey),
         floatingActionButton: IconButton(
             icon: const Icon(Icons.refresh_rounded),
             tooltip: "Refresh Cache",

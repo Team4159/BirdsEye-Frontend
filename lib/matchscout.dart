@@ -5,6 +5,7 @@ import 'package:birdseye/widgets/matchformfields.dart';
 import 'package:birdseye/widgets/errorcontainer.dart';
 import 'package:birdseye/widgets/resetbutton.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 enum MatchScoutQuestionTypes { text, counter, toggle, slider }
 
@@ -95,7 +96,7 @@ class MatchScoutState extends State<MatchScout> {
                                                           content,
                                                 );
                                               case MatchScoutQuestionTypes
-                                                  .counter:
+                                                    .counter:
                                                 return CounterFormField(
                                                     labelText: e2.key,
                                                     onSaved: (content) =>
@@ -104,7 +105,7 @@ class MatchScoutState extends State<MatchScout> {
                                                                 {})[e2
                                                             .key] = content);
                                               case MatchScoutQuestionTypes
-                                                  .toggle:
+                                                    .toggle:
                                                 return ToggleFormField(
                                                     labelText: e2.key,
                                                     onSaved: (content) =>
@@ -113,7 +114,7 @@ class MatchScoutState extends State<MatchScout> {
                                                                 {})[e2
                                                             .key] = content);
                                               case MatchScoutQuestionTypes
-                                                  .slider:
+                                                    .slider:
                                                 return RatingFormField(
                                                   labelText: e2.key,
                                                   onSaved: (content) =>
@@ -168,18 +169,17 @@ class MatchScoutState extends State<MatchScout> {
                                                     backgroundColor:
                                                         Colors.transparent,
                                                   )));
-                                        postResponse(WebDataTypes.matchScout, {
+                                        Supabase.instance.client
+                                            .from(
+                                                "${SettingsState.season}_match")
+                                            .insert({
                                           ..._fields,
-                                          "teamNumber": _matchInfoKey
+                                          "event": prefs.getString('event'),
+                                          "team": _matchInfoKey
                                               .currentState!.teamNumber,
                                           "match": _matchInfoKey
-                                              .currentState!.matchCode,
-                                          "name": prefs.getString("name")
+                                              .currentState!.matchCode
                                         }).then((response) {
-                                          if (response.statusCode >= 400) {
-                                            throw Exception(
-                                                "Error ${response.statusCode}: ${response.body}");
-                                          }
                                           _formKey.currentState!.reset();
                                           _matchInfoKey.currentState!.reset();
                                           m.hideCurrentSnackBar();
@@ -188,9 +188,8 @@ class MatchScoutState extends State<MatchScout> {
                                               duration:
                                                   const Duration(seconds: 1),
                                               curve: Curves.easeInOutQuad);
-                                          m.showSnackBar(SnackBar(
-                                              content: Text(
-                                                  "Response Sent! [${response.statusCode}]")));
+                                          m.showSnackBar(const SnackBar(
+                                              content: Text("Response Sent!")));
                                         }).catchError((e) {
                                           setState(() => _loading = false);
                                           m
