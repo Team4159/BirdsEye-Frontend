@@ -7,7 +7,20 @@ import 'package:birdseye/widgets/resetbutton.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-enum MatchScoutQuestionTypes { text, counter, toggle, slider }
+typedef MatchSchema = Map<String, Map<String, MatchScoutQuestionTypes>>;
+// Section: {Question: Type}
+
+enum MatchScoutQuestionTypes<T> {
+  text<String>(sqlType: "text"),
+  counter<int>(sqlType: "int2"),
+  toggle<bool>(sqlType: "bool"),
+  slider<double>(sqlType: "float4");
+
+  final String sqlType;
+  const MatchScoutQuestionTypes({required this.sqlType});
+  static fromSQLType(String s) =>
+      MatchScoutQuestionTypes.values.firstWhere((type) => type.sqlType == s);
+}
 
 class MatchScout extends StatefulWidget {
   const MatchScout({super.key});
@@ -37,7 +50,7 @@ class MatchScoutState extends State<MatchScout> {
                 )
               ],
           body: FutureBuilder(
-              future: stock.get(WebDataTypes.matchScout),
+              future: SupabaseInterface.matchSchema,
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return snapshot.hasError
@@ -83,9 +96,7 @@ class MatchScoutState extends State<MatchScout> {
                                           crossAxisSpacing: 10,
                                           children: List.from(
                                               e1.value.entries.map((e2) {
-                                            switch (MatchScoutQuestionTypes
-                                                .values
-                                                .byName(e2.value)) {
+                                            switch (e2.value) {
                                               case MatchScoutQuestionTypes.text:
                                                 return STextFormField(
                                                   labelText: e2.key,

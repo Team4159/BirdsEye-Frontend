@@ -166,6 +166,6 @@ class STextFormField extends TextFormField {
                 counterText: null,
                 border: const OutlineInputBorder(),
                 enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey[700]!)),
+                    borderSide: BorderSide(color: Colors.grey[700]!, width: 4)),
                 labelText: labelText));
 }

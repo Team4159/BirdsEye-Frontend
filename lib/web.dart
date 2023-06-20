@@ -5,8 +5,9 @@ import 'package:birdseye/matchscout.dart';
 import 'package:birdseye/settings.dart';
 import "package:http/http.dart" show Client;
 import 'package:stock/stock.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-final client = Client();
+final client = Client(); // TODO remove fully
 
 Uri parseURI(String path, {Map<String, dynamic>? params}) =>
     Uri.http("127.0.0.1", path, params);
@@ -34,29 +35,6 @@ final tbaStock = Stock<String, Map<String, String>>(
     }),
     sourceOfTruth: tbaSoT);
 
-enum WebDataTypes { pitScout, matchScout }
-
-final stock = Stock<WebDataTypes, Map<String, dynamic>>(
-  fetcher: Fetcher.ofFuture<WebDataTypes, Map<String, dynamic>>((dataType) {
-    switch (dataType) {
-      case WebDataTypes.pitScout:
-        return client
-            .get(parseURI("/api/${SettingsState.season}/pitschema"))
-            .then((resp) => json.decode(resp.body));
-      case WebDataTypes.matchScout:
-        return client
-            .get(parseURI("/api/${SettingsState.season}/matchschema"))
-            .then((resp) => Map.castFrom(json.decode(resp.body)))
-            .then((data) => data.map((k, v) => MapEntry<String, dynamic>(
-                k,
-                Map.fromEntries(v.entries.where((e) => MatchScoutQuestionTypes
-                    .values
-                    .any((element) => e.value == element.name))))));
-    }
-  }),
-  sourceOfTruth: CachedSourceOfTruth(),
-);
-
 Future<List<int>> pitScoutGetUnfilled() => client
         .get(parseURI(
             "api/bluealliance/${SettingsState.season}/${prefs.getString('event')}/*",
@@ -66,3 +44,34 @@ Future<List<int>> pitScoutGetUnfilled() => client
       data.sort();
       return data;
     });
+
+class SupabaseInterface {
+  static Future<bool> get canConnect => Supabase.instance.client
+      .rpc("getavailableseasons")
+      .then((_) => true)
+      .catchError((_) => false);
+
+  static final Stock<int, MatchSchema> _matchSchemaStock =
+      Stock<int, MatchSchema>(
+          fetcher: Fetcher.ofFuture((key) => Supabase.instance.client.rpc(
+                  'gettableschema',
+                  params: {"tablename": "${key}_match"}).then((resp) {
+                Map<String, String> raw = Map.castFrom(resp);
+                raw.removeWhere((key, value) =>
+                    {"event", "match", "team", "scouter"}.contains(key));
+                MatchSchema matchSchema = {};
+                for (MapEntry<String, String> s in raw.entries) {
+                  List<String> components = s.key.split(RegExp('[A-Z]'));
+                  if (matchSchema[components.first] == null) {
+                    matchSchema[components.first] = {};
+                  }
+                  matchSchema[components.first]![components.sublist(1).join()] =
+                      MatchScoutQuestionTypes.fromSQLType(s.value);
+                }
+                return matchSchema;
+              })),
+          sourceOfTruth: CachedSourceOfTruth());
+  static Future<MatchSchema> get matchSchema async => await canConnect
+      ? _matchSchemaStock.fresh(SettingsState.season)
+      : _matchSchemaStock.get(SettingsState.season);
+}

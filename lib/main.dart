@@ -3,6 +3,7 @@ import 'package:birdseye/pitscout.dart';
 import 'package:birdseye/settings.dart';
 import 'package:birdseye/web.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -20,8 +21,10 @@ void main() async {
         defaultValue:
             "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpjY2traXdvc3h6dXB4YmxvY2ZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE2ODY4NDk3MzMsImV4cCI6MjAwMjQyNTczM30.IVIT9yIxQ9JiwbDB6v10ZI8eP7c1oQhwoWZejoODllQ"),
   );
-  // await Supabase.instance.client.auth.signInWithOAuth(Provider.github,
-  //     authScreenLaunchMode: LaunchMode.externalNonBrowserApplication);
+  if (Supabase.instance.client.auth.currentUser == null) {
+    await Supabase.instance.client.auth.signInWithOAuth(Provider.github,
+        authScreenLaunchMode: LaunchMode.externalNonBrowserApplication);
+  }
   runApp(
     MaterialApp(
       title: "Bird's Eye",
@@ -126,46 +129,134 @@ class AppDrawer extends Builder {
       : super(
             builder: (context) => Drawer(
                 width: 200,
-                child: Column(
-                  children: [
-                    const SizedBox(
-                        height: 75,
-                        child: DrawerHeader(
-                            margin: EdgeInsets.zero,
-                            padding: EdgeInsets.only(top: 10),
-                            child: Text(
-                              "Bird's Eye",
-                              style: TextStyle(
-                                  fontFamily: "HemiHead",
-                                  fontSize: 32,
-                                  color: cardinalred),
-                            ))),
-                    ListTile(
-                      title: Text(
-                        "Configuration",
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      onTap: () => Navigator.of(context)
-                          .pushReplacement(_createRoute(MainScreen())),
+                child: Column(children: [
+                  const SizedBox(
+                      height: 75,
+                      child: DrawerHeader(
+                          margin: EdgeInsets.zero,
+                          padding: EdgeInsets.only(top: 10),
+                          child: Text(
+                            "Bird's Eye",
+                            style: TextStyle(
+                                fontFamily: "HemiHead",
+                                fontSize: 32,
+                                color: cardinalred),
+                          ))),
+                  ListTile(
+                    title: Text(
+                      "Configuration",
+                      style: Theme.of(context).textTheme.titleLarge,
                     ),
-                    ListTile(
-                      title: Text(
-                        "Match Scouting",
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      onTap: () => Navigator.of(context)
-                          .pushReplacement(_createRoute(const MatchScout())),
+                    onTap: () => Navigator.of(context)
+                        .pushReplacement(_createRoute(MainScreen())),
+                  ),
+                  ListTile(
+                    title: Text(
+                      "Match Scouting",
+                      style: Theme.of(context).textTheme.titleLarge,
                     ),
-                    ListTile(
-                      title: Text(
-                        "Pit Scouting",
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      onTap: () => Navigator.of(context)
-                          .pushReplacement(_createRoute(const PitScout())),
-                    )
-                  ],
-                )));
+                    onTap: () => Navigator.of(context)
+                        .pushReplacement(_createRoute(const MatchScout())),
+                  ),
+                  ListTile(
+                    title: Text(
+                      "Pit Scouting",
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    onTap: () => Navigator.of(context)
+                        .pushReplacement(_createRoute(const PitScout())),
+                  ),
+                  Expanded(
+                      child: Align(
+                          alignment: Alignment.bottomLeft,
+                          child: GestureDetector(
+                              onLongPress:
+                                  () =>
+                                      Supabase.instance.client.auth.currentUser ==
+                                              null
+                                          ? null
+                                          : showDialog(
+                                              context: context,
+                                              builder:
+                                                  (BuildContext context) =>
+                                                      FutureBuilder(
+                                                          future: Supabase
+                                                              .instance.client
+                                                              .from("users")
+                                                              .select<Map<String, dynamic>?>(
+                                                                  'name, team')
+                                                              .eq(
+                                                                  'id',
+                                                                  Supabase
+                                                                          .instance
+                                                                          .client
+                                                                          .auth
+                                                                          .currentUser
+                                                                          ?.id ??
+                                                                      "0")
+                                                              .maybeSingle(),
+                                                          builder: (context,
+                                                              snapshot) {
+                                                            if (!snapshot
+                                                                .hasData) {
+                                                              return const Center(
+                                                                  child:
+                                                                      CircularProgressIndicator());
+                                                            }
+                                                            GlobalKey<FormState>
+                                                                formKey =
+                                                                GlobalKey();
+                                                            String name =
+                                                                snapshot.data![
+                                                                    'name'];
+                                                            int team = snapshot
+                                                                .data!['team'];
+                                                            return FractionallySizedBox(
+                                                                heightFactor:
+                                                                    1 / 2,
+                                                                child: Dialog(
+                                                                    child: Padding(
+                                                                        padding: const EdgeInsets.all(15),
+                                                                        child: Form(
+                                                                            key: formKey,
+                                                                            child: Column(children: [
+                                                                              Text("Modify User Info", textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleLarge),
+                                                                              TextFormField(
+                                                                                initialValue: name,
+                                                                                decoration: const InputDecoration(labelText: "Name"),
+                                                                                onSaved: (String? value) => name = value ?? "User",
+                                                                              ),
+                                                                              TextFormField(
+                                                                                initialValue: team.toString(),
+                                                                                decoration: const InputDecoration(labelText: "Team", counterText: ""),
+                                                                                inputFormatters: [
+                                                                                  FilteringTextInputFormatter.digitsOnly
+                                                                                ],
+                                                                                maxLength: 4,
+                                                                                onSaved: (String? value) => team = int.parse(value ?? "0"),
+                                                                              ),
+                                                                              Expanded(
+                                                                                  child: Align(
+                                                                                      alignment: Alignment.bottomCenter,
+                                                                                      child: ElevatedButton(
+                                                                                          onPressed: () {
+                                                                                            formKey.currentState!.save();
+                                                                                            if (name == snapshot.data!['name'] && team == snapshot.data!['team']) return;
+                                                                                            Supabase.instance.client.from("users").update(<String, dynamic>{"name": name, "team": team}).eq("id", Supabase.instance.client.auth.currentUser!.id).then((_) => Navigator.of(context).pop()).catchError((e) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())))); // FIXME doesnt update
+                                                                                          },
+                                                                                          child: const Text("Submit"))))
+                                                                            ])))));
+                                                          })),
+                              child: UserAccountsDrawerHeader(
+                                  margin:
+                                      const EdgeInsets.only(top: 15, bottom: 0),
+                                  decoration:
+                                      const BoxDecoration(color: cardinalred),
+                                  currentAccountPicture:
+                                      Icon(Supabase.instance.client.auth.currentUser == null ? Icons.person_off_outlined : Icons.person, size: 64),
+                                  accountName: FutureBuilder(future: Supabase.instance.client.from("users").select<Map<String, dynamic>?>('name, team').eq('id', Supabase.instance.client.auth.currentUser?.id ?? "0").maybeSingle(), builder: (context, snapshot) => !snapshot.hasData ? const Text("No User") : Text("${snapshot.data!['name']}\nTeam ${snapshot.data!['team']}")),
+                                  accountEmail: Text(Supabase.instance.client.auth.currentUser?.email ?? "No Email")))))
+                ])));
 }
 
 class MainScreen extends StatelessWidget {
@@ -183,7 +274,6 @@ class MainScreen extends StatelessWidget {
             icon: const Icon(Icons.refresh_rounded),
             tooltip: "Refresh Cache",
             onPressed: () {
-              stock.clearAll();
               tbaStock.clearAll();
               _settingsKey.currentState!.reload();
             }),

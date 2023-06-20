@@ -7,6 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+typedef PitSchema = Map<String, String>;
+// ID: Question
+
 class PitScout extends StatefulWidget {
   const PitScout({super.key});
 
@@ -34,7 +37,9 @@ class PitScoutState extends State<PitScout> {
       appBar: AppBar(title: const Text("Pit Scouting")),
       drawer: AppDrawer(),
       body: FutureBuilder(
-          future: stock.get(WebDataTypes.pitScout),
+          future: Future.value({
+            "commentsGeneric": "Comments Generic" // TODO figure out pit stuff
+          }), //stock.get(WebDataTypes.pitScout)
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
               return snapshot.hasError
