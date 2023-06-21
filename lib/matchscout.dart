@@ -33,7 +33,7 @@ class MatchScoutState extends State<MatchScout> {
   final GlobalKey<MatchInfoFieldsState> _matchInfoKey = GlobalKey();
   final GlobalKey<FormState> _formKey = GlobalKey();
   final ScrollController _scrollController = ScrollController();
-  final Map<String, Map<String, dynamic>> _fields = {};
+  final Map<String, dynamic> _fields = {};
   bool _loading = false;
 
   @override
@@ -42,9 +42,9 @@ class MatchScoutState extends State<MatchScout> {
       body: NestedScrollView(
           controller: _scrollController,
           headerSliverBuilder: (context, innerBoxIsScrolled) => [
-                const SliverAppBar(
-                  title: Text("Match Scouting"),
-                  centerTitle: false,
+                SliverAppBar(
+                  title: const Text("Match Scouting"),
+                  centerTitle: Theme.of(context).appBarTheme.centerTitle,
                   floating: true,
                   snap: true,
                 )
@@ -99,41 +99,31 @@ class MatchScoutState extends State<MatchScout> {
                                             switch (e2.value) {
                                               case MatchScoutQuestionTypes.text:
                                                 return STextFormField(
-                                                  labelText: e2.key,
-                                                  onSaved: (content) =>
-                                                      (_fields[e1.key] =
-                                                              _fields[e1.key] ??
-                                                                  {})[e2.key] =
-                                                          content,
-                                                );
+                                                    labelText: e2.key,
+                                                    onSaved: (content) => _fields[
+                                                            "${e1.key}_${e2.key}"] =
+                                                        content);
                                               case MatchScoutQuestionTypes
                                                     .counter:
                                                 return CounterFormField(
                                                     labelText: e2.key,
-                                                    onSaved: (content) =>
-                                                        (_fields[e1.key] =
-                                                            _fields[e1.key] ??
-                                                                {})[e2
-                                                            .key] = content);
+                                                    onSaved: (content) => _fields[
+                                                            "${e1.key}_${e2.key}"] =
+                                                        content);
                                               case MatchScoutQuestionTypes
                                                     .toggle:
                                                 return ToggleFormField(
                                                     labelText: e2.key,
-                                                    onSaved: (content) =>
-                                                        (_fields[e1.key] =
-                                                            _fields[e1.key] ??
-                                                                {})[e2
-                                                            .key] = content);
+                                                    onSaved: (content) => _fields[
+                                                            "${e1.key}_${e2.key}"] =
+                                                        content);
                                               case MatchScoutQuestionTypes
                                                     .slider:
                                                 return RatingFormField(
-                                                  labelText: e2.key,
-                                                  onSaved: (content) =>
-                                                      (_fields[e1.key] =
-                                                              _fields[e1.key] ??
-                                                                  {})[e2.key] =
-                                                          content,
-                                                );
+                                                    labelText: e2.key,
+                                                    onSaved: (content) => _fields[
+                                                            "${e1.key}_${e2.key}"] =
+                                                        content);
                                             }
                                           }), growable: false)))
                                 ]))
@@ -142,15 +132,6 @@ class MatchScoutState extends State<MatchScout> {
                               padding: const EdgeInsets.all(10),
                               sliver: SliverToBoxAdapter(
                                   child: ElevatedButton(
-                                      style: ButtonStyle(
-                                          backgroundColor:
-                                              MaterialStateProperty.all(_loading
-                                                  ? Theme.of(context)
-                                                      .colorScheme
-                                                      .secondary
-                                                  : Theme.of(context)
-                                                      .colorScheme
-                                                      .primary)),
                                       onPressed: () {
                                         if (_loading) return;
                                         _fields.clear();
@@ -202,14 +183,24 @@ class MatchScoutState extends State<MatchScout> {
                                           m.showSnackBar(const SnackBar(
                                               content: Text("Response Sent!")));
                                         }).catchError((e) {
+                                          debugPrint(e.toString());
                                           setState(() => _loading = false);
                                           m
                                             ..hideCurrentSnackBar()
                                             ..showSnackBar(SnackBar(
-                                                content: Text(e.toString())));
+                                                content: Text(
+                                                    e is PostgrestException
+                                                        ? e.message
+                                                        : e.toString())));
                                         });
                                       },
-                                      child: const Text("Submit"))))
+                                      child: _loading
+                                          ? const LinearProgressIndicator()
+                                          : Text("Submit",
+                                              style: TextStyle(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onPrimary)))))
                         ]).toList()));
               })));
 }
