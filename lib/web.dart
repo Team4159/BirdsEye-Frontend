@@ -20,8 +20,6 @@ Future getJson(String path) => !prefs.containsKey("tbaKey")
 
 final tbaRegex = RegExp(
     r"^(?<season>\d{4})(?:(?<event>[a-z0-9]{2,})(?:_(?<match>(?:qm\d+?)|(?:(?:qf|sf|f)\dm\d)|\*))?)?$");
-final CachedSourceOfTruth<String, Map<String, String>> tbaSoT =
-    CachedSourceOfTruth();
 final tbaStock = Stock<String, Map<String, String>>(
     fetcher: Fetcher.ofFuture<String, Map<String, String>>((String key) async {
       RegExpMatch? rm = tbaRegex.firstMatch(key);
@@ -72,7 +70,7 @@ final tbaStock = Stock<String, Map<String, String>>(
         return o;
       }
     }),
-    sourceOfTruth: tbaSoT);
+    sourceOfTruth: CachedSourceOfTruth());
 
 Future<List<int>> pitScoutGetUnfilled() => tbaStock
         .get("${SettingsState.season}${prefs.getString('event')}_*")
@@ -85,7 +83,6 @@ Future<List<int>> pitScoutGetUnfilled() => tbaStock
           .then((value) => value.map((e) => int.parse(e['team'])).toSet());
       return teams.difference(filledteams).toList()..sort();
     });
-// TODO: Fix postgres validation
 
 class SupabaseInterface {
   static Future<bool> get canConnect => Supabase.instance.client

@@ -2,8 +2,8 @@ import 'package:birdseye/matchscout.dart';
 import 'package:birdseye/pitscout.dart';
 import 'package:birdseye/settings.dart';
 import 'package:birdseye/web.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -31,7 +31,8 @@ void main() async {
   });
   if (!UserDetails.isAuthenticated) {
     await Supabase.instance.client.auth.signInWithOAuth(Provider.github,
-        authScreenLaunchMode: LaunchMode.externalNonBrowserApplication);
+        authScreenLaunchMode: LaunchMode.externalNonBrowserApplication,
+        redirectTo: kDebugMode ? "http://localhost:50920" : null);
   } else {
     UserDetails.update();
   }
@@ -63,7 +64,7 @@ void main() async {
               progressIndicatorTheme: const ProgressIndicatorThemeData(
                   linearTrackColor: Colors.transparent,
                   refreshBackgroundColor: Colors.transparent)),
-          Typography.whiteHelsinki.merge(Typography.englishLike2021).apply(bodyColor: Colors.white, displayColor: Colors.grey[300], fontFamilyFallback: ["Arial", "Calibri"]).copyWith(
+          Typography.whiteHelsinki.merge(Typography.englishLike2021).copyWith(
               titleLarge: const TextStyle(fontFamily: "Verdana"),
               displaySmall: const TextStyle(fontFamily: "OpenSans"),
               displayMedium: const TextStyle(
@@ -83,9 +84,19 @@ void main() async {
                   secondaryContainer: const Color(0xff1C7C7C),
                   tertiaryContainer: const Color(0xffCF772E),
                   surface: cardinalred)),
-          Typography.blackCupertino
-              .merge(Typography.englishLike2021)
-              .apply(bodyColor: Colors.black, displayColor: Colors.white, fontFamilyFallback: ["Arial", "Calibri"]).copyWith(titleLarge: const TextStyle(fontFamily: "Verdana"), displaySmall: const TextStyle(fontFamily: "OpenSans"), displayMedium: const TextStyle(fontFamily: "VarelaRound", letterSpacing: 2, fontSize: 48)))));
+          Typography.blackCupertino.merge(Typography.englishLike2021).apply(
+              bodyColor: Colors.black,
+              displayColor: Colors.white,
+              fontFamilyFallback: [
+                "Arial",
+                "Calibri"
+              ]).copyWith(
+              titleLarge: const TextStyle(fontFamily: "Verdana"),
+              displaySmall: const TextStyle(fontFamily: "OpenSans"),
+              displayMedium: const TextStyle(
+                  fontFamily: "VarelaRound",
+                  letterSpacing: 2,
+                  fontSize: 48)))));
 }
 
 late SharedPreferences prefs;
@@ -134,128 +145,18 @@ class AppDrawer extends Builder {
                       child: Align(
                           alignment: Alignment.bottomLeft,
                           child: GestureDetector(
-                              onLongPress: () => !UserDetails.isAuthenticated
-                                  ? null
-                                  : showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        GlobalKey<FormState> formKey =
-                                            GlobalKey();
-                                        String name = UserDetails.name;
-                                        int team = UserDetails.team;
-                                        return FractionallySizedBox(
-                                            heightFactor: 0.6,
-                                            child: Dialog(
-                                                child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            15),
-                                                    child: Form(
-                                                        key: formKey,
-                                                        child: Column(
-                                                            children: [
-                                                              Text(
-                                                                  "Modify User Info",
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                  style: Theme.of(
-                                                                          context)
-                                                                      .textTheme
-                                                                      .titleLarge),
-                                                              TextFormField(
-                                                                initialValue:
-                                                                    name,
-                                                                decoration:
-                                                                    const InputDecoration(
-                                                                        labelText:
-                                                                            "Name"),
-                                                                onSaved: (String?
-                                                                        value) =>
-                                                                    name = value ??
-                                                                        "User",
-                                                              ),
-                                                              TextFormField(
-                                                                initialValue: team
-                                                                    .toString(),
-                                                                decoration: const InputDecoration(
-                                                                    labelText:
-                                                                        "Team",
-                                                                    counterText:
-                                                                        ""),
-                                                                inputFormatters: [
-                                                                  FilteringTextInputFormatter
-                                                                      .digitsOnly
-                                                                ],
-                                                                maxLength: 4,
-                                                                onSaved: (String?
-                                                                        value) =>
-                                                                    team = int.parse(
-                                                                        value ??
-                                                                            "0"),
-                                                              ),
-                                                              TextFormField(
-                                                                initialValue: prefs
-                                                                    .getString(
-                                                                        "tbaKey"),
-                                                                decoration: const InputDecoration(
-                                                                    labelText:
-                                                                        "TBA API Key",
-                                                                    counterText:
-                                                                        ""),
-                                                                maxLength: 65,
-                                                                validator: (value) =>
-                                                                    (value?.length ??
-                                                                                0) !=
-                                                                            65
-                                                                        ? "Wrong Length"
-                                                                        : null,
-                                                                onSaved: (String?
-                                                                        value) =>
-                                                                    prefs.setString(
-                                                                        "tbaKey",
-                                                                        value ??
-                                                                            ""),
-                                                              ),
-                                                              Expanded(
-                                                                  child: Align(
-                                                                      alignment:
-                                                                          Alignment
-                                                                              .bottomCenter,
-                                                                      child: ElevatedButton(
-                                                                          onPressed: () {
-                                                                            formKey.currentState!.save();
-                                                                            Supabase
-                                                                                .instance.client
-                                                                                .from(
-                                                                                    "users")
-                                                                                .update(<String, dynamic>{
-                                                                                  "name": name,
-                                                                                  "team": team
-                                                                                })
-                                                                                .eq("id", UserDetails.id)
-                                                                                .then((_) {
-                                                                                  Navigator.of(context).pop();
-                                                                                  UserDetails.update();
-                                                                                })
-                                                                                .catchError((e) {
-                                                                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
-                                                                                }); // FIXME doesnt update
-                                                                          },
-                                                                          child: const Text("Submit"))))
-                                                            ])))));
-                                      }),
+                              onLongPress: () => UserDetails.isAuthenticated
+                                  ? Settings.showConfigDialog(context)
+                                  : null,
                               child: UserAccountsDrawerHeader(
                                   margin:
                                       const EdgeInsets.only(top: 15, bottom: 0),
-                                  decoration:
-                                      const BoxDecoration(color: cardinalred),
                                   currentAccountPicture: Icon(
                                       UserDetails.isAuthenticated
                                           ? Icons.person
                                           : Icons.person_off_outlined,
                                       size: 64),
-                                  accountName: Text(UserDetails.name),
+                                  accountName: Text(UserDetails.name ?? "User"),
                                   accountEmail:
                                       Text("Team ${UserDetails.team}")))))
                 ])));
@@ -276,7 +177,10 @@ class MainScreen extends StatelessWidget {
             icon: const Icon(Icons.refresh_rounded),
             tooltip: "Refresh Cache",
             onPressed: () {
-              tbaStock.clearAll();
+              tbaStock
+                  .fresh("")
+                  .then((_) => tbaStock.clearAll())
+                  .catchError((_) {}); // only clear cache if tba is reachable
               _settingsKey.currentState!.reload();
             }),
       );
